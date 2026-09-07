@@ -13,6 +13,10 @@ This repository maintains a Coding Agent workflow for product managers working o
 5. Report product-manager acceptance and machine verification separately.
 6. Check `docs/open-source-boundary.md` before every contribution.
 
+## Merge authority
+
+Follow `docs/maintenance-policy.md`. Low-risk and medium-risk changes may be merged after the documented validation without waiting for manual approval. High-risk changes require the product owner's explicit approval before merge.
+
 ## Completion report
 
 State the result, changed files, validation performed, pending questions, and material risks.
