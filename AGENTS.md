@@ -20,4 +20,3 @@ Follow `docs/maintenance-policy.md`. Low-risk and medium-risk changes may be mer
 ## Completion report
 
 State the result, changed files, validation performed, pending questions, and material risks.
-

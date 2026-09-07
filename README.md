@@ -148,5 +148,3 @@ cd PM-product-workflow
 ## License
 
 原创内容计划采用 [MIT License](LICENSE)。第三方依赖和资产遵循各自许可证。
-
-
