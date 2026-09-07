@@ -1,28 +1,44 @@
-# Open-source boundary
+# 开源边界
 
-## What may be published
+本文件是公开内容红线。修改本文件属于高风险，必须由产品负责人确认。无法判断能否公开时，默认不公开。
 
-- Original workflow methods, templates, scripts, and documentation.
-- Fully fictional examples created specifically for this repository.
-- Design guidance rewritten as general principles with a clear source and compatible license.
-- Third-party dependencies and assets whose licenses allow the intended use.
+> 学习真实项目，但不发布真实项目；提炼模式，不搬运内容。
 
-## What must stay outside the repository
+## 允许公开
 
-- Real project source code, screenshots, prototypes, exports, and delivery packages.
-- Client, organization, employee, applicant, or citizen names and data.
-- Internal policies, business rules, procurement materials, contracts, and unpublished documents.
-- Production APIs, URLs, servers, database details, accounts, tokens, keys, and credentials.
-- Local absolute paths, Coding Agent conversation exports, private handoffs, and internal extraction notes.
-- Assets whose ownership or redistribution permission cannot be confirmed.
+- 为本仓库原创的方法、模板、Skill、脚本和文档。
+- 专门为教学重新创作的完全虚构案例、机构、人员和数据。
+- 重新表述的通用设计原则，并注明适用场景和可用来源。
+- 许可证明确允许当前用途的第三方依赖和资产，并保留必要声明。
 
-Renaming people, organizations, fields, or modules does not make real project material safe to publish. Public examples must be written again from a fictional scenario.
+## 禁止公开
 
-## Required review before publishing
+- 真实项目源码、截图、原型、导出文件、交付包和 Git 历史。
+- 真实客户、单位、部门、人员、岗位、联系方式和组织关系。
+- 真实业务数据、台账、办件记录、内部政策、业务规则、会议和确认记录。
+- 生产接口、域名、服务器、网络、数据库、账号、令牌、密钥、证书和环境配置。
+- 本机或服务器绝对路径、Coding Agent 对话导出、内部交接和私有提炼记录。
+- 无法确认所有权、许可证或再分发权限的第三方文档、代码、字体、图片和组件。
 
-1. A product owner reviews business confidentiality, identifiability, and copyright.
-2. Automated checks scan for local paths, identifiers, internal addresses, personal-data patterns, and generated archives.
-3. A secret scanner checks tokens, keys, and credentials.
-4. The pull request states the source, authorization status, and validation evidence for any external asset.
+替换名称、字段或机构不能使真实材料变成可公开内容。多条信息组合后能够反推出真实项目时，同样禁止。
 
-If evidence is insufficient, mark the item as pending and keep it out of the public branch.
+## 真实经验提炼流程
+
+```text
+真实工作区 → 仓库外私有提炼 → 全新公开改写 → 人工复核 → 自动检查 → 公开候选
+```
+
+- 真实材料和私有词表始终位于公开仓库目录之外。
+- 公开案例重新设计情境、流程、字段、数据和界面，不映射真实模块。
+- 无法在不携带真实细节的前提下抽象时，放弃公开该内容。
+- 教学错误必须明确为虚构用例，不伪称真实事故或项目历史。
+
+## 发布前检查
+
+1. 产品负责人检查保密性、组合可识别性、版权和授权。
+2. 本地脚本检查绝对路径、凭据特征、个人信息格式和禁入文件。
+3. 推送前检查待提交文件、Git 差异和实际打包清单。
+4. PR 检查再次执行，但 CI 不能替代本地检查，因为公开上传无法由后续删除完全撤回。
+5. 外部资产在 PR 中说明来源、许可证和验证结果。
+
+扫描通过只说明已定义模式未命中，不代表业务保密、权属或政策审查通过。证据不足时标记待确认并保持在公开分支之外。

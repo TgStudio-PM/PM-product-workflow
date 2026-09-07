@@ -85,11 +85,11 @@ ERROR_LEDGER.md
 ## 快速开始
 
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/TgStudio-PM/PM-product-workflow.git
 cd PM-product-workflow
 ```
 
-1. 阅读 `docs/open-source-boundary.md`。
+1. 阅读根目录 `AGENTS.md` 及其指定的项目宪章、开源边界和当前状态。
 2. 复制 `templates/` 中的项目与模块模板。
 3. 在 `DESIGN_PROFILE.md` 中选择 `gov-enterprise-cn` 或填写自己的规范。
 4. 让 Coding Agent 先读取项目事实，再开始需求分析或原型修改。首版示例使用 Codex。
@@ -106,6 +106,21 @@ cd PM-product-workflow
 【下一步】
 【禁止事项】
 ```
+
+## 维护与接力
+
+本仓库自身采用同一套 Repository as Memory 方法：
+
+- [项目宪章](docs/project-charter.md)保存长期定位与 Non-Goals。
+- [开源边界](docs/open-source-boundary.md)规定允许和禁止公开的内容。
+- [治理规则](docs/governance-rules.md)处理上下文、冲突、同步、ADR 和错误。
+- [分级维护规则](docs/maintenance-policy.md)规定合并权限。
+- [接力维护流程](docs/maintainer-workflow.md)规定新任务、验证、中断和换会话流程。
+- [当前状态](docs/current.md)提供稳定基线、进行中工作和下一步。
+
+不自动读取 `AGENTS.md` 的 Coding Agent，可以使用：
+
+> 读取根目录 AGENTS.md，按规定加载当前项目状态；核对关联 Issue、PR、分支差异和最近接力块，再从“下一步”继续。不得把历史聊天当作未落盘事实。
 
 ## 事实与冲突
 
@@ -133,6 +148,7 @@ cd PM-product-workflow
 ## 路线图
 
 - [x] 建立 README、开源边界和基础目录
+- [x] 建立长期治理、分级维护和接力协议
 - [ ] 发布虚构案例第 1 轮与 `pm-prototype-packager`
 - [ ] 发布案例第 2 轮与 `pm-prototype-handover`
 - [ ] 发布案例第 3 轮与 `pm-prototype-memory`
