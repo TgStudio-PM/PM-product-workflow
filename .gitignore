@@ -1,0 +1,20 @@
+# Local and generated files
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.zip
+
+# Dependencies and build output
+node_modules/
+dist/
+build/
+coverage/
+
+# Editors and local agent state
+.idea/
+.vscode/
+.env
+.env.*
+!.env.example
+.codex/
