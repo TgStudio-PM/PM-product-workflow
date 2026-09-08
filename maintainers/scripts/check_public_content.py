@@ -15,12 +15,12 @@ from pathlib import Path
 REQUIRED_FILES = (
     "AGENTS.md",
     "README.md",
-    "docs/project-charter.md",
-    "docs/open-source-boundary.md",
-    "docs/governance-rules.md",
-    "docs/maintenance-policy.md",
-    "docs/maintainer-workflow.md",
-    "docs/current.md",
+    "maintainers/PROJECT_CHARTER.md",
+    "maintainers/OPEN_SOURCE_BOUNDARY.md",
+    "maintainers/GOVERNANCE.md",
+    "maintainers/MAINTENANCE_POLICY.md",
+    "maintainers/WORKFLOW.md",
+    "maintainers/CURRENT.md",
 )
 
 TEXT_SUFFIXES = {
@@ -45,15 +45,15 @@ PATTERNS = (
 HIGH_RISK_PATHS = {
     "AGENTS.md",
     "LICENSE",
-    "docs/project-charter.md",
-    "docs/open-source-boundary.md",
-    "docs/governance-rules.md",
-    "docs/maintenance-policy.md",
-    "docs/maintainer-workflow.md",
+    "maintainers/PROJECT_CHARTER.md",
+    "maintainers/OPEN_SOURCE_BOUNDARY.md",
+    "maintainers/GOVERNANCE.md",
+    "maintainers/MAINTENANCE_POLICY.md",
+    "maintainers/WORKFLOW.md",
     ".github/pull_request_template.md",
 }
-HIGH_RISK_PREFIXES = (".github/workflows/", "scripts/check_public_content.py")
-MEDIUM_RISK_PREFIXES = (".agents/skills/", "examples/", "profiles/", "templates/")
+HIGH_RISK_PREFIXES = (".github/workflows/", "maintainers/scripts/check_public_content.py")
+MEDIUM_RISK_PREFIXES = (".agents/skills/", "docs/product/", "examples/", "profiles/", "templates/")
 README_HIGH_RISK_TERMS = ("定位", "使命", "开源边界", "license", "自动合并", "维护规则")
 
 

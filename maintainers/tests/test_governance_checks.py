@@ -6,8 +6,8 @@ import unittest
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "scripts"))
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "maintainers" / "scripts"))
 
 from check_markdown_links import check_file  # noqa: E402
 from check_public_content import scan_text  # noqa: E402

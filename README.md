@@ -2,12 +2,22 @@
 
 **面向政务与复杂 B 端产品经理的 Coding Agent 原型迭代、上下文治理与交付工作流。**
 
-它把需求、业务规则、原型、评审、验证和交接放进同一个仓库，让产品经理与开发者可以在多轮 Coding Agent 协作中持续维护同一份项目事实。
+它把需求、业务规则、原型、评审、验证和交接沉淀在项目仓库中，让产品经理与开发者在多轮 Coding Agent 协作中持续维护同一份事实。
 
 > Repository is memory. Conversation is working context.  
 > 仓库保存经过确认的项目事实，对话承载当前工作上下文。
 
-**当前状态：v0.1 开发中。** 首版将提供模板、3 个核心 Skill、1 个政务/复杂 B 端预设，以及一个经过 3 轮迭代的可运行虚构案例。
+## 选择入口
+
+### 使用产品工作流
+
+如果你想把这套方法用于自己的产品项目，从[产品工作流指南](docs/product/README.md)开始，然后复制 `templates/` 并选择 `profiles/` 中的设计预设。
+
+普通使用者不需要读取根目录 `AGENTS.md` 或 `maintainers/`；它们只负责维护本开源仓库。
+
+### 参与维护本仓库
+
+如果你要修改 PM-product-workflow 本身，先读取[仓库维护入口](AGENTS.md)和[贡献指南](CONTRIBUTING.md)。仓库状态、边界、风险分级、决策和检查工具集中在 `maintainers/`。
 
 ## 适合谁
 
@@ -15,24 +25,14 @@
 - 与产品经理共同维护规则、原型和交付物的开发者。
 - 容易遇到多对话失忆、规则漂移、重复返工和交付边界不清的长期项目。
 
-## 它解决什么
-
-- 换一个对话后，不必重新讲述全部背景。
-- 页面或代码变化时，相关业务事实能够同步更新。
-- 评审意见可以区分业务错误、规范问题和审美建议。
-- 重复失败可以查到根因、无效尝试和验证证据。
-- 原型交付时带上运行入口、规则边界和验证结果。
-
-## 项目边界
-
-核心机制可以迁移到其他项目，但本项目首要维护：
+核心机制可以迁移到其他产品，但首版主要维护：
 
 ```text
 gov-enterprise-cn
 政务与复杂 B 端 Web 管理系统
 ```
 
-它关注查询台账、复杂表单、材料申报、批量操作、多角色协作、状态流转、防误操作和可追溯性。其他产品类型可以自行扩展 Profile；首版不追求覆盖所有行业和设计风格。
+它关注查询台账、复杂表单、材料申报、批量操作、多角色协作、状态流转、防误操作和可追溯性。Codex 是首版参考实现，公开方法不绑定具体 Coding Agent、前端框架或设计系统。
 
 ## 工作方式
 
@@ -41,126 +41,64 @@ gov-enterprise-cn
         → 同步事实 → 验证 → 交付 → 接续开发
 ```
 
-每轮工作结束时，仓库应能回答：
+每轮工作结束时，项目仓库应能回答：
 
 1. 本轮改变了什么？
 2. 哪些页面和业务规则受到影响？
 3. 哪些内容已经验证，哪些仍待确认？
 4. 下一个 Coding Agent 会话从哪里继续？
 
-## v0.1 内容
+## 当前内容
 
-### 项目与模块模板
+| 能力 | 状态 | 位置 |
+| --- | --- | --- |
+| 项目与模块事实模板 | 可用 | `templates/project/`、`templates/module/` |
+| 政务与复杂 B 端设计预设 | 可用，持续完善 | `profiles/gov-enterprise-cn/` |
+| 产品方法与快速开始 | 可用 | `docs/product/` |
+| 三个核心 Skills | 规划中 | 完成后放入 `.agents/skills/` |
+| 三轮迭代虚构案例 | 规划中 | 完成后放入 `examples/material-submission/` |
 
-```text
-PROJECT_CONTEXT.md
-MODULE_REGISTRY.md
-DESIGN_PROFILE.md
+计划中的核心 Skills：
 
-CURRENT.md
-BUSINESS_RULES.md
-PAGE_FLOW.md
-DECISIONS.md
-ERROR_LEDGER.md
-```
-
-### 核心 Skills
-
-- `pm-prototype-packager`：检查并整理可独立运行的原型交付包。
-- `pm-prototype-handover`：生成短接续或完整交接材料。
 - `pm-prototype-memory`：维护事实、变更、冲突和错误闭环。
+- `pm-prototype-handover`：生成短接续或完整交接材料。
+- `pm-prototype-packager`：检查并整理可独立运行的原型交付包。
 
-核心方法不绑定某个 Coding Agent。首版使用 Codex 作为参考实现，仓库级 Skills 放在 `.agents/skills/`，由 Codex 从项目中发现并使用；其他工具可以复用模板、流程和验收规则，并按自身机制适配 Skills。
-
-### 可运行案例
-
-`examples/material-submission/` 使用纯 HTML、CSS 和 JavaScript，演示一个完全虚构的材料申报场景：
-
-1. 建立申报表单与材料清单。
-2. 增加退回修改和状态反馈。
-3. 增加角色边界、规则同步、验证与交付。
-
-案例不连接真实后端，不使用真实政策、单位、人员或项目数据。
-
-## 快速开始
-
-```bash
-git clone https://github.com/TgStudio-PM/PM-product-workflow.git
-cd PM-product-workflow
-```
-
-1. 阅读根目录 `AGENTS.md` 及其指定的项目宪章、开源边界和当前状态。
-2. 复制 `templates/` 中的项目与模块模板。
-3. 在 `DESIGN_PROFILE.md` 中选择 `gov-enterprise-cn` 或填写自己的规范。
-4. 让 Coding Agent 先读取项目事实，再开始需求分析或原型修改。首版示例使用 Codex。
-5. 每轮结束后同步事实，分别完成人工业务验收和机器验证。
-6. 需要交付或换对话时，运行相应 Skill。
-
-建议每次接续至少保留：
+## 仓库结构
 
 ```text
-【模块】
-【当前基线】
-【已验证】
-【待解决】
-【下一步】
-【禁止事项】
+docs/product/                  产品使用指南
+templates/                     使用者项目与模块模板
+profiles/                      可选择或扩展的设计预设
+.agents/skills/                已发布的产品 Skills
+examples/                      完全虚构的可运行案例
+
+AGENTS.md                      本仓库维护入口
+maintainers/                   本仓库治理、状态和检查工具
+.github/                       Issue、PR 与 CI 配置
 ```
 
-## 维护与接力
-
-本仓库自身采用同一套 Repository as Memory 方法：
-
-- [项目宪章](docs/project-charter.md)保存长期定位与 Non-Goals。
-- [开源边界](docs/open-source-boundary.md)规定允许和禁止公开的内容。
-- [治理规则](docs/governance-rules.md)处理上下文、冲突、同步、ADR 和错误。
-- [分级维护规则](docs/maintenance-policy.md)规定合并权限。
-- [接力维护流程](docs/maintainer-workflow.md)规定新任务、验证、中断和换会话流程。
-- [当前状态](docs/current.md)提供稳定基线、进行中工作和下一步。
-
-不自动读取 `AGENTS.md` 的 Coding Agent，可以使用：
-
-> 读取根目录 AGENTS.md，按规定加载当前项目状态；核对关联 Issue、PR、分支差异和最近接力块，再从“下一步”继续。不得把历史聊天当作未落盘事实。
-
-## 事实与冲突
-
-- `BUSINESS_RULES.md` 保存已经确认的当前业务基线。
-- 用户明确确认的新变更应形成决策，并同步到受影响的事实文件。
-- 源码和页面是当前实现证据，不自动等于正确需求。
-- 旧截图、旧对话和历史交接只用于溯源。
-- 无法判断的冲突必须标记为待确认，由产品经理裁决。
-
-## 验收
-
-- **产品经理验收**：术语、规则、角色、状态、流程和交互结果。
-- **机器验证**：测试、构建、浏览器运行、链接、资源、交付包和敏感信息扫描。
-
-两类验收都通过，才能把本轮结果作为新的稳定基线。
+`.agents/skills/` 和 `examples/` 只在有真实可用内容后加入仓库，不创建空目录表示完成。
 
 ## 开源边界
 
-本仓库只接收原创、虚构、脱敏且完成授权检查的内容。
+本仓库只接收原创、完全虚构且完成授权检查的内容。真实项目代码、截图、业务材料、人员数据、生产接口、账号密钥、本机路径、历史对话和来源不明的第三方资产不得进入仓库，也不能通过替换名称包装公开。
 
-以下内容不得进入仓库：真实项目代码或截图、客户和人员数据、内部政策与业务材料、生产接口和服务器信息、账号密钥、本机绝对路径、Coding Agent 对话导出（包括 Codex），以及无法确认授权的第三方资产。
-
-真实实践只用于总结方法。公开案例和规则必须重新创作，不能通过替换名称的方式包装真实项目。
+完整维护红线见[开源边界](maintainers/OPEN_SOURCE_BOUNDARY.md)。产品使用者可借鉴这一原则建立自己项目的公开或交付边界。
 
 ## 路线图
 
-- [x] 建立 README、开源边界和基础目录
+- [x] 建立 README、开源边界和基础模板
 - [x] 建立长期治理、分级维护和接力协议
-- [ ] 发布虚构案例第 1 轮与 `pm-prototype-packager`
-- [ ] 发布案例第 2 轮与 `pm-prototype-handover`
-- [ ] 发布案例第 3 轮与 `pm-prototype-memory`
-- [ ] 完成 `gov-enterprise-cn` Profile 和 v0.1 验收
-- [ ] 根据真实使用反馈补充其他 Profile 与社区示例
+- [x] 分离产品使用入口与仓库自管理入口
+- [ ] 发布 `pm-prototype-memory`
+- [ ] 发布 `pm-prototype-handover`
+- [ ] 发布 `pm-prototype-packager`
+- [ ] 完成三轮迭代的可运行虚构案例
+- [ ] 完善 `gov-enterprise-cn` Profile 并完成 v0.1 验收
 
-## 贡献
+## 贡献与许可
 
-欢迎提交模板改进、虚构案例、验证规则和新的 Profile。贡献内容必须说明适用场景、验证方式、来源与授权情况，并遵守开源边界。
+欢迎提交模板改进、完全虚构的案例、验证规则和新的 Profile。贡献前请阅读[贡献指南](CONTRIBUTING.md)。
 
-仓库采用分级维护规则：常规变更通过 PR 留痕并在验证后合并；项目定位、开源边界、授权、重大兼容变更和正式发布需要人工确认。详见 [维护规则](docs/maintenance-policy.md)。
-
-## License
-
-原创内容计划采用 [MIT License](LICENSE)。第三方依赖和资产遵循各自许可证。
+原创内容采用 [MIT License](LICENSE)。第三方依赖和资产遵循各自许可证。
