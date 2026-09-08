@@ -40,4 +40,4 @@ assignees: ''
 
 ## 接力状态
 
-任务中断时粘贴并填写 `templates/maintenance-handoff.md` 中的接力块。
+任务中断时粘贴并填写 `maintainers/templates/maintenance-handoff.md` 中的接力块。

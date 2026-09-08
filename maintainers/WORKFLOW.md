@@ -6,9 +6,9 @@
 
 1. 读取根目录 `AGENTS.md` 及其指定的必读文件。
 2. 读取关联 Issue、PR、ADR 和任务涉及的 Skill、Profile 或模板。
-3. 核对 `main` 当前提交、已有分支和最近接力块。
+3. 获取远端状态，核对本地提交、远端 `main`、关联 PR、已有分支和最近接力块；不得只依据旧克隆或长期记忆。
 4. 判断风险等级；无法确定时提高一级。
-5. 使用 `feature/*`、`fix/*`、`docs/*` 或 `chore/*` 分支。
+5. 从远端最新 `main` 使用 `feature/*`、`fix/*`、`docs/*`、`chore/*` 或 `refactor/*` 分支；不复用已合并分支。
 
 一个任务只保留一个核心目标。需要改变目标时先更新 Issue 或拆分任务。
 
@@ -27,7 +27,7 @@ PR 必须说明问题、最终行为、风险等级、影响范围、产品验�
 
 ## 中断与换会话
 
-未完成任务在 Issue 或 PR 中留下 `templates/maintenance-handoff.md` 定义的接力块。已完成并合并的任务由 Git 历史、PR 和 ADR 保存，不建立长期堆积的交接归档。
+未完成任务在 Issue 或 PR 中留下 `maintainers/templates/maintenance-handoff.md` 定义的接力块。已完成并合并的任务由 Git 历史、PR 和 ADR 保存，不建立长期堆积的交接归档。
 
 新会话使用以下启动指令：
 
