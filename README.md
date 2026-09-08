@@ -11,18 +11,6 @@
 > Repository is memory. Conversation is working context.  
 > 仓库保存经过确认的项目事实，对话承载当前工作上下文。
 
-## 关于 / About
-
-我是产品经理。这个项目来自我对实际工作和项目中反复遇到的问题、验证过的方法与可复用成果的持续总结。公开内容只保留通用工作流、模板和经验，不包含任何真实项目材料。
-
-从大学学习、参加工作，到持续学习和使用 AI 的这段时间，我从开源社区获得了许多工具、知识和启发。如今我很高兴能把自己的实践整理成一个开源项目，为社区贡献一份力量。
-
-I am a product manager. This project distills recurring problems, validated practices, and reusable outcomes from my day-to-day work into a public workflow, without exposing real project materials.
-
-From university through my professional career and continued AI learning, I have benefited greatly from open-source tools, knowledge, and communities. I am happy to organize my own practice into an open-source project and give something back.
-
-**Keywords:** Product Manager, Coding Agent, AI workflow, enterprise software, government software, prototype development, context governance, handoff, delivery.
-
 ## 选择入口 / Choose your path
 
 ### 使用产品工作流
@@ -118,3 +106,15 @@ maintainers/                   本仓库治理、状态和检查工具
 欢迎提交模板改进、完全虚构的案例、验证规则和新的 Profile。贡献前请阅读[贡献指南](CONTRIBUTING.md)。
 
 原创内容采用 [MIT License](LICENSE)。第三方依赖和资产遵循各自许可证。
+
+## 关于 / About
+
+我是产品经理。这个项目来自我对实际工作和项目中反复遇到的问题、验证过的方法与可复用成果的持续总结。公开内容只保留通用工作流、模板和经验，不包含任何真实项目材料。
+
+从大学学习、参加工作，到持续学习和使用 AI 的这段时间，我从开源社区获得了许多工具、知识和启发。如今我很高兴能把自己的实践整理成一个开源项目，为社区贡献一份力量。
+
+I am a product manager. This project distills recurring problems, validated practices, and reusable outcomes from my day-to-day work into a public workflow, without exposing real project materials.
+
+From university through my professional career and continued AI learning, I have benefited greatly from open-source tools, knowledge, and communities. I am happy to organize my own practice into an open-source project and give something back.
+
+**Keywords:** Product Manager, Coding Agent, AI workflow, enterprise software, government software, prototype development, context governance, handoff, delivery.

@@ -8,14 +8,6 @@ PM-product-workflow keeps requirements, business rules, prototypes, reviews, val
 
 > Repository is memory. Conversation is working context.
 
-## About
-
-I am a product manager. This project distills recurring problems, validated practices, and reusable outcomes from my day-to-day work into a public workflow, without exposing real project materials.
-
-From university through my professional career and continued AI learning, I have benefited greatly from open-source tools, knowledge, and communities. I am happy to organize my own practice into an open-source project and give something back.
-
-**Keywords:** Product Manager, Coding Agent, AI workflow, enterprise software, government software, prototype development, context governance, handoff, delivery.
-
 ## Choose your path
 
 ### Use the product workflow
@@ -111,3 +103,11 @@ See the complete [open-source boundary](maintainers/OPEN_SOURCE_BOUNDARY.md). Pr
 Contributions to templates, fully fictional examples, validation rules, and new profiles are welcome. Read the [contribution guide](CONTRIBUTING.md) before opening a pull request.
 
 Original content is licensed under the [MIT License](LICENSE). Third-party dependencies and assets remain subject to their respective licenses.
+
+## About
+
+I am a product manager. This project distills recurring problems, validated practices, and reusable outcomes from my day-to-day work into a public workflow, without exposing real project materials.
+
+From university through my professional career and continued AI learning, I have benefited greatly from open-source tools, knowledge, and communities. I am happy to organize my own practice into an open-source project and give something back.
+
+**Keywords:** Product Manager, Coding Agent, AI workflow, enterprise software, government software, prototype development, context governance, handoff, delivery.
