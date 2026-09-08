@@ -40,4 +40,4 @@ assignees: ''
 
 ## 接力状态
 
-任务中断时粘贴并填写 `maintainers/templates/maintenance-handoff.md` 中的接力块。
+需要公开协作时，可粘贴并填写 `maintainers/templates/maintenance-handoff.md` 中的技术摘要；个人未完成状态保存在本机忽略文件中。
