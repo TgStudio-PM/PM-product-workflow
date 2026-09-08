@@ -9,7 +9,8 @@
 1. `maintainers/PROJECT_CHARTER.md`：使命、定位和明确不做。
 2. `maintainers/OPEN_SOURCE_BOUNDARY.md`：公开边界和敏感信息红线。
 3. `maintainers/CURRENT.md`：当前稳定基线和下一步。
-4. 关联 Issue、PR、ADR，以及任务涉及的 Skill、Profile、模板或源码。
+4. 如果存在 `.codex-local/MAINTENANCE_STATE.md`，读取本机未完成任务；该文件不得提交。
+5. 关联 Issue、PR、ADR，以及任务涉及的 Skill、Profile、模板或源码。
 
 涉及冲突、文档同步、错误或决策时读取 `maintainers/GOVERNANCE.md`；准备 PR 和合并时读取 `maintainers/MAINTENANCE_POLICY.md` 与 `maintainers/WORKFLOW.md`。
 
@@ -17,8 +18,9 @@
 
 1. 先检查工作树，保留并隔离已有未提交修改。
 2. 获取远端最新状态，分别核对本地提交、远端 `main` 提交和关联 PR 状态。
-3. 长期记忆、旧克隆和接力块只作线索；与 GitHub 当前状态冲突时，以远端仓库为准并修正 `maintainers/CURRENT.md`。
-4. 从最新 `main` 创建 `feature/*`、`fix/*`、`docs/*`、`chore/*` 或 `refactor/*` 分支，不复用已合并分支。
+3. GitHub 当前 `main` 和 PR、实际工作树、本地接力文件、当前对话依次降级；低层信息与高层冲突时不得覆盖高层事实。
+4. 长期记忆、旧克隆和接力块只作线索；与 GitHub 当前状态冲突时，以远端仓库为准。
+5. 从最新 `main` 创建 `feature/*`、`fix/*`、`docs/*`、`chore/*` 或 `refactor/*` 分支，不复用已合并分支。
 
 ## 不可违反的规则
 
@@ -40,7 +42,7 @@
 
 ## 任务执行与接力
 
-按 `maintainers/WORKFLOW.md` 执行。中断或换会话时，使用 `maintainers/templates/maintenance-handoff.md` 在 Issue 或 PR 留下接力块。
+按 `maintainers/WORKFLOW.md` 执行。未完成任务优先更新本机 `.codex-local/MAINTENANCE_STATE.md`；已经创建 PR 且需要公开协作时，使用 `maintainers/templates/maintenance-handoff.md` 留下必要摘要。
 
 任务结束时说明结果、改动文件、治理文档同步、产品验收、机器验证、未决项、风险和下一步。仅当里程碑、稳定基线、下一步、阻塞或错误状态变化时更新 `maintainers/CURRENT.md`。
 
