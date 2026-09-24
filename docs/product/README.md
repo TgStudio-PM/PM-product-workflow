@@ -35,6 +35,11 @@
 - 无法确认的内容标记为待确认，不用合理猜测补齐。
 - 同一问题两次等价尝试仍失败时，停止盲试并记录稳定复现、无效方案和下一项可验证假设。
 
+## 示例与 Skills
+
+- [材料申报离线教学示例](../../examples/material-submission/index.html)：查看完全虚构的单页案例及其[项目事实](../../examples/material-submission/facts/project/PROJECT_CONTEXT.md)和[模块规则](../../examples/material-submission/facts/module/BUSINESS_RULES.md)。下载或克隆仓库后可直接打开 `index.html`；页面交互仅保存在当前浏览器。
+- [pm-prototype-memory](../../.agents/skills/pm-prototype-memory/SKILL.md)：在原型任务中读取项目事实、区分已确认规则与当前实现、同步受影响文档并检查漂移。
+
 ## 新会话接力
 
 新会话只需要读取项目级事实、相关模块事实和当前任务，不依赖完整聊天记录。建议提供：
@@ -59,4 +64,4 @@
 
 ## 当前交付状态
 
-模板和 `gov-enterprise-cn` Profile 已可使用。三个核心 Skills 与可运行虚构案例仍在建设中，当前进度以根 README 的路线图为准。
+模板和 `gov-enterprise-cn` Profile 已可使用。`pm-prototype-memory` 与材料申报首轮案例已形成可审阅内容；独立浏览器验收、模板中文优先化、案例后续迭代、交接 Skill 和打包 Skill 仍待完成。
