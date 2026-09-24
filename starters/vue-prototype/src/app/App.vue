@@ -1,21 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { pageRegistry, type PagePath } from './page-registry'
+import { pageRegistry } from './page-registry'
+import { useHashRouter } from './router'
 
-const currentPath = ref<PagePath>('/overview')
-const activePage = computed(() => pageRegistry.find((page) => page.path === currentPath.value) ?? pageRegistry[0])
-
-function readLocation() {
-  const path = window.location.hash.replace(/^#/, '')
-  currentPath.value = pageRegistry.some((page) => page.path === path) ? path as PagePath : '/overview'
-}
-
-onMounted(() => {
-  readLocation()
-  window.addEventListener('hashchange', readLocation)
-})
-
-onUnmounted(() => window.removeEventListener('hashchange', readLocation))
+const { currentPath, activePage } = useHashRouter()
 </script>
 
 <template>

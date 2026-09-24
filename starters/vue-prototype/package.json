@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "preview:pack": "node scripts/build-preview.mjs",
+    "preview:pack": "node scripts/build-preview.mjs && node scripts/verify-preview.mjs",
+    "preview:verify": "node scripts/verify-preview.mjs",
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {

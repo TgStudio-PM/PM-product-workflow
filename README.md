@@ -61,6 +61,7 @@ gov-enterprise-cn
 | 产品方法与快速开始 | 可用 | `docs/product/` |
 | `pm-prototype-memory` Skill | 已交付 | `.agents/skills/pm-prototype-memory/SKILL.md` |
 | 材料申报虚构案例 | 前两轮已交付，第三轮规划中 | `examples/material-submission/` |
+| Tg Studio Vue 原型工程模板 | 已交付，可选使用 | `starters/vue-prototype/` |
 | `pm-prototype-handover`、`pm-prototype-packager` Skills | 规划中 | 完成后放入 `.agents/skills/` |
 
 已交付与计划中的核心 Skills：
@@ -68,6 +69,12 @@ gov-enterprise-cn
 - `pm-prototype-memory`（已交付）：维护事实、变更、冲突和错误闭环。
 - `pm-prototype-handover`（规划中）：生成短接续或完整交接材料。
 - `pm-prototype-packager`（规划中）：检查并整理可独立运行的原型交付包。
+
+### 可选 Vue 工程模板
+
+如果你希望从现成的 Vue 工程结构开始，可以查看[Tg Studio Vue 原型工程模板](starters/vue-prototype/README.md)。它用 Vue 3 + Vite 展示页面注册、页面模板、mock 数据、共享组件、前后端交接和静态预览打包。Vue 模板是可选的工程实现；上面的产品工作流和其他模板不依赖 Vue。
+
+模板已交付，可按需使用。新增简单页面的目标用时尚未经过非开发产品经理计时验收；`file://` 行为仍应在实际目标浏览器中验证。案例为完全虚构的 Tg Studio 材料申报演示，不提供真实 API、身份认证、文件上传或生产办理能力。
 
 ## 仓库结构
 
@@ -97,6 +104,7 @@ maintainers/                   本仓库治理、状态和检查工具
 - [x] 建立长期治理、分级维护和接力协议
 - [x] 分离产品使用入口与仓库自管理入口
 - [x] 发布 `pm-prototype-memory` 与材料申报前两轮离线虚构案例
+- [x] 交付可选的 Tg Studio Vue 原型工程模板
 - [ ] 发布 `pm-prototype-handover`
 - [ ] 发布 `pm-prototype-packager`
 - [ ] 完成材料申报案例第三轮迭代，演示交接与交付

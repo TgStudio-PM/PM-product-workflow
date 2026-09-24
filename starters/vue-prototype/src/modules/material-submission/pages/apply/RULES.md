@@ -1,14 +1,8 @@
 # 材料申报页规则索引
 
-本页只实现案例已确认的演示规则，规则正文以仓库中的 [BUSINESS_RULES.md](../../../../../../../examples/material-submission/facts/module/BUSINESS_RULES.md) 和 [PAGE_FLOW.md](../../../../../../../examples/material-submission/facts/module/PAGE_FLOW.md) 为准。
+本页的规则正文只维护在 starter 内的 [BUSINESS_RULES.md](../../facts/module/BUSINESS_RULES.md) 与 [PAGE_FLOW.md](../../facts/module/PAGE_FLOW.md)。依据仓库公开的完全虚构教学案例重新整理，未搬运真实项目材料。
 
-- BR-001：固定显示 Tg Studio 品牌与示例事项名称。
-- BR-002：申请说明去首尾空白后必填，最多 500 字。
-- BR-003：两项必备材料均确认后才可提交；页面流程草图可选；勾选表示已备齐，不上传文件。
-- BR-004：未提交草稿保存在当前浏览器，重新打开可恢复。
-- BR-005：提交后表单只读，不可再次提交。
-- BR-006：清除操作只移除本示例使用的浏览器存储项，并返回空白草稿。
-- BR-007：不上传、不联网、不生成真实办件。
+- BR-001—BR-007：本页业务和离线演示边界。
 
 ## 本页验收点
 
