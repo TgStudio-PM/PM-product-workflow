@@ -42,6 +42,12 @@
 - [材料申报离线教学示例](../../examples/material-submission/index.html)：查看完全虚构的单页案例及其[项目事实](../../examples/material-submission/facts/project/PROJECT_CONTEXT.md)和[模块规则](../../examples/material-submission/facts/module/BUSINESS_RULES.md)。下载或克隆仓库后可直接打开 `index.html`；页面交互仅保存在当前浏览器。
 - [pm-prototype-memory](../../.agents/skills/pm-prototype-memory/SKILL.md)：在原型任务中读取项目事实、区分已确认规则与当前实现、同步受影响文档并检查漂移。
 
+### 可选 Vue 原型工程模板
+
+[Tg Studio Vue 原型工程模板](../../starters/vue-prototype/README.md)面向希望直接使用 Vue 3 + Vite 的产品经理与协作开发者，提供页面注册、可复制页面骨架、mock 数据、共享组件、前后端交接说明和静态预览打包示例。它是可选的工程实现，不是使用本工作流的前提；产品方法与基础模板不绑定 Vue。
+
+该模板已交付，可按需使用。新增简单页面的目标用时尚未经过非开发产品经理计时验收；`file://` 行为仍应在实际目标浏览器中验证。模板以仓库内完全虚构的材料申报案例演示工程结构；不包含生产接口、认证、文件上传或真实办理。
+
 ## 新会话接力
 
 新会话只需要读取项目级事实、相关模块事实和当前任务，不依赖完整聊天记录。建议提供：
@@ -66,4 +72,4 @@
 
 ## 当前交付状态
 
-中文优先模板和 `gov-enterprise-cn` Profile 已可使用。`pm-prototype-memory` 与完全虚构的材料申报前两轮离线案例已交付，并完成独立浏览器交互验收；第二轮演示了规则变化与事实同步。案例第三轮、交接 Skill 和打包 Skill 仍待完成。
+中文优先模板和 `gov-enterprise-cn` Profile 已可使用。`pm-prototype-memory` 与完全虚构的材料申报前两轮离线案例已交付，并完成独立浏览器交互验收；第二轮演示了规则变化与事实同步。可选 Vue 工程模板已交付，新增页面计时验收和更多目标浏览器的 `file://` 验证仍待完成；案例第三轮、交接 Skill 和打包 Skill 仍待完成。

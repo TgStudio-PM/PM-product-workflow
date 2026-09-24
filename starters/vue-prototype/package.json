@@ -1,0 +1,21 @@
+{
+  "name": "tg-studio-vue-prototype-starter",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "preview:pack": "node scripts/build-preview.mjs && node scripts/verify-preview.mjs",
+    "preview:verify": "node scripts/verify-preview.mjs",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "vue": "^3.5.43"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.9",
+    "typescript": "~5.8.3",
+    "vite": "^6.4.1",
+    "vue-tsc": "^2.2.12"
+  }
+}

@@ -58,6 +58,7 @@ At the end of each iteration, the project repository should answer:
 | Product method and quick start | Available | `docs/product/` |
 | `pm-prototype-memory` Skill | Delivered | `.agents/skills/pm-prototype-memory/SKILL.md` |
 | Fictional material-submission example | First two iterations delivered; third planned | `examples/material-submission/` |
+| Tg Studio Vue prototype starter | Delivered; optional to use | `starters/vue-prototype/` |
 | `pm-prototype-handover` and `pm-prototype-packager` Skills | Planned | `.agents/skills/` after implementation |
 
 Delivered and planned core Skills:
@@ -65,6 +66,12 @@ Delivered and planned core Skills:
 - `pm-prototype-memory` (delivered): maintains facts, changes, conflicts, and error history.
 - `pm-prototype-handover` (planned): creates concise continuation notes or complete handoff material.
 - `pm-prototype-packager` (planned): validates and prepares independently runnable prototype delivery packages.
+
+### Optional Vue starter
+
+If you want to start from a Vue project structure, see the [Tg Studio Vue prototype starter](starters/vue-prototype/README.md). It demonstrates page registration, a copyable page template, mock data, shared components, frontend/backend handoff notes, and static preview packaging with Vue 3 + Vite. This is an optional engineering starter; the product workflow and other templates do not depend on Vue.
+
+The starter is delivered and optional. The target time for adding a simple page has not been measured by a non-developer product manager; `file://` behavior should still be checked in each target browser. Its material-submission case is fully fictional and provides no real API, authentication, file upload, or production processing.
 
 ## Repository structure
 
@@ -94,6 +101,7 @@ See the complete [open-source boundary](maintainers/OPEN_SOURCE_BOUNDARY.md). Pr
 - [x] Establish durable governance, tiered maintenance, and continuation rules.
 - [x] Separate the product entry from repository self-management.
 - [x] Publish `pm-prototype-memory` and the first two offline fictional material-submission iterations.
+- [x] Deliver the optional Tg Studio Vue prototype starter.
 - [ ] Publish `pm-prototype-handover`.
 - [ ] Publish `pm-prototype-packager`.
 - [ ] Complete a third fictional iteration covering handoff and delivery.
