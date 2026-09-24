@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Tg Studio 项目品牌下的离线材料申报教学示例。">
+    <title>Tg Studio · 材料申报示例</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="demo-banner" role="note">
+      <span class="demo-dot" aria-hidden="true"></span>
+      <span>Tg Studio 是本案例页面品牌；事项、材料和流程均为虚构教学内容，不对应真实政务服务</span>
+    </div>
+
+    <header class="site-header">
+      <a class="brand" href="#main" aria-label="Tg Studio 示例页面">
+        <span class="brand-mark" aria-hidden="true">Tg</span>
+        <span class="brand-copy"><strong>Tg Studio</strong><small>PROJECT BRAND · DEMO</small></span>
+      </a>
+      <div class="header-meta"><span class="meta-label">原型体验</span><span class="header-divider"></span><span>材料申报演示</span></div>
+    </header>
+
+    <main id="main" class="page-shell">
+      <nav class="breadcrumbs" aria-label="当前位置">
+        <a href="#main">首页</a><span aria-hidden="true">/</span><span>事项办理</span><span aria-hidden="true">/</span><strong>材料申报</strong>
+      </nav>
+
+      <section class="intro">
+        <div class="intro-copy">
+          <div class="eyebrow"><span class="eyebrow-line"></span>MATTER APPLICATION</div>
+          <h1>Tg Studio 示例项目<br><span>材料申报</span></h1>
+          <p>提交前请核对所需材料。此页面用于演示表单校验、草稿暂存与提交后的只读状态。</p>
+        </div>
+        <div class="intro-side" aria-label="办理信息">
+          <div><span>演示方式</span><strong>离线填报</strong></div>
+          <div><span>内容范围</span><strong>单页表单</strong></div>
+          <div><span>页面状态</span><strong id="status-label">草稿</strong></div>
+        </div>
+      </section>
+
+      <div class="workspace">
+        <section class="form-panel" aria-labelledby="form-title">
+          <div class="section-heading">
+            <div><span class="step-number">01</span><div><h2 id="form-title">填写申报信息</h2><p>带 <span class="required-mark">*</span> 的项目为必填内容</p></div></div>
+            <span class="draft-indicator" id="draft-indicator"><span></span>草稿已暂存</span>
+          </div>
+
+          <form id="application-form" novalidate>
+            <div class="field-group">
+              <label for="matter-name">申报事项 <span class="required-mark">*</span></label>
+              <input id="matter-name" name="matterName" type="text" value="Tg Studio 示例项目材料申报" readonly aria-describedby="matter-help">
+              <small id="matter-help" class="field-hint">本教学案例中的固定事项名称。</small>
+            </div>
+            <div class="field-group">
+              <label for="application-description">申请说明 <span class="required-mark">*</span></label>
+              <textarea id="application-description" name="description" rows="4" maxlength="500" placeholder="请简要说明本次申报内容（虚构示例，不填写真实个人或机构信息）" required></textarea>
+              <div class="field-footer"><small class="field-hint">最多 500 字。请勿填写真实个人信息。</small><small id="character-count">0 / 500</small></div>
+              <p class="field-error" id="description-error" role="alert" hidden>请填写申请说明后再提交。</p>
+            </div>
+
+            <div class="materials-heading">
+              <div><label>申报材料 <span class="required-mark">*</span></label><p>勾选表示已备齐该项演示材料，不会上传文件。</p></div>
+              <span class="materials-count"><strong id="checked-count">0</strong> / 3 项已确认</span>
+            </div>
+            <fieldset class="material-list" id="material-list">
+              <legend class="visually-hidden">确认已备齐申报材料</legend>
+              <label class="material-row">
+                <input type="checkbox" name="materials" value="project-note">
+                <span class="material-check" aria-hidden="true"></span>
+                <span class="material-icon icon-note" aria-hidden="true">文</span>
+                <span class="material-copy"><strong>项目背景说明</strong><small>演示材料 A · 内容由使用者自行准备</small></span>
+                <span class="required-tag">必备</span>
+              </label>
+              <label class="material-row">
+                <input type="checkbox" name="materials" value="space-sketch">
+                <span class="material-check" aria-hidden="true"></span>
+                <span class="material-icon icon-map" aria-hidden="true">图</span>
+                <span class="material-copy"><strong>页面流程草图</strong><small>演示材料 B · 内容由使用者自行准备</small></span>
+                <span class="required-tag">必备</span>
+              </label>
+              <label class="material-row">
+                <input type="checkbox" name="materials" value="schedule">
+                <span class="material-check" aria-hidden="true"></span>
+                <span class="material-icon icon-calendar" aria-hidden="true">期</span>
+                <span class="material-copy"><strong>迭代计划摘要</strong><small>演示材料 C · 内容由使用者自行准备</small></span>
+                <span class="required-tag">必备</span>
+              </label>
+            </fieldset>
+            <p class="field-error materials-error" id="materials-error" role="alert" hidden>请确认已备齐全部 3 项演示材料。</p>
+
+            <div class="form-actions">
+              <button class="button button-secondary" id="save-draft" type="button"><span aria-hidden="true">↓</span> 暂存草稿</button>
+              <div class="primary-actions">
+                <button class="button button-primary" id="submit-application" type="submit">确认并提交 <span aria-hidden="true">→</span></button>
+              </div>
+            </div>
+          </form>
+        </section>
+
+        <aside class="side-column">
+          <section class="steps-card" aria-labelledby="steps-title">
+            <div class="card-title"><span class="card-icon" aria-hidden="true">↗</span><h2 id="steps-title">办理流程</h2></div>
+            <ol class="steps-list">
+              <li class="step-current"><span class="step-node">1</span><div><strong>填写申报信息</strong><small>说明情况并确认材料</small></div></li>
+              <li><span class="step-node">2</span><div><strong>核对并提交</strong><small>提交后内容将锁定</small></div></li>
+              <li><span class="step-node">3</span><div><strong>完成本次演示</strong><small>可清除本地演示数据重新开始</small></div></li>
+            </ol>
+            <div class="flow-note"><span aria-hidden="true">i</span><p>本页仅展示前端交互，不会发送信息或生成真实办件。</p></div>
+          </section>
+          <section class="help-card">
+            <div class="help-mark" aria-hidden="true">?</div>
+            <div><strong>如何重置演示？</strong><p>提交后可清除本页保存的演示数据，并从草稿状态重新开始。</p></div>
+            <button class="reset-link" id="reset-demo" type="button">清除演示数据 <span aria-hidden="true">↗</span></button>
+          </section>
+          <div class="privacy-note"><span aria-hidden="true">◇</span><p>内容只暂存在当前浏览器。此示例不包含文件上传、网络请求或真实业务处理。</p></div>
+        </aside>
+      </div>
+
+      <section class="submitted-panel" id="submitted-panel" aria-live="polite" hidden>
+        <span class="success-mark" aria-hidden="true">✓</span><div><strong>演示提交完成</strong><p>本地表单已锁定为只读状态。此页面没有向任何服务发送数据。</p></div>
+      </section>
+      <footer class="page-footer"><span>Tg Studio · 虚构教学示例</span><span>仅用于演示原型事实与页面同步</span></footer>
+    </main>
+  </body>
+</html>
