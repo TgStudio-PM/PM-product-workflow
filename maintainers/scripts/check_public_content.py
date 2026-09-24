@@ -53,7 +53,7 @@ HIGH_RISK_PATHS = {
     ".github/pull_request_template.md",
 }
 HIGH_RISK_PREFIXES = (".github/workflows/", "maintainers/scripts/check_public_content.py")
-MEDIUM_RISK_PREFIXES = (".agents/skills/", "docs/product/", "examples/", "profiles/", "templates/")
+MEDIUM_RISK_PREFIXES = (".agents/skills/", "docs/product/", "examples/", "profiles/", "starters/", "templates/")
 README_HIGH_RISK_TERMS = ("定位", "使命", "开源边界", "license", "自动合并", "维护规则")
 
 
@@ -147,44 +147,93 @@ def validate_repository(root: Path) -> list[Finding]:
     return findings
 
 
-def changed_files(root: Path, base_ref: str) -> list[str]:
+def changed_paths_with_status(root: Path, base_ref: str) -> list[tuple[str, tuple[str, ...]]]:
+    """Return change status and affected paths, preserving both sides of renames."""
     result = subprocess.run(
-        ["git", "-C", str(root), "diff", "--name-only", f"{base_ref}...HEAD", "--"],
+        ["git", "-C", str(root), "diff", "--name-status", "--find-renames", "-z", f"{base_ref}...HEAD", "--"],
         check=True,
         capture_output=True,
-        text=True,
-        encoding="utf-8",
     )
-    return [line.strip() for line in result.stdout.splitlines() if line.strip()]
+    fields = result.stdout.split(b"\0")
+    if fields and not fields[-1]:
+        fields.pop()
+    changes: list[tuple[str, tuple[str, ...]]] = []
+    index = 0
+    while index < len(fields):
+        try:
+            status = fields[index].decode("ascii")
+            path_count = 2 if status.startswith(("R", "C")) else 1
+            paths = tuple(fields[index + offset].decode("utf-8") for offset in range(1, path_count + 1))
+        except (UnicodeDecodeError, IndexError) as error:
+            raise ValueError("Unable to parse Git change status") from error
+        if not status or any(not path for path in paths):
+            raise ValueError("Unable to parse Git change status")
+        changes.append((status, paths))
+        index += path_count + 1
+    return changes
+
+
+def is_root_readme(path: str) -> bool:
+    return path.replace("\\", "/").casefold() == "readme.md"
+
+
+def readme_diff_has_high_risk_terms(root: Path, base_ref: str, path: str) -> bool:
+    """Inspect only changed README lines; fail closed when Git cannot parse text."""
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(root), "diff", "--no-ext-diff", "--no-color", "--unified=0", f"{base_ref}...HEAD", "--", path],
+            check=True,
+            capture_output=True,
+        )
+        diff = result.stdout.decode("utf-8")
+    except (OSError, subprocess.CalledProcessError, UnicodeDecodeError):
+        return True
+
+    if not diff.startswith("diff --git "):
+        return True
+    lowered_terms = tuple(term.casefold() for term in README_HIGH_RISK_TERMS)
+    in_hunk = False
+    for line in diff.splitlines():
+        if line.startswith(("Binary files ", "GIT binary patch")):
+            return True
+        if line.startswith("@@"):
+            in_hunk = True
+            continue
+        if not in_hunk or not line.startswith(("+", "-")):
+            continue
+        changed_text = line[1:].casefold()
+        if any(term in changed_text for term in lowered_terms):
+            return True
+    return False
 
 
 def classify_risk(root: Path, base_ref: str | None) -> tuple[str, list[str]]:
     if not base_ref:
         return "not-evaluated", []
-    files = changed_files(root, base_ref)
+    changes = changed_paths_with_status(root, base_ref)
     reasons: list[str] = []
     risk = "low"
-    for path in files:
-        lowered = path.casefold()
-        if path in HIGH_RISK_PATHS or lowered.startswith(tuple(item.casefold() for item in HIGH_RISK_PREFIXES)):
-            risk = "high"
-            reasons.append(path)
-        elif lowered.startswith(tuple(item.casefold() for item in MEDIUM_RISK_PREFIXES)) and risk == "low":
-            risk = "medium"
-            reasons.append(path)
-        elif path == "README.md":
-            diff = subprocess.run(
-                ["git", "-C", str(root), "diff", f"{base_ref}...HEAD", "--", path],
-                check=True,
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-            ).stdout.casefold()
-            if any(term.casefold() in diff for term in README_HIGH_RISK_TERMS):
+    high_paths = {path.casefold() for path in HIGH_RISK_PATHS}
+    high_prefixes = tuple(item.casefold() for item in HIGH_RISK_PREFIXES)
+    medium_prefixes = tuple(item.casefold() for item in MEDIUM_RISK_PREFIXES)
+    for status, paths in changes:
+        for path in paths:
+            normalized = path.replace("\\", "/").casefold()
+            if normalized in high_paths or normalized.startswith(high_prefixes):
                 risk = "high"
-            elif risk == "low":
+                reasons.append(path)
+            elif any(is_root_readme(item) for item in paths):
+                if status.startswith("D") or status.startswith(("R", "C")):
+                    risk = "high"
+                elif readme_diff_has_high_risk_terms(root, base_ref, path):
+                    risk = "high"
+                elif risk == "low":
+                    risk = "medium"
+                reasons.extend(paths)
+                break
+            elif normalized.startswith(medium_prefixes) and risk == "low":
                 risk = "medium"
-            reasons.append(path)
+                reasons.append(path)
     return risk, sorted(set(reasons))
 
 
