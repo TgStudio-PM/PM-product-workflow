@@ -61,13 +61,13 @@
             </div>
 
             <div class="materials-heading">
-              <div><label>申报材料 <span class="required-mark">*</span></label><p>勾选表示已备齐该项演示材料，不会上传文件。</p></div>
-              <span class="materials-count"><strong id="checked-count">0</strong> / 3 项已确认</span>
+              <div><label>申报材料</label><p>两项必备材料需确认；可选材料也会随草稿保存，不会上传文件。</p></div>
+              <span class="materials-count"><strong id="checked-count">0</strong> / 2 项必备材料已确认</span>
             </div>
             <fieldset class="material-list" id="material-list">
-              <legend class="visually-hidden">确认已备齐申报材料</legend>
+              <legend class="visually-hidden">确认申报材料准备情况</legend>
               <label class="material-row">
-                <input type="checkbox" name="materials" value="project-note">
+                <input type="checkbox" name="materials" value="project-note" data-required="true">
                 <span class="material-check" aria-hidden="true"></span>
                 <span class="material-icon icon-note" aria-hidden="true">文</span>
                 <span class="material-copy"><strong>项目背景说明</strong><small>演示材料 A · 内容由使用者自行准备</small></span>
@@ -78,17 +78,17 @@
                 <span class="material-check" aria-hidden="true"></span>
                 <span class="material-icon icon-map" aria-hidden="true">图</span>
                 <span class="material-copy"><strong>页面流程草图</strong><small>演示材料 B · 内容由使用者自行准备</small></span>
-                <span class="required-tag">必备</span>
+                <span class="optional-tag">可选</span>
               </label>
               <label class="material-row">
-                <input type="checkbox" name="materials" value="schedule">
+                <input type="checkbox" name="materials" value="schedule" data-required="true">
                 <span class="material-check" aria-hidden="true"></span>
                 <span class="material-icon icon-calendar" aria-hidden="true">期</span>
                 <span class="material-copy"><strong>迭代计划摘要</strong><small>演示材料 C · 内容由使用者自行准备</small></span>
                 <span class="required-tag">必备</span>
               </label>
             </fieldset>
-            <p class="field-error materials-error" id="materials-error" role="alert" hidden>请确认已备齐全部 3 项演示材料。</p>
+            <p class="field-error materials-error" id="materials-error" role="alert" hidden>请确认已备齐全部 2 项必备演示材料。</p>
 
             <div class="form-actions">
               <button class="button button-secondary" id="save-draft" type="button"><span aria-hidden="true">↓</span> 暂存草稿</button>

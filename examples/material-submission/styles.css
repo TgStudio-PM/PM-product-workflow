@@ -491,12 +491,21 @@ body {
   color: #9aa6a8
 }
 
-.required-tag {
+.required-tag,
+.optional-tag {
   font-size: 12px;
-  color: #b98156;
-  background: #fcf4eb;
   padding: 4px 6px;
   border-radius: 3px
+}
+
+.required-tag {
+  color: #b98156;
+  background: #fcf4eb
+}
+
+.optional-tag {
+  color: #6d8292;
+  background: #eef3f6
 }
 
 .materials-error {

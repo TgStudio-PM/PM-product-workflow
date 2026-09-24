@@ -3,6 +3,7 @@
   const form = document.querySelector("#application-form");
   const description = document.querySelector("#application-description");
   const checkboxes = [...document.querySelectorAll('input[name="materials"]')];
+  const requiredCheckboxes = checkboxes.filter(box => box.dataset.required === "true");
   const statusLabel = document.querySelector("#status-label");
   const indicator = document.querySelector("#draft-indicator");
   const descriptionError = document.querySelector("#description-error");
@@ -33,7 +34,7 @@
 
   function updateCounters() {
     characterCount.textContent = `${description.value.length} / 500`;
-    const count = checkboxes.filter(box => box.checked).length;
+    const count = requiredCheckboxes.filter(box => box.checked).length;
     checkedCount.textContent = String(count);
     return count;
   }
@@ -99,7 +100,8 @@
     event.preventDefault();
     if (form.dataset.status === "submitted") return;
     const descriptionValid = description.value.trim().length > 0;
-    const materialsValid = updateCounters() === checkboxes.length;
+    updateCounters();
+    const materialsValid = requiredCheckboxes.every(box => box.checked);
     descriptionError.hidden = descriptionValid;
     materialsError.hidden = materialsValid;
     if (!descriptionValid) description.focus();
@@ -107,7 +109,7 @@
 
     const state = {
       description: description.value,
-      materials: checkboxes.map(box => box.value),
+      materials: checkboxes.filter(box => box.checked).map(box => box.value),
       status: "已提交"
     };
     try {
