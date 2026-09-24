@@ -66,4 +66,4 @@
 
 ## 当前交付状态
 
-中文优先模板和 `gov-enterprise-cn` Profile 已可使用。`pm-prototype-memory` 与完全虚构的材料申报首轮离线案例已交付，并完成独立浏览器交互验收。案例第二、三轮迭代（规则变化、漂移发现与修复）、交接 Skill 和打包 Skill 仍待完成。
+中文优先模板和 `gov-enterprise-cn` Profile 已可使用。`pm-prototype-memory` 与完全虚构的材料申报前两轮离线案例已交付，并完成独立浏览器交互验收；第二轮演示了规则变化与事实同步。案例第三轮、交接 Skill 和打包 Skill 仍待完成。

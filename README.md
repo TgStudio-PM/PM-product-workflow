@@ -60,7 +60,7 @@ gov-enterprise-cn
 | 政务与复杂 B 端设计预设 | 可用，持续完善 | `profiles/gov-enterprise-cn/` |
 | 产品方法与快速开始 | 可用 | `docs/product/` |
 | `pm-prototype-memory` Skill | 已交付 | `.agents/skills/pm-prototype-memory/SKILL.md` |
-| 材料申报虚构案例 | 首轮已交付，后续迭代规划中 | `examples/material-submission/` |
+| 材料申报虚构案例 | 前两轮已交付，第三轮规划中 | `examples/material-submission/` |
 | `pm-prototype-handover`、`pm-prototype-packager` Skills | 规划中 | 完成后放入 `.agents/skills/` |
 
 已交付与计划中的核心 Skills：
@@ -96,10 +96,10 @@ maintainers/                   本仓库治理、状态和检查工具
 - [x] 建立 README、开源边界和基础模板
 - [x] 建立长期治理、分级维护和接力协议
 - [x] 分离产品使用入口与仓库自管理入口
-- [x] 发布 `pm-prototype-memory` 与材料申报首轮离线虚构案例
+- [x] 发布 `pm-prototype-memory` 与材料申报前两轮离线虚构案例
 - [ ] 发布 `pm-prototype-handover`
 - [ ] 发布 `pm-prototype-packager`
-- [ ] 将材料申报案例扩展为三轮迭代，演示规则变化、漂移发现与修复
+- [ ] 完成材料申报案例第三轮迭代，演示交接与交付
 - [ ] 完善 `gov-enterprise-cn` Profile 并完成 v0.1 验收
 
 ## 贡献与许可

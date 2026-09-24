@@ -57,7 +57,7 @@ At the end of each iteration, the project repository should answer:
 | Government and complex enterprise design profile | Available and evolving | `profiles/gov-enterprise-cn/` |
 | Product method and quick start | Available | `docs/product/` |
 | `pm-prototype-memory` Skill | Delivered | `.agents/skills/pm-prototype-memory/SKILL.md` |
-| Fictional material-submission example | First iteration delivered; later iterations planned | `examples/material-submission/` |
+| Fictional material-submission example | First two iterations delivered; third planned | `examples/material-submission/` |
 | `pm-prototype-handover` and `pm-prototype-packager` Skills | Planned | `.agents/skills/` after implementation |
 
 Delivered and planned core Skills:
@@ -93,10 +93,10 @@ See the complete [open-source boundary](maintainers/OPEN_SOURCE_BOUNDARY.md). Pr
 - [x] Establish the README, publication boundary, and base templates.
 - [x] Establish durable governance, tiered maintenance, and continuation rules.
 - [x] Separate the product entry from repository self-management.
-- [x] Publish `pm-prototype-memory` and the first offline fictional material-submission example.
+- [x] Publish `pm-prototype-memory` and the first two offline fictional material-submission iterations.
 - [ ] Publish `pm-prototype-handover`.
 - [ ] Publish `pm-prototype-packager`.
-- [ ] Expand the fictional example to three iterations covering rule changes, drift detection, and repair.
+- [ ] Complete a third fictional iteration covering handoff and delivery.
 - [ ] Complete the `gov-enterprise-cn` profile and v0.1 acceptance.
 
 ## Contributing and license
