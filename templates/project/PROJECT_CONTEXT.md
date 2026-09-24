@@ -1,33 +1,33 @@
-# Project context
+# 项目背景
 
-## Positioning
+## 项目定位
 
-- Product:
-- Users:
-- Problems:
-- Current phase:
+- 产品名称：
+- 主要使用者：
+- 要解决的问题：
+- 当前阶段：
 
-## Confirmed scope
-
--
-
-## Out of scope
+## 已确认范围
 
 -
 
-## Shared constraints
-
-- Business:
-- Design:
-- Technology:
-- Delivery:
-
-## Pending questions
+## 范围之外
 
 -
 
-## Evidence
+## 共同约束
 
-| Fact | Status | Source | Last checked |
+- 业务约束：
+- 设计约束：
+- 技术约束：
+- 交付约束：
+
+## 待确认问题
+
+-
+
+## 事实与依据
+
+| 事实 | 状态 | 来源 | 最近核对日期 |
 | --- | --- | --- | --- |
-|  | Confirmed / Pending |  |  |
+|  | Confirmed（已确认）/ Pending（待确认） |  |  |

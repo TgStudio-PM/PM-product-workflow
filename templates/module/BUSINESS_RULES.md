@@ -1,9 +1,9 @@
-# Business rules
+# 业务规则
 
-| ID | Rule | Status | Applies to | Evidence | Last changed |
+| 编号 | 规则 | 状态 | 适用范围 | 依据 | 最近变更日期 |
 | --- | --- | --- | --- | --- | --- |
-| BR-001 |  | Confirmed / Pending |  |  |  |
+| BR-001 |  | Confirmed（已确认）/ Pending（待确认） |  |  |  |
 
-## Conflict handling
+## 冲突处理
 
-A newly confirmed change must create a decision and update the affected current baseline. Source code records current implementation; it does not prove business correctness. Historical screenshots and conversations are reference evidence only.
+新规则得到确认后，应记录对应决策，并更新受影响的当前状态。源码只说明当前实现，不能证明业务规则正确。历史截图和对话只能作为参考依据。

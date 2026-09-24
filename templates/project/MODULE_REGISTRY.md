@@ -1,5 +1,5 @@
-# Module registry
+# 模块清单
 
-| Module | Purpose | Status | Fact directory | Entry | Owner | Last verified |
+| 模块 | 用途 | 状态 | 事实文件目录 | 入口 | 负责人 | 最近核验日期 |
 | --- | --- | --- | --- | --- | --- | --- |
-|  |  | Planned / Active / Delivered |  |  |  |  |
+|  |  | Planned（规划中）/ Active（进行中）/ Delivered（已交付） |  |  |  |  |

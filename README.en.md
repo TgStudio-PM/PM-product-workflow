@@ -53,17 +53,18 @@ At the end of each iteration, the project repository should answer:
 
 | Capability | Status | Location |
 | --- | --- | --- |
-| Project and module fact templates | Available | `templates/project/` and `templates/module/` |
+| Project and module fact templates | Available, Chinese-first | `templates/project/` and `templates/module/` |
 | Government and complex enterprise design profile | Available and evolving | `profiles/gov-enterprise-cn/` |
 | Product method and quick start | Available | `docs/product/` |
-| Three core Skills | Planned | `.agents/skills/` after implementation |
-| Three-iteration fictional example | Planned | `examples/material-submission/` after implementation |
+| `pm-prototype-memory` Skill | Delivered | `.agents/skills/pm-prototype-memory/SKILL.md` |
+| Fictional material-submission example | First iteration delivered; later iterations planned | `examples/material-submission/` |
+| `pm-prototype-handover` and `pm-prototype-packager` Skills | Planned | `.agents/skills/` after implementation |
 
-Planned core Skills:
+Delivered and planned core Skills:
 
-- `pm-prototype-memory`: maintains facts, changes, conflicts, and error history.
-- `pm-prototype-handover`: creates concise continuation notes or complete handoff material.
-- `pm-prototype-packager`: validates and prepares independently runnable prototype delivery packages.
+- `pm-prototype-memory` (delivered): maintains facts, changes, conflicts, and error history.
+- `pm-prototype-handover` (planned): creates concise continuation notes or complete handoff material.
+- `pm-prototype-packager` (planned): validates and prepares independently runnable prototype delivery packages.
 
 ## Repository structure
 
@@ -92,10 +93,10 @@ See the complete [open-source boundary](maintainers/OPEN_SOURCE_BOUNDARY.md). Pr
 - [x] Establish the README, publication boundary, and base templates.
 - [x] Establish durable governance, tiered maintenance, and continuation rules.
 - [x] Separate the product entry from repository self-management.
-- [ ] Publish `pm-prototype-memory`.
+- [x] Publish `pm-prototype-memory` and the first offline fictional material-submission example.
 - [ ] Publish `pm-prototype-handover`.
 - [ ] Publish `pm-prototype-packager`.
-- [ ] Complete a runnable fictional example with three iterations.
+- [ ] Expand the fictional example to three iterations covering rule changes, drift detection, and repair.
 - [ ] Complete the `gov-enterprise-cn` profile and v0.1 acceptance.
 
 ## Contributing and license
