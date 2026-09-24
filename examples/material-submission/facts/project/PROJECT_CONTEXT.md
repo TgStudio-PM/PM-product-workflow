@@ -5,13 +5,14 @@
 - 产品：以 Tg Studio 为页面品牌、内容完全虚构的静态材料申报教学案例。
 - 使用者：学习 Coding Agent 原型事实治理方法的产品经理与开发者。
 - 问题：示范业务规则、页面交互和仓库事实如何共同维护，并展示简单表单的完整状态闭环。
-- 当前阶段：首轮教学案例，限一个离线申报页面。
+- 当前阶段：第二轮教学案例，继续在同一离线申报页面演示规则变更、漂移识别与事实同步。
 
 ## 已确认范围
 
 - 页面品牌为 Tg Studio；事项名称为“Tg Studio 示例项目材料申报”。
 - 展示申请说明和三项虚构材料：“项目背景说明”“页面流程草图”“迭代计划摘要”。
-- 申请说明和三项材料确认均为提交必填项。
+- 申请说明、“项目背景说明”和“迭代计划摘要”为提交必填项；“页面流程草图”为可选项。
+- 必备材料计数只统计两项必备材料；可选材料勾选状态随草稿保存和恢复。
 - 草稿保存在当前浏览器的本地存储；刷新后恢复。
 - 提交成功后表单进入只读状态。
 - 使用者可清除本案例保存的演示数据并重新开始。
@@ -39,4 +40,4 @@
 | 事实 | 状态 | 产品确认依据 | 当前实现证据 | 最近核对 |
 | --- | --- | --- | --- | --- |
 | 本项目是完全虚构的单页离线材料申报教学示例 | 已确认 | Issue #8 的公开目标；`examples/material-submission/facts/module/DECISIONS.md` 中 DEC-001 | `examples/material-submission/index.html` 的教学提示 | 2026-09-24 |
-| 教学闭环包含说明和材料必填、草稿暂存、提交后只读及清除重开 | 已确认 | Issue #8 的公开目标；`examples/material-submission/facts/module/DECISIONS.md` 中 DEC-001 | `examples/material-submission/facts/module/BUSINESS_RULES.md`、`examples/material-submission/facts/module/PAGE_FLOW.md` 和页面脚本 | 2026-09-24 |
+| 教学闭环包含说明和必备材料校验、可选材料、草稿暂存、提交后只读及清除重开 | 已确认 | Issue #8 的公开目标；Issue #12 和 `examples/material-submission/facts/module/DECISIONS.md` 中 DEC-002 | `examples/material-submission/facts/module/BUSINESS_RULES.md`、`examples/material-submission/facts/module/PAGE_FLOW.md` 和页面脚本 | 2026-09-24 |
