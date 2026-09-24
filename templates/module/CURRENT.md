@@ -1,29 +1,29 @@
-# Current state
+# 模块当前状态
 
-## Module
+## 模块信息
 
-- Name:
-- Purpose:
-- Current baseline:
-- Entry:
+- 模块名称：
+- 模块用途：
+- 当前稳定基线：
+- 页面或功能入口：
 
-## Completed
-
--
-
-## Verified
-
-- Product-manager acceptance:
-- Machine verification:
-
-## Pending
+## 已完成
 
 -
 
-## Next step
+## 已验证
+
+- 产品验收：
+- 机器验证：
+
+## 待处理
 
 -
 
-## Prohibited actions
+## 下一步
+
+-
+
+## 禁止操作
 
 -

@@ -1,16 +1,16 @@
-# Design profile selection
+# 设计规范选择
 
-- Product type:
-- Platform:
-- Selected profile:
-- Existing design system:
-- Component library:
-- Accessibility target:
+- 产品类型：
+- 使用平台：
+- 选用的设计预设：
+- 项目已有设计规范：
+- 组件库：
+- 无障碍目标：
 
-## Project overrides
+## 项目自定义规则
 
-| Rule | Reason | Confirmed by | Date |
+| 规则 | 原因 | 确认人 | 日期 |
 | --- | --- | --- | --- |
 |  |  |  |  |
 
-Project-confirmed constraints take precedence over optional visual suggestions. Record conflicts instead of silently replacing existing rules.
+项目已确认的约束优先于可选的视觉建议。发现规则冲突时先记录并核对，不要静默替换现有约定。

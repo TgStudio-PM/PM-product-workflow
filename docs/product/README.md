@@ -14,14 +14,16 @@
 
 | 层级 | 文件 | 保存内容 |
 | --- | --- | --- |
-| 项目 | `PROJECT_CONTEXT.md` | 目标、范围、角色、约束和事实来源 |
-| 项目 | `MODULE_REGISTRY.md` | 模块状态、入口和负责人 |
-| 项目 | `DESIGN_PROFILE.md` | 当前选择的设计规范及覆盖规则 |
-| 模块 | `CURRENT.md` | 稳定基线、正在进行、下一步和阻塞 |
-| 模块 | `BUSINESS_RULES.md` | 已确认规则与待确认问题 |
-| 模块 | `PAGE_FLOW.md` | 页面、角色、状态和操作流程 |
-| 模块 | `DECISIONS.md` | 重要取舍、理由和影响 |
-| 模块 | `ERROR_LEDGER.md` | 重复错误、根因、无效尝试和验证 |
+| 项目 | `PROJECT_CONTEXT.md` | 项目定位、范围、约束、待确认问题与事实依据 |
+| 项目 | `MODULE_REGISTRY.md` | 模块用途、状态、入口、负责人和核验日期 |
+| 项目 | `DESIGN_PROFILE.md` | 产品类型、平台、设计预设、组件库与项目自定义规则 |
+| 模块 | `CURRENT.md` | 模块基线、已完成、验收与验证、待处理和下一步 |
+| 模块 | `BUSINESS_RULES.md` | 规则编号、状态、适用范围、依据和变更日期 |
+| 模块 | `PAGE_FLOW.md` | 角色目标、操作权限、状态流转、主流程和例外 |
+| 模块 | `DECISIONS.md` | 决策状态、背景、决定、理由、影响和验证结果 |
+| 模块 | `ERROR_LEDGER.md` | 错误状态、复现、尝试、根因、修复和验证 |
+
+模板字段和操作提示以中文为主。用于机器识别或保持兼容的编号与状态枚举保留原值，并附中文释义，例如 `BR-001`、`Confirmed（已确认）/ Pending（待确认）`。
 
 ## 每轮迭代
 
@@ -64,4 +66,4 @@
 
 ## 当前交付状态
 
-模板和 `gov-enterprise-cn` Profile 已可使用。`pm-prototype-memory` 与材料申报首轮案例已形成可审阅内容；独立浏览器验收、模板中文优先化、案例后续迭代、交接 Skill 和打包 Skill 仍待完成。
+中文优先模板和 `gov-enterprise-cn` Profile 已可使用。`pm-prototype-memory` 与完全虚构的材料申报前两轮离线案例已交付，并完成独立浏览器交互验收；第二轮演示了规则变化与事实同步。案例第三轮、交接 Skill 和打包 Skill 仍待完成。

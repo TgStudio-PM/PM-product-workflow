@@ -1,21 +1,21 @@
-# Page flow
+# 页面与流程
 
-## Roles
+## 角色
 
-| Role | Goal | Allowed actions | Prohibited actions |
+| 角色 | 目标 | 可执行操作 | 禁止操作 |
 | --- | --- | --- | --- |
 |  |  |  |  |
 
-## States
+## 状态
 
-| State | Meaning | Available actions | Next state |
+| 状态 | 含义 | 可执行操作 | 后续状态 |
 | --- | --- | --- | --- |
 |  |  |  |  |
 
-## Main flow
+## 主流程
 
 1.
 
-## Exceptions
+## 异常与例外
 
 -

@@ -1,20 +1,20 @@
-# Error ledger
+# 错误记录
 
 ## ERR-YYYYMMDD-001
 
-- Time:
-- Scope:
-- Status: Unlocated / Mitigating / Resolved
-- Symptom:
-- Reproduction:
-- Signature:
-- Impact:
-- Attempts and results:
-- Root cause:
-- Final fix:
-- Targeted verification:
-- Regression verification:
-- Prevention rule:
-- Evidence:
+- 时间：
+- 影响范围：
+- 状态：Unlocated（未定位）/ Mitigating（缓解中）/ Resolved（已解决）
+- 现象：
+- 复现步骤：
+- 错误特征：
+- 影响：
+- 尝试及结果：
+- 根因：
+- 最终修复：
+- 定向验证：
+- 回归验证：
+- 预防规则：
+- 证据：
 
-After two equivalent failures, stop blind retries. Preserve the reproducible state and test one falsifiable cause at a time.
+同一问题连续两次等价尝试仍失败时，停止盲目重试。保留可复现现场，一次只验证一个可证伪的原因。

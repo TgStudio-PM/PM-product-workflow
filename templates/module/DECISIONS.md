@@ -1,12 +1,12 @@
-# Decisions
+# 产品决策
 
 ## DEC-001
 
-- Date:
-- Status: Confirmed / Superseded
-- Context:
-- Decision:
-- Reason:
-- Affected rules:
-- Affected pages or files:
-- Verification:
+- 日期：
+- 状态：Confirmed（已确认）/ Superseded（已被新决策替代）
+- 背景：
+- 决定：
+- 原因：
+- 影响的规则：
+- 影响的页面或文件：
+- 验证结果：
