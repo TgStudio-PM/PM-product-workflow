@@ -49,6 +49,18 @@ try {
 
   const registry = await readFile(path.join(root, 'src', 'app', 'page-registry.ts'), 'utf8')
   const registeredRoutes = [...registry.matchAll(/path:\s*['"]([^'"]+)['"]/g)].map((match) => match[1])
+  const findDuplicates = (values) => {
+    const counts = new Map()
+    for (const value of values) counts.set(value, (counts.get(value) ?? 0) + 1)
+    return [...counts].filter(([, count]) => count > 1).map(([value]) => value)
+  }
+  for (const route of findDuplicates(registeredRoutes)) issue(`源码页面注册表包含重复路由：${route}`)
+
+  const manifestRoutes = Array.isArray(manifest.pages)
+    ? manifest.pages.map((page) => page?.route).filter((route) => typeof route === 'string')
+    : []
+  for (const route of findDuplicates(manifestRoutes)) issue(`manifest 页面清单包含重复路由：${route}`)
+
   for (const route of registeredRoutes) {
     if (!manifest.pages?.some((page) => page.route === route) || !app.includes(route) || !(await readFile(path.join(output, 'PAGES.md'), 'utf8')).includes(route)) {
       issue(`页面路由未完整进入离线包：${route}`)
