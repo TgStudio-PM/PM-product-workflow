@@ -44,7 +44,7 @@ function searchPages() {
       <QuerySection v-model="query" label="页面名称或说明" placeholder="输入页面名称或关键词" @search="searchPages" @reset="resetQuery" />
       <section class="panel registry-panel">
         <div class="panel-heading"><div><span class="section-kicker">PAGE REGISTRY</span><h2>页面清单</h2></div><span class="panel-count">{{ rows.length }} 个页面</span></div>
-        <DataTable :columns="overviewMock.columns" :rows="rows" :selected-id="selectedPath" @select="selectedPath = $event" />
+        <DataTable :columns="overviewMock.columns" :rows="rows" :selected-id="selectedPath" row-label-key="title" empty-text="没有匹配的页面" @select="selectedPath = $event" />
       </section>
     </div>
     <DetailPanel :title="selectedPage.title" :description="selectedPage.description" label="PAGE DETAILS">
