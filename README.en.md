@@ -60,19 +60,24 @@ At the end of each iteration, the project repository should answer:
 | Fictional material-submission example | Three iterations documented; iteration three is a simulated interruption and fact-reconciliation exercise that changes no page or business rule | `examples/material-submission/` |
 | Tg Studio Vue prototype starter | Delivered; optional to use | `starters/vue-prototype/` |
 | `pm-prototype-handover` Skill | Delivered | `.agents/skills/pm-prototype-handover/SKILL.md` |
-| `pm-prototype-packager` Skill | Planned | `.agents/skills/` after implementation |
+| Three delivery profiles and guide | Delivered | `examples/package-profiles/`, `docs/product/PACKAGING.md` |
+| `pm-prototype-packager` Skill | Delivered | `.agents/skills/pm-prototype-packager/SKILL.md` |
 
-Delivered and planned core Skills:
+Core Skills:
 
 - `pm-prototype-memory` (delivered): maintains facts, changes, conflicts, and error history.
 - `pm-prototype-handover` (delivered): creates concise continuation notes or complete handoff material.
-- `pm-prototype-packager` (planned): validates and prepares independently runnable prototype delivery packages.
+- `pm-prototype-packager` (delivered): prepares allowlisted static preview, frontend source, and backend requirements packages with distinct acceptance boundaries.
 
 ### Optional Vue starter
 
 If you want to start from a Vue project structure, see the [Tg Studio Vue prototype starter](starters/vue-prototype/README.md). It demonstrates page registration, a copyable page template, mock data, shared components, frontend/backend handoff notes, and static preview packaging with Vue 3 + Vite. This is an optional engineering starter; the product workflow and other templates do not depend on Vue.
 
 The starter is delivered and optional. The target time for adding a simple page has not been measured by a non-developer product manager; `file://` behavior should still be checked in each target browser. Its material-submission case is fully fictional and provides no real API, authentication, file upload, or production processing.
+
+### Prototype delivery packages
+
+Choose a static preview, frontend source, or backend requirements package before selecting files. See the [Chinese packaging guide](docs/product/PACKAGING.md) and [three fictional profile examples](examples/package-profiles/). The `pm-prototype-packager` Skill is delivered and guides package selection, evidence checks, and production-interface boundaries.
 
 ## Repository structure
 
@@ -104,7 +109,7 @@ See the complete [open-source boundary](maintainers/OPEN_SOURCE_BOUNDARY.md). Pr
 - [x] Publish `pm-prototype-memory` and three offline fictional material-submission iterations (the third is a simulated continuation exercise).
 - [x] Deliver the optional Tg Studio Vue prototype starter.
 - [x] Deliver `pm-prototype-handover`.
-- [ ] Publish `pm-prototype-packager`.
+- [x] Deliver three fictional delivery profiles, the packaging guide, and `pm-prototype-packager`.
 - [ ] Complete the `gov-enterprise-cn` profile and v0.1 acceptance.
 
 ## Contributing and license

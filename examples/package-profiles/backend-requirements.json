@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "kind": "backend-requirements",
+  "name": "Tg Studio 虚构材料申报后端需求讨论包",
+  "output": "artifacts/material-submission-backend-requirements.zip",
+  "include": [
+    "docs/BACKEND_HANDOFF.md",
+    "src/modules/material-submission/contracts",
+    "src/modules/material-submission/facts/module"
+  ],
+  "required": [
+    "docs/BACKEND_HANDOFF.md",
+    "src/modules/material-submission/contracts/README.md",
+    "src/modules/material-submission/facts/module/CURRENT.md",
+    "src/modules/material-submission/facts/module/BUSINESS_RULES.md",
+    "src/modules/material-submission/facts/module/PAGE_FLOW.md",
+    "src/modules/material-submission/facts/module/DECISIONS.md"
+  ],
+  "entry": "docs/BACKEND_HANDOFF.md",
+  "limitations": "此包只用于讨论完全虚构案例中的模块事实和待确认接口问题。文档没有定义已确认的生产 API；不得将本案例 mock 数据、页面操作或字段示例当作真实接口契约。对接前需由相关产品与前后端人员确认接口和业务语义。"
+}

@@ -63,19 +63,24 @@ gov-enterprise-cn
 | 材料申报虚构案例 | 三轮记录已提供；第三轮为模拟中断后的事实核对与接续练习，不改页面或业务规则 | `examples/material-submission/` |
 | Tg Studio Vue 原型工程模板 | 已交付，可选使用 | `starters/vue-prototype/` |
 | `pm-prototype-handover` Skill | 已交付 | `.agents/skills/pm-prototype-handover/SKILL.md` |
-| `pm-prototype-packager` Skill | 规划中 | 完成后放入 `.agents/skills/` |
+| 三类交付 Profile 与使用说明 | 已交付 | `examples/package-profiles/`、`docs/product/PACKAGING.md` |
+| `pm-prototype-packager` Skill | 已交付 | `.agents/skills/pm-prototype-packager/SKILL.md` |
 
-已交付与计划中的核心 Skills：
+核心 Skills：
 
 - `pm-prototype-memory`（已交付）：维护事实、变更、冲突和错误闭环。
 - `pm-prototype-handover`（已交付）：生成短接续或完整交接材料。
-- `pm-prototype-packager`（规划中）：检查并整理可独立运行的原型交付包。
+- `pm-prototype-packager`（已交付）：按静态预览、前端源码和后端需求材料准备白名单交付包，并分别说明验收边界。
 
 ### 可选 Vue 工程模板
 
 如果你希望从现成的 Vue 工程结构开始，可以查看[Tg Studio Vue 原型工程模板](starters/vue-prototype/README.md)。它用 Vue 3 + Vite 展示页面注册、页面模板、mock 数据、共享组件、前后端交接和静态预览打包。Vue 模板是可选的工程实现；上面的产品工作流和其他模板不依赖 Vue。
 
 模板已交付，可按需使用。新增简单页面的目标用时尚未经过非开发产品经理计时验收；`file://` 行为仍应在实际目标浏览器中验证。案例为完全虚构的 Tg Studio 材料申报演示，不提供真实 API、身份认证、文件上传或生产办理能力。
+
+### 原型交付包
+
+交付前先选择静态预览、前端源码或后端需求材料，并按对应白名单准备文件。查看[中文交付说明](docs/product/PACKAGING.md)和[三类虚构 profile 样例](examples/package-profiles/)。`pm-prototype-packager` Skill 已交付，可指导按用途选包、检查证据并遵守生产接口边界。
 
 ## 仓库结构
 
@@ -107,7 +112,7 @@ maintainers/                   本仓库治理、状态和检查工具
 - [x] 发布 `pm-prototype-memory` 与材料申报三轮离线虚构案例（第三轮为模拟接续练习）
 - [x] 交付可选的 Tg Studio Vue 原型工程模板
 - [x] 交付 `pm-prototype-handover`
-- [ ] 发布 `pm-prototype-packager`
+- [x] 交付三类虚构交付 Profile、使用说明与 `pm-prototype-packager`
 - [ ] 完善 `gov-enterprise-cn` Profile 并完成 v0.1 验收
 
 ## 贡献与许可
