@@ -117,7 +117,7 @@ maintainers/                   本仓库治理、状态和检查工具
 - [x] 交付三类虚构交付 Profile、使用说明与 `pm-prototype-packager`
 - [ ] 完善 `gov-enterprise-cn` Profile 并完成 v0.1 验收
 
-本次空白上下文验收记录见[2026-10-21 v0.1 产品验收](maintainers/acceptance/2026-10-21-v01-product-audit.md)；浏览器运行和非开发产品经理人测仍待完成，项目尚未正式发布 v0.1。
+空白上下文试用与后续静态包浏览器补验收见[2026-10-21 v0.1 产品验收记录](maintainers/acceptance/2026-10-21-v01-product-audit.md)。当前静态包已通过 Chrome、Edge 的 `file://` 交互与离线检查；非开发产品经理人测仍待完成，项目尚未正式发布 v0.1。
 
 ## 贡献与许可
 

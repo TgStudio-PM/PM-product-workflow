@@ -114,7 +114,7 @@ See the complete [open-source boundary](maintainers/OPEN_SOURCE_BOUNDARY.md). Pr
 - [x] Deliver three fictional delivery profiles, the packaging guide, and `pm-prototype-packager`.
 - [ ] Complete the `gov-enterprise-cn` profile and v0.1 acceptance.
 
-See the [October 21, 2026 v0.1 product acceptance](maintainers/acceptance/2026-10-21-v01-product-audit.md) for the blank-context review. Browser execution and testing by a non-developer product manager remain pending; v0.1 has not been formally released.
+See the [October 21, 2026 v0.1 acceptance record](maintainers/acceptance/2026-10-21-v01-product-audit.md) for the blank-context review and subsequent browser check. The current static package passed `file://` interaction and offline checks in Chrome and Edge; testing by a non-developer product manager remains pending, and v0.1 has not been formally released.
 
 ## Contributing and license
 
