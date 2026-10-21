@@ -10,10 +10,15 @@ import { overviewMock } from './mock'
 const query = ref('')
 const appliedQuery = ref('')
 const selectedPath = ref<string>(pageRegistry[0].path)
-const rows = computed<TableRow[]>(() => pageRegistry
+const visiblePages = computed(() => pageRegistry
   .filter((page) => `${page.title} ${page.menuLabel} ${page.description}`.toLocaleLowerCase().includes(appliedQuery.value.trim().toLocaleLowerCase()))
+)
+const rows = computed<TableRow[]>(() => visiblePages.value
   .map((page) => ({ id: page.path, cells: { title: page.title, menu: page.menuLabel, role: page.demoRole } })))
-const selectedPage = computed(() => pageRegistry.find((page) => page.path === selectedPath.value) ?? pageRegistry[0])
+const visibleSelectedPath = computed(() => visiblePages.value.some((page) => page.path === selectedPath.value)
+  ? selectedPath.value
+  : visiblePages.value[0]?.path)
+const selectedPage = computed(() => visiblePages.value.find((page) => page.path === visibleSelectedPath.value))
 
 function resetQuery() {
   query.value = ''
@@ -44,12 +49,14 @@ function searchPages() {
       <QuerySection v-model="query" label="页面名称或说明" placeholder="输入页面名称或关键词" @search="searchPages" @reset="resetQuery" />
       <section class="panel registry-panel">
         <div class="panel-heading"><div><span class="section-kicker">PAGE REGISTRY</span><h2>页面清单</h2></div><span class="panel-count">{{ rows.length }} 个页面</span></div>
-        <DataTable :columns="overviewMock.columns" :rows="rows" :selected-id="selectedPath" row-label-key="title" empty-text="没有匹配的页面" @select="selectedPath = $event" />
+        <DataTable :columns="overviewMock.columns" :rows="rows" :selected-id="visibleSelectedPath" row-label-key="title" empty-text="没有匹配的页面" @select="selectedPath = $event" />
       </section>
     </div>
-    <DetailPanel :title="selectedPage.title" :description="selectedPage.description" label="PAGE DETAILS">
-      <dl class="page-detail-list"><dt>页面路径</dt><dd>{{ selectedPage.path }}</dd><dt>演示角色标识</dt><dd>{{ selectedPage.demoRole }}</dd><dt>说明</dt><dd>该角色仅用于展示页面上下文，不执行真实鉴权。</dd></dl>
-      <a class="inline-link" :href="`#${selectedPage.path}`">打开页面 <span aria-hidden="true">→</span></a>
+    <DetailPanel :title="selectedPage?.title ?? '没有匹配的页面'" :description="selectedPage?.description ?? '调整或清除筛选条件后可查看页面详情。'" label="PAGE DETAILS">
+      <template v-if="selectedPage">
+        <dl class="page-detail-list"><dt>页面路径</dt><dd>{{ selectedPage.path }}</dd><dt>演示角色标识</dt><dd>{{ selectedPage.demoRole }}</dd><dt>说明</dt><dd>该角色仅用于展示页面上下文，不执行真实鉴权。</dd></dl>
+        <a class="inline-link" :href="`#${selectedPage.path}`">打开页面 <span aria-hidden="true">→</span></a>
+      </template>
     </DetailPanel>
   </div>
 
