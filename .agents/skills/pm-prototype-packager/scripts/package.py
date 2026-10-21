@@ -289,20 +289,25 @@ def _sha(data: bytes) -> str:
 
 def _readme(profile: dict, filenames: Iterable[str]) -> bytes:
     lines = [
-        f"# {profile['name']}", "", f"Delivery kind: `{profile['kind']}`.", "",
+        f"# {profile['name']}", "",
+        f"交付类型 / Delivery kind: `{profile['kind']}`.",
+        f"声明入口 / Declared entry: `{profile['entry']}`.", "",
+        "本包只包含交付 Profile 选定的文件。生成与完整性检查不等于浏览器运行、工程构建、后端对接或生产验收。",
         "This archive contains only files selected by its package profile. Its creation and integrity checks do not establish browser, runtime, backend, or production acceptance.",
+        "脚本会拒绝常见凭据或证书文件名，但不扫描文件内容，不能据此证明包内没有敏感信息。",
         "Common secret and certificate filenames are rejected, but file contents are not scanned and this does not prove that the archive contains no secrets.",
-        "", "## Included files", "",
+        "", "## 文件清单 / Included files", "",
     ]
     lines.extend(f"- `{name}`" for name in sorted(filenames))
     if profile.get("limitations"):
-        lines.extend(["", "## Limitations", "", profile["limitations"].strip()])
+        lines.extend(["", "## 已知限制 / Limitations", "", profile["limitations"].strip()])
     if profile["kind"] == "static-preview":
         lines.extend([
             "",
+            "静态离线检查只覆盖常见 HTML/CSS 资源引用、JavaScript 模块加载和常见网络 API 特征；它不能证明任意 JavaScript 都不会联网，仍须在目标浏览器验收。",
             "Static offline checks cover common HTML/CSS resource references, JavaScript module loading, and common network APIs. They are heuristic and cannot prove arbitrary JavaScript has no network behavior; browser testing is still required.",
         ])
-    lines.extend(["", "Verify the archive with `python package.py --verify <archive.zip>`.", ""])
+    lines.extend(["", "验包 / Verify the archive: `python package.py --verify <archive.zip>`.", ""])
     return "\n".join(lines).encode("utf-8")
 
 
