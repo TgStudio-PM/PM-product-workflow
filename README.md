@@ -59,7 +59,7 @@ gov-enterprise-cn
 | 项目与模块事实模板 | 可用，中文优先 | `templates/project/`、`templates/module/` |
 | 政务与复杂 B 端 Web 可选预设 | 可用，持续完善；可由项目设计配置覆盖 | `profiles/gov-enterprise-cn/`、`templates/project/DESIGN_PROFILE.md` |
 | 页面评审模板 | 可用；平台不合规判断需项目提供权威条款 | `profiles/gov-enterprise-cn/REVIEW_TEMPLATE.md` |
-| 虚构页面评审示例 | 本轮新增，内容见示例文件 | `examples/material-submission/reviews/gov-enterprise-cn.md` |
+| 虚构页面评审示例 | 可用，内容见示例文件 | `examples/material-submission/reviews/gov-enterprise-cn.md` |
 | 产品方法与快速开始 | 可用 | `docs/product/` |
 | `pm-prototype-memory` Skill | 已交付 | `.agents/skills/pm-prototype-memory/SKILL.md` |
 | 材料申报虚构案例 | 三轮记录已提供；第三轮为模拟中断后的事实核对与接续练习，不改页面或业务规则 | `examples/material-submission/` |
@@ -116,6 +116,8 @@ maintainers/                   本仓库治理、状态和检查工具
 - [x] 交付 `pm-prototype-handover`
 - [x] 交付三类虚构交付 Profile、使用说明与 `pm-prototype-packager`
 - [ ] 完善 `gov-enterprise-cn` Profile 并完成 v0.1 验收
+
+本次空白上下文验收记录见[2026-10-21 v0.1 产品验收](maintainers/acceptance/2026-10-21-v01-product-audit.md)；浏览器运行和非开发产品经理人测仍待完成，项目尚未正式发布 v0.1。
 
 ## 贡献与许可
 

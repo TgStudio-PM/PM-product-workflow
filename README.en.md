@@ -56,7 +56,7 @@ At the end of each iteration, the project repository should answer:
 | Project and module fact templates | Available, Chinese-first | `templates/project/` and `templates/module/` |
 | Optional government and complex enterprise web profile | Available and evolving; projects may override it | `profiles/gov-enterprise-cn/`, `templates/project/DESIGN_PROFILE.md` |
 | Page review template | Available; non-compliance findings require authoritative project-provided criteria | `profiles/gov-enterprise-cn/REVIEW_TEMPLATE.md` |
-| Fictional page review example | Added in this iteration; see the example file | `examples/material-submission/reviews/gov-enterprise-cn.md` |
+| Fictional page review example | Available; see the example file | `examples/material-submission/reviews/gov-enterprise-cn.md` |
 | Product method and quick start | Available | `docs/product/` |
 | `pm-prototype-memory` Skill | Delivered | `.agents/skills/pm-prototype-memory/SKILL.md` |
 | Fictional material-submission example | Three iterations documented; iteration three is a simulated interruption and fact-reconciliation exercise that changes no page or business rule | `examples/material-submission/` |
@@ -113,6 +113,8 @@ See the complete [open-source boundary](maintainers/OPEN_SOURCE_BOUNDARY.md). Pr
 - [x] Deliver `pm-prototype-handover`.
 - [x] Deliver three fictional delivery profiles, the packaging guide, and `pm-prototype-packager`.
 - [ ] Complete the `gov-enterprise-cn` profile and v0.1 acceptance.
+
+See the [October 21, 2026 v0.1 product acceptance](maintainers/acceptance/2026-10-21-v01-product-audit.md) for the blank-context review. Browser execution and testing by a non-developer product manager remain pending; v0.1 has not been formally released.
 
 ## Contributing and license
 
