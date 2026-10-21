@@ -20,6 +20,22 @@ jobs:
           python-version: '3.12'
       - name: Unit tests
         run: python -m unittest discover -s maintainers/tests -v
+      - name: Product packager tests
+        run: python -m unittest discover -s .agents/skills/pm-prototype-packager/tests -v
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: starters/vue-prototype/package-lock.json
+      - name: Install Vue starter dependencies
+        run: npm ci
+        working-directory: starters/vue-prototype
+      - name: Check Vue starter types
+        run: npm run typecheck
+        working-directory: starters/vue-prototype
+      - name: Build and verify Vue starter preview
+        run: npm run preview:pack
+        working-directory: starters/vue-prototype
       - name: Public content and risk
         if: github.event_name == 'pull_request'
         run: python maintainers/scripts/check_public_content.py --root . --base-ref origin/${{ github.base_ref }}
