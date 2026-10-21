@@ -54,7 +54,9 @@ At the end of each iteration, the project repository should answer:
 | Capability | Status | Location |
 | --- | --- | --- |
 | Project and module fact templates | Available, Chinese-first | `templates/project/` and `templates/module/` |
-| Government and complex enterprise design profile | Available and evolving | `profiles/gov-enterprise-cn/` |
+| Optional government and complex enterprise web profile | Available and evolving; projects may override it | `profiles/gov-enterprise-cn/`, `templates/project/DESIGN_PROFILE.md` |
+| Page review template | Available; non-compliance findings require authoritative project-provided criteria | `profiles/gov-enterprise-cn/REVIEW_TEMPLATE.md` |
+| Fictional page review example | Added in this iteration; see the example file | `examples/material-submission/reviews/gov-enterprise-cn.md` |
 | Product method and quick start | Available | `docs/product/` |
 | `pm-prototype-memory` Skill | Delivered | `.agents/skills/pm-prototype-memory/SKILL.md` |
 | Fictional material-submission example | Three iterations documented; iteration three is a simulated interruption and fact-reconciliation exercise that changes no page or business rule | `examples/material-submission/` |

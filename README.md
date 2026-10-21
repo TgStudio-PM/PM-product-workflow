@@ -57,7 +57,9 @@ gov-enterprise-cn
 | 能力 | 状态 | 位置 |
 | --- | --- | --- |
 | 项目与模块事实模板 | 可用，中文优先 | `templates/project/`、`templates/module/` |
-| 政务与复杂 B 端设计预设 | 可用，持续完善 | `profiles/gov-enterprise-cn/` |
+| 政务与复杂 B 端 Web 可选预设 | 可用，持续完善；可由项目设计配置覆盖 | `profiles/gov-enterprise-cn/`、`templates/project/DESIGN_PROFILE.md` |
+| 页面评审模板 | 可用；平台不合规判断需项目提供权威条款 | `profiles/gov-enterprise-cn/REVIEW_TEMPLATE.md` |
+| 虚构页面评审示例 | 本轮新增，内容见示例文件 | `examples/material-submission/reviews/gov-enterprise-cn.md` |
 | 产品方法与快速开始 | 可用 | `docs/product/` |
 | `pm-prototype-memory` Skill | 已交付 | `.agents/skills/pm-prototype-memory/SKILL.md` |
 | 材料申报虚构案例 | 三轮记录已提供；第三轮为模拟中断后的事实核对与接续练习，不改页面或业务规则 | `examples/material-submission/` |

@@ -1,30 +1,46 @@
 # gov-enterprise-cn
 
-Default design and review profile for Chinese government and complex enterprise web management systems.
+面向中文政务与复杂 B 端 Web 管理产品的可选评审预设，主要帮助产品经理检查业务原型中的术语、流程、数据呈现和操作反馈。开发者可协作使用。
 
-## Priorities
+本预设是 Tg Studio 项目的经验化检查清单，不代表任何政府部门、行业主管单位或政务平台的官方标准，也不替代项目提供的规范。产品工作流本身仍可用于其他产品类型、平台和技术栈。
 
-1. Correct business terminology and state meaning.
-2. Clear role boundaries, permissions, and prohibited actions.
-3. Traceable operations, results, and exception handling.
-4. Efficient tables, filters, forms, material lists, and batch actions.
-5. Consistency with the host project's existing design system and component library.
+## 采用顺序
 
-## Interaction guidance
+按以下顺序判断冲突：
 
-- Keep query fields, list columns, details, and exports consistent where they represent the same concept.
-- Make status, required action, responsible role, and next step visible together.
-- Enforce prohibited actions through controls and business logic, not warning copy alone.
-- Use confirmation for destructive or hard-to-reverse actions and show the concrete impact.
-- Preserve search conditions and work context when users return from details or complete a subtask.
-- Prefer readable information density over decorative whitespace in frequent administrative work.
+1. 项目提供且适用的权威平台硬规范及其条款。
+2. 项目已确认的业务规则、设计决策和组件约定。
+3. 本预设中适用于当前页面的检查点。
+4. 评审者的主观体验建议。
 
-## Review classification
+使用者可以不选用本预设，也可以在项目的 `DESIGN_PROFILE.md` 中记录覆盖项。先核对规则适用范围和来源；证据冲突或不足时标记“待确认”，不自行裁定。
 
-- Business error: conflicts with confirmed terminology, rules, roles, or flows.
-- Profile violation: conflicts with a rule in this profile or a project override.
-- Design suggestion: an optional improvement that needs product judgment.
+## 使用说明
 
-## Project adaptation
+逐项判断页面是否适用，再检查其可观察行为。不要要求每个页面都具有表格、复杂表单、材料清单或审批功能。建议结合已确认规则、页面结构、交互结果和视口观察；仅凭静态截图无法确认的行为应标为待验证。
 
-This profile does not replace an existing platform standard. Record project-specific overrides in `DESIGN_PROFILE.md` and cite their evidence.
+| 编号 | 检查点 | 可观察问题 |
+| --- | --- | --- |
+| GE-01 | 术语与状态 | 同一业务概念在查询、列表、详情和操作结果中是否使用一致名称？状态是否表达清楚，是否与已确认规则冲突？ |
+| GE-02 | 查询与表格 | 适用时，查询项是否对应列表字段；筛选、清空、排序、分页和返回列表后的条件保持是否可理解且符合已确认规则？ |
+| GE-03 | 行动与流程 | 页面是否让用户看清当前事项、所需动作、办理角色和下一步？流程或状态缺少依据时记录待确认，不补造流程。 |
+| GE-04 | 表单与校验 | 适用时，必填、格式、条件字段、错误位置及修正方式是否清晰？校验时机和业务约束是否有已确认依据？ |
+| GE-05 | 材料清单 | 适用时，材料名称、要求、必需/可选状态、提交状态和缺项反馈是否易辨认；不虚构法定材料要求。 |
+| GE-06 | 角色与权限提示 | 页面是否说明操作面向的角色或适用范围？没有真实权限和后端证据时，不将静态按钮状态判为生产权限缺陷，也不宣称权限已生效。 |
+| GE-07 | 高影响操作 | 删除、撤回、提交等难以撤销的操作是否呈现具体影响，并在适当位置提供确认或可理解的防误操作反馈？是否符合项目规则？ |
+| GE-08 | 结果反馈与追溯 | 操作完成、失败、处理中或无结果时，页面是否给出清楚反馈；适用时能否找到处理结果或记录入口？不得假设有生产审计能力。 |
+| GE-09 | 信息密度与可读性 | 高频信息是否便于扫描，字段、状态和操作是否易区分；信息密度是否妨碍阅读或关键行动？避免把个人偏好的留白或装饰当作硬规则。 |
+| GE-10 | 窄视口与适配 | 项目目标视口内，关键内容、操作和反馈是否可访问；布局是否出现遮挡、横向溢出或不可操作元素？未测试的设备/浏览器需注明。 |
+
+## 评审分类与证据
+
+- **错误**：有证据表明实现缺陷，或页面与已确认业务规则、术语、流程冲突。指出具体规则或可复现现象。
+- **平台不合规**：只有在项目提供了可核验的权威平台规范、适用范围和具体条款时使用，并引用来源及条款。没有这些证据时不得使用此分类。
+- **主观审美优化**：一般体验、表达或视觉建议，供产品判断；不得伪装为业务错误或平台要求。
+- **Profile 偏差（可选记录）**：页面与本预设检查点不一致时，可作为评审观察单独说明。这不自动代表错误，也不等于平台不合规；需结合项目规则判断是否提出改进建议。
+
+每条正式结论记录：位置、现象、证据/规则编号、影响、建议和待确认项。推荐使用同目录的 [`REVIEW_TEMPLATE.md`](REVIEW_TEMPLATE.md)。事实写“已确认”或“待确认”；只有产品负责人明确允许时才写“假设”。
+
+## 原型与生产边界
+
+原型只能证明当前可观察的页面和交互实现。若没有后端、权限模型或接口证据，不推断真实数据持久化、身份鉴别、权限控制、审计留痕或平台合规状态。将尚未验证的能力列为待确认/待验证，并注明本次评审实际检查的页面、环境和视口。
