@@ -181,6 +181,50 @@ class PackageTests(unittest.TestCase):
         with self.assertRaisesRegex(package.PackageError, "VERIFY-07"):
             package.verify(tampered)
 
+    def test_verify_rejects_special_files_and_dos_directories(self) -> None:
+        self.write("note.txt", "unchanged fictional payload")
+        self.profile("backend-requirements", ["note.txt"], ["note.txt"], "note.txt")
+        self.build_and_verify()
+
+        cases = [
+            ("symlink", 3, 0o120777 << 16),
+            ("fifo", 3, 0o010600 << 16),
+            ("character-device", 3, 0o020600 << 16),
+            ("dos-directory", 0, 0x10),
+        ]
+        for label, create_system, external_attr in cases:
+            with self.subTest(entry_type=label):
+                tampered = self.root / f"{label}.zip"
+                with zipfile.ZipFile(self.output) as original, zipfile.ZipFile(tampered, "w") as changed:
+                    for source_info in original.infolist():
+                        info = zipfile.ZipInfo(source_info.filename, source_info.date_time)
+                        info.compress_type = source_info.compress_type
+                        info.create_system = source_info.create_system
+                        info.external_attr = source_info.external_attr
+                        if source_info.filename == "note.txt":
+                            info.create_system = create_system
+                            info.external_attr = external_attr
+                        changed.writestr(info, original.read(source_info.filename))
+                with self.assertRaisesRegex(package.PackageError, "VERIFY-02"):
+                    package.verify(tampered)
+
+    def test_verify_accepts_regular_files_without_unix_type_bits(self) -> None:
+        self.write("note.txt", "unchanged fictional payload")
+        self.profile("backend-requirements", ["note.txt"], ["note.txt"], "note.txt")
+        self.build_and_verify()
+        compatible = self.root / "no-unix-type.zip"
+        with zipfile.ZipFile(self.output) as original, zipfile.ZipFile(compatible, "w") as changed:
+            for source_info in original.infolist():
+                info = zipfile.ZipInfo(source_info.filename, source_info.date_time)
+                info.compress_type = source_info.compress_type
+                info.create_system = source_info.create_system
+                info.external_attr = source_info.external_attr
+                if source_info.filename == "note.txt":
+                    info.create_system = 3
+                    info.external_attr = 0o644 << 16
+                changed.writestr(info, original.read(source_info.filename))
+        package.verify(compatible)
+
     def test_verify_reaudits_resigned_static_archive(self) -> None:
         self.write("index.html", '<script src="app.js"></script>')
         self.write("app.js", "window.fixture = true;")
