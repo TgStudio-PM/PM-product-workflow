@@ -60,7 +60,22 @@ export function useApplicationDraft(isMaterialId: (value: unknown) => value is M
   onMounted(async () => {
     suppressAutoSave.value = true
     const loaded = readApplicationDraft(isMaterialId)
-    if (loaded.draft) Object.assign(draft, loaded.draft)
+    if (loaded.draft) {
+      Object.assign(draft, loaded.draft)
+      const restoredSubmissionIsInvalid = draft.submitted && (
+        !draft.description.trim() || requiredIds.some((id) => !draft.checkedMaterials.includes(id))
+      )
+      if (restoredSubmissionIsInvalid) {
+        draft.submitted = false
+        const saved = writeApplicationDraft(draft)
+        setStorageState(
+          saved,
+          saved
+            ? '无效的已提交记录已按草稿恢复，并已更正保存到当前浏览器'
+            : '无效的已提交记录已按草稿恢复，但更正未能保存到当前浏览器',
+        )
+      }
+    }
     if (!loaded.available) setStorageState(false, '无法读取本地草稿；当前内容不会持久保存')
     await nextTick()
     suppressAutoSave.value = false
