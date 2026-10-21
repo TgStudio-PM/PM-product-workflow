@@ -57,14 +57,15 @@ At the end of each iteration, the project repository should answer:
 | Government and complex enterprise design profile | Available and evolving | `profiles/gov-enterprise-cn/` |
 | Product method and quick start | Available | `docs/product/` |
 | `pm-prototype-memory` Skill | Delivered | `.agents/skills/pm-prototype-memory/SKILL.md` |
-| Fictional material-submission example | First two iterations delivered; third planned | `examples/material-submission/` |
+| Fictional material-submission example | Three iterations documented; iteration three is a simulated interruption and fact-reconciliation exercise that changes no page or business rule | `examples/material-submission/` |
 | Tg Studio Vue prototype starter | Delivered; optional to use | `starters/vue-prototype/` |
-| `pm-prototype-handover` and `pm-prototype-packager` Skills | Planned | `.agents/skills/` after implementation |
+| `pm-prototype-handover` Skill | Delivered | `.agents/skills/pm-prototype-handover/SKILL.md` |
+| `pm-prototype-packager` Skill | Planned | `.agents/skills/` after implementation |
 
 Delivered and planned core Skills:
 
 - `pm-prototype-memory` (delivered): maintains facts, changes, conflicts, and error history.
-- `pm-prototype-handover` (planned): creates concise continuation notes or complete handoff material.
+- `pm-prototype-handover` (delivered): creates concise continuation notes or complete handoff material.
 - `pm-prototype-packager` (planned): validates and prepares independently runnable prototype delivery packages.
 
 ### Optional Vue starter
@@ -100,11 +101,10 @@ See the complete [open-source boundary](maintainers/OPEN_SOURCE_BOUNDARY.md). Pr
 - [x] Establish the README, publication boundary, and base templates.
 - [x] Establish durable governance, tiered maintenance, and continuation rules.
 - [x] Separate the product entry from repository self-management.
-- [x] Publish `pm-prototype-memory` and the first two offline fictional material-submission iterations.
+- [x] Publish `pm-prototype-memory` and three offline fictional material-submission iterations (the third is a simulated continuation exercise).
 - [x] Deliver the optional Tg Studio Vue prototype starter.
-- [ ] Publish `pm-prototype-handover`.
+- [x] Deliver `pm-prototype-handover`.
 - [ ] Publish `pm-prototype-packager`.
-- [ ] Complete a third fictional iteration covering handoff and delivery.
 - [ ] Complete the `gov-enterprise-cn` profile and v0.1 acceptance.
 
 ## Contributing and license

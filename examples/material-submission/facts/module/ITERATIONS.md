@@ -31,3 +31,33 @@
 
 - 产品验收：Chrome 152 `file://` 真实交互确认仅两项必备可提交、三项全选也可提交、可选项草稿恢复、提交只读和重置；390px 设备模拟截图无明显遮挡。
 - 机器验证：Chrome CDP 13 项检查、Node DOM 模拟、JavaScript 语法、4 项仓库测试、公开内容扫描、Markdown 链接检查和 `git diff --check` 通过；390px 页面无横向溢出，未产生 HTTP(S) 请求。
+
+## 第三轮：模拟中断后的事实核对与接续
+
+### 输入与基线
+
+- 任务：GitHub Issue #18，练习只依赖仓库事实与任务接力块继续工作；不读取旧聊天。
+- 本地基线：分支 `feature/fictional-handover-iteration`，HEAD `7250a470ea62bed92744b6cf51536b6824baf3b8`；该提交与本地 `main`、`origin/main` 一致。Issue #18 当前为 Open。
+- 核对输入：根 `AGENTS.md`、项目宪章、开源边界、当前状态、治理规则、接力流程、Issue #18、模拟中断快照、项目与模块事实、`index.html`、`app.js`。
+- 本地工作树另有未跟踪的 `.agents/skills/pm-prototype-handover/SKILL.md`。本轮仅核对其存在及内容，不将其视为已跟踪、已合并或已完成验收的证据。
+
+### 发现并修正的过期或冲突事实
+
+| 位置 | 原表述 | 证据与处理 |
+| --- | --- | --- |
+| `facts/module/CURRENT.md` | “已验证”记录第二轮 Chrome `file://` 产品验收完成，但“待处理”又要求主线完成同一真实浏览器验收；“下一步”仍指向进入第三轮设计。 | `facts/module/ITERATIONS.md` 第二轮“验证”记录 Chrome 152 的 `file://` 验收已通过；同文件、`PAGE_FLOW.md` 与当前 `index.html` / `app.js` 支持当前交互基线。本轮删除重复待验收要求并标明浏览器验收是第二轮既有记录、本轮未重跑；下一步改为完成 Issue #18 剩余 Skill 审查与验收。 |
+| `facts/project/PROJECT_CONTEXT.md` | 当前阶段仍为第二轮。 | Issue #18 与已存在的第三轮模拟中断快照显示，当前教学任务已进入接续练习；改为“第三轮接续记录已补充”，并明确页面与规则没有变化。 |
+| `facts/project/MODULE_REGISTRY.md` | 模块仍标为“验收中”，日期为 2026-09-24。 | 第二轮迭代记录和 `CURRENT.md` 的产品验收记录均明确案例完成离线浏览器验收；更新状态与核对日期，并注明第三轮只涉及事实/接续记录。 |
+
+没有发现能支持修改 BR-001 至 BR-007、页面流程或页面实现的业务规则证据，因此本轮未改这些内容，也未把代码现状升级为新需求。
+
+### 接续结果
+
+- 事实状态已对齐：第二轮产品验收保留为有来源的历史记录，本轮机器检查单独列示；第三轮为接续文档练习，不宣称重新做过浏览器验收。
+- 模拟中断快照保留原文；本轮实际读取、冲突、处理、验证和下一步追加在 `iterations/03-handoff-exercise.md` 的“接续结果”。
+- 本轮未修改案例页面或业务规则，没有新增业务/API/权限事实。
+
+### 验证
+
+- 产品验收：本轮未执行浏览器 `file://` 产品验收。第二轮已留存的产品验收不等同于本轮重测。
+- 机器验证：`python maintainers/scripts/check_markdown_links.py .` 通过；`python maintainers/scripts/check_public_content.py --root .` 报告 `Public-content check passed`，同时显示 `Change risk: NOT-EVALUATED`（未提供 PR base-ref，故不作为风险分类结论）；`git diff --check` 与 `node --check examples/material-submission/app.js` 通过。这些检查不证明浏览器交互、全部 BR 回归或生产能力。

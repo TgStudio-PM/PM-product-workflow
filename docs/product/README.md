@@ -41,6 +41,8 @@
 
 - [材料申报离线教学示例](../../examples/material-submission/index.html)：查看完全虚构的单页案例及其[项目事实](../../examples/material-submission/facts/project/PROJECT_CONTEXT.md)和[模块规则](../../examples/material-submission/facts/module/BUSINESS_RULES.md)。下载或克隆仓库后可直接打开 `index.html`；页面交互仅保存在当前浏览器。
 - [pm-prototype-memory](../../.agents/skills/pm-prototype-memory/SKILL.md)：在原型任务中读取项目事实、区分已确认规则与当前实现、同步受影响文档并检查漂移。
+- [第三轮模拟中断与接续练习](../../examples/material-submission/iterations/03-handoff-exercise.md)：查看如何从仓库事实接续任务并记录核对结果。该轮只修正过期事实和补充接续记录，没有修改页面或业务规则；浏览器交互验收沿用第二轮既有记录，本轮未重跑。
+- [pm-prototype-handover](../../.agents/skills/pm-prototype-handover/SKILL.md)：生成证据支持的短接续或完整交接材料；Skill 已交付。
 
 ### 可选 Vue 原型工程模板
 
@@ -72,4 +74,4 @@
 
 ## 当前交付状态
 
-中文优先模板和 `gov-enterprise-cn` Profile 已可使用。`pm-prototype-memory` 与完全虚构的材料申报前两轮离线案例已交付，并完成独立浏览器交互验收；第二轮演示了规则变化与事实同步。可选 Vue 工程模板已交付，新增页面计时验收和更多目标浏览器的 `file://` 验证仍待完成；案例第三轮、交接 Skill 和打包 Skill 仍待完成。
+中文优先模板和 `gov-enterprise-cn` Profile 已可使用。`pm-prototype-memory` 与完全虚构的材料申报三轮记录已提供：前两轮演示页面规则迭代与事实同步，第三轮是模拟中断后的事实核对和接续记录，不改页面或业务规则。第二轮已有独立浏览器交互验收记录，第三轮没有重跑浏览器。可选 Vue 工程模板与 `pm-prototype-handover` Skill 已交付；打包 Skill、新增页面计时验收和更多目标浏览器的 `file://` 验证仍待完成。
