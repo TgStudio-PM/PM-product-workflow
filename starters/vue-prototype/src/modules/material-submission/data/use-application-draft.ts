@@ -53,6 +53,7 @@ export function useApplicationDraft(isMaterialId: (value: unknown) => value is M
   }
 
   watch(() => [draft.description, [...draft.checkedMaterials]], () => {
+    if (requiredCheckedCount.value === requiredIds.length) showMaterialsError.value = false
     if (!draft.submitted && !suppressAutoSave.value) persistDraft()
   }, { deep: true })
 
