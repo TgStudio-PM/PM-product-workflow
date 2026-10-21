@@ -12,7 +12,7 @@ PM-product-workflow keeps requirements, business rules, prototypes, reviews, val
 
 ### Use the product workflow
 
-If you want to apply this workflow to your own product project, begin with the [product workflow guide](docs/product/README.md), copy the files under `templates/`, and select a design profile from `profiles/`.
+If you want to apply this workflow to your own product project, begin with the [product workflow guide](docs/product/README.md), see [how to use the Skills](docs/product/USING_SKILLS.md), copy the files under `templates/`, and select a design profile from `profiles/`.
 
 Product users do not need to read the root `AGENTS.md` or `maintainers/` directory. Those files govern this public repository itself.
 
