@@ -90,7 +90,7 @@
     saveDraft();
   });
   checkboxes.forEach(box => box.addEventListener("change", () => {
-    materialsError.hidden = true;
+    materialsError.hidden = requiredCheckboxes.every(requiredBox => requiredBox.checked);
     updateCounters();
     saveDraft();
   }));
