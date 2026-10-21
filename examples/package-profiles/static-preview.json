@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "kind": "static-preview",
+  "name": "Tg Studio 虚构材料申报静态预览包",
+  "output": "artifacts/material-submission-static-preview.zip",
+  "include": [
+    "index.html",
+    "app.js",
+    "styles.css"
+  ],
+  "required": [
+    "index.html",
+    "app.js",
+    "styles.css"
+  ],
+  "entry": "index.html",
+  "pages": [
+    "index.html"
+  ],
+  "limitations": "完全虚构的离线教学页面。包内结构检查不等于浏览器验收；请解压后在目标浏览器中打开 index.html 并检查核心交互。页面只在当前浏览器本地保存演示状态，不连接后端、不上传文件，也不办理真实业务。"
+}

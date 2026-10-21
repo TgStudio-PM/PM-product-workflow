@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "kind": "frontend-source",
+  "name": "Tg Studio Vue 原型工程前端源码包",
+  "output": "artifacts/vue-prototype-frontend-source.zip",
+  "include": [
+    "package.json",
+    "package-lock.json",
+    "tsconfig.json",
+    "vite.config.ts",
+    "index.html",
+    "src",
+    "page-template",
+    "scripts",
+    "docs/ADD_PAGE.md",
+    "docs/FRONTEND_HANDOFF.md",
+    "docs/BACKEND_HANDOFF.md"
+  ],
+  "required": [
+    "package.json",
+    "package-lock.json",
+    "tsconfig.json",
+    "vite.config.ts",
+    "index.html",
+    "src/main.ts",
+    "src/app/page-registry.ts",
+    "page-template/Page.vue",
+    "page-template/mock.ts",
+    "page-template/RULES.md",
+    "scripts/build-preview.mjs",
+    "scripts/verify-preview.mjs",
+    "docs/ADD_PAGE.md",
+    "docs/FRONTEND_HANDOFF.md",
+    "docs/BACKEND_HANDOFF.md"
+  ],
+  "entry": "index.html",
+  "limitations": "此包用于安装、检查和修改虚构 Vue 原型源码，不包含 node_modules、dist 或生产后端。请在干净目录运行 npm ci、npm run typecheck、npm run preview:pack 和 npm run preview:verify；构建检查通过不等于浏览器交互验收。"
+}
