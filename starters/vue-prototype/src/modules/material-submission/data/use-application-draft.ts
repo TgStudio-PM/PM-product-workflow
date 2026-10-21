@@ -76,7 +76,11 @@ export function useApplicationDraft(isMaterialId: (value: unknown) => value is M
         )
       }
     }
-    if (!loaded.available) setStorageState(false, '无法读取本地草稿；当前内容不会持久保存')
+    if (loaded.status === 'invalid') {
+      setStorageState(true, '本地草稿格式无法识别；可重新填写并自动保存，或清除演示数据')
+    } else if (loaded.status === 'unavailable') {
+      setStorageState(false, '无法读取本地草稿；当前内容不会持久保存')
+    }
     await nextTick()
     suppressAutoSave.value = false
   })
