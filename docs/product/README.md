@@ -6,7 +6,7 @@
 
 1. 将 `templates/project/` 复制到自己的项目仓库，填写项目背景、模块清单和设计规范。
 2. 每个持续迭代的模块复制一份 `templates/module/`。
-3. 参考 `profiles/gov-enterprise-cn/` 选择或编写适合项目的设计预设。
+3. 按 `templates/project/DESIGN_PROFILE.md` 声明项目采用的产品类型、平台和设计规则；需要政务与复杂 B 端 Web 起点时，可选用 `profiles/gov-enterprise-cn/`，项目自定义规则可覆盖该预设。
 4. 让 Coding Agent 先读取项目级文件，再按任务读取相关模块文件。
 5. 每轮完成后同步事实、分别记录产品验收与机器验证。
 
@@ -44,6 +44,14 @@
 - [第三轮模拟中断与接续练习](../../examples/material-submission/iterations/03-handoff-exercise.md)：查看如何从仓库事实接续任务并记录核对结果。该轮只修正过期事实和补充接续记录，没有修改页面或业务规则；浏览器交互验收沿用第二轮既有记录，本轮未重跑。
 - [pm-prototype-handover](../../.agents/skills/pm-prototype-handover/SKILL.md)：生成证据支持的短接续或完整交接材料；Skill 已交付。
 - [pm-prototype-packager](../../.agents/skills/pm-prototype-packager/SKILL.md)：按静态预览、前端源码或后端需求材料选择白名单、验证产物并区分验收层次；Skill 已交付。
+
+## 可选设计预设与页面评审
+
+`gov-enterprise-cn` 是面向政务与复杂 B 端 Web 管理系统的可选预设，不是所有产品项目的强制规范。核心事实治理、迭代、交接和交付方法仍可用于其他产品类型；项目可以在自己的 `DESIGN_PROFILE.md` 中选择、调整或覆盖预设内容。
+
+预设包含 [Profile 说明](../../profiles/gov-enterprise-cn/PROFILE.md) 和[页面评审模板](../../profiles/gov-enterprise-cn/REVIEW_TEMPLATE.md)。使用评审模板时，只有项目提供了可核验的权威条款，才能将问题判为“平台不合规”；不得臆造官方规范。业务错误须有已确认规则或可复现缺陷作为依据，证据不足时标为待确认，审美建议单独列出。
+
+可参照[完全虚构的材料申报页面评审示例](../../examples/material-submission/reviews/gov-enterprise-cn.md)：它展示如何核对证据、标记不适用的检查点，并诚实记录未运行的浏览器验收。
 
 ### 可选 Vue 原型工程模板
 
