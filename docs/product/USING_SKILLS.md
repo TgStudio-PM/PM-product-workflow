@@ -2,17 +2,19 @@
 
 本仓库的产品 Skills 是可复用的工作说明。根据本轮任务选择需要的 Skill，并把 **Skill 文件路径**和**你自己项目中的事实文件路径**明确提供给 Coding Agent。Codex 只是本仓库使用过的参考工具；其他工具是否自动发现或安装 Skill，取决于各自的能力和配置。不要假定所有工具都会自动读取 `.agents/skills/`，也不要把本仓库维护用的根目录 `AGENTS.md` 当作产品 Skill 或安装步骤。
 
+`pm-prototype-memory` 和 `pm-prototype-handover` 是工作说明；提供 Skill 内容或可访问路径，并按任务提供自己工作区中的事实文件即可。`pm-prototype-packager` 还依赖其目录下的 `scripts/package.py`、`docs/product/PACKAGING.md` 和对应的 `examples/package-profiles/` 样例。推荐让 Coding Agent 将本仓库作为只读工具来源，同时让它访问使用者自己的项目和项目外输出目录。只提供或粘贴单个 `pm-prototype-packager/SKILL.md` 时，缺少脚本、指南和 Profile 样例，不能据此完成打包；不要假定任意工具会自动安装或发现这些资源。
+
 ## 按任务选择
 
 - 维护或核对项目事实、规则与当前实现：使用 [`pm-prototype-memory`](../../.agents/skills/pm-prototype-memory/SKILL.md)，并提供项目上下文、模块事实及相关源码路径。
 - 为新会话准备接续信息或从接续材料恢复：使用 [`pm-prototype-handover`](../../.agents/skills/pm-prototype-handover/SKILL.md)，并提供目标项目的模块状态、规则、流程、决策和错误记录等相关路径。
-- 准备静态预览、前端源码或后端需求交付：使用 [`pm-prototype-packager`](../../.agents/skills/pm-prototype-packager/SKILL.md)，并提供目标项目路径、权威需求和已确认的交付用途。
+- 准备静态预览、前端源码或后端需求交付：使用 [`pm-prototype-packager`](../../.agents/skills/pm-prototype-packager/SKILL.md)，并提供目标项目路径、权威需求和已确认的交付用途；确认依赖可访问，并依据目标项目证据另建私有白名单。
 
 先确认 Agent 能读取所给路径；若工具支持 Skill 自动发现，可按该工具自己的说明配置。否则，将 Skill 文件内容或可访问路径作为本轮上下文提供。每轮只提供任务需要的项目事实，不依赖不可访问的历史对话。
 
 ## 可复制的短提示词
 
-以下示例中的项目和路径都是虚构内容。使用前将 `<PM-product-workflow 根目录>`、`<私有项目根目录>` 和 `<项目外输出目录>` 替换为 Agent 能访问的实际路径；输出目录须位于项目源文件目录之外。把真实项目资料留在自己的私有项目中，不要复制到本公开仓库。
+以下示例中的项目和路径都是虚构内容。使用前将 `<PM-product-workflow 根目录>`、`<私有项目根目录>` 和 `<项目外输出目录>` 替换为 Agent 能访问的实际路径；完整公开仓库作为只读工具来源，输出目录置于私有项目源文件目录之外。公开 Profile 只供理解结构，须按私有项目证据和交付范围重写白名单；真实资料和产物留在使用者自己的工作区，不复制到本公开仓库。
 
 **事实同步**
 
