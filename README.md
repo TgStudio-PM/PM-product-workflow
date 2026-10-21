@@ -15,7 +15,7 @@
 
 ### 使用产品工作流
 
-如果你想把这套方法用于自己的产品项目，从[产品工作流指南](docs/product/README.md)开始，然后复制 `templates/` 并选择 `profiles/` 中的设计预设。
+如果你想把这套方法用于自己的产品项目，从[产品工作流指南](docs/product/README.md)开始，查看[如何使用 Skills](docs/product/USING_SKILLS.md)，然后复制 `templates/` 并选择 `profiles/` 中的设计预设。
 
 普通使用者不需要读取根目录 `AGENTS.md` 或 `maintainers/`；它们只负责维护本开源仓库。
 
