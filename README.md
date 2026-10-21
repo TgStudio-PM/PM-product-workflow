@@ -60,14 +60,15 @@ gov-enterprise-cn
 | 政务与复杂 B 端设计预设 | 可用，持续完善 | `profiles/gov-enterprise-cn/` |
 | 产品方法与快速开始 | 可用 | `docs/product/` |
 | `pm-prototype-memory` Skill | 已交付 | `.agents/skills/pm-prototype-memory/SKILL.md` |
-| 材料申报虚构案例 | 前两轮已交付，第三轮规划中 | `examples/material-submission/` |
+| 材料申报虚构案例 | 三轮记录已提供；第三轮为模拟中断后的事实核对与接续练习，不改页面或业务规则 | `examples/material-submission/` |
 | Tg Studio Vue 原型工程模板 | 已交付，可选使用 | `starters/vue-prototype/` |
-| `pm-prototype-handover`、`pm-prototype-packager` Skills | 规划中 | 完成后放入 `.agents/skills/` |
+| `pm-prototype-handover` Skill | 已交付 | `.agents/skills/pm-prototype-handover/SKILL.md` |
+| `pm-prototype-packager` Skill | 规划中 | 完成后放入 `.agents/skills/` |
 
 已交付与计划中的核心 Skills：
 
 - `pm-prototype-memory`（已交付）：维护事实、变更、冲突和错误闭环。
-- `pm-prototype-handover`（规划中）：生成短接续或完整交接材料。
+- `pm-prototype-handover`（已交付）：生成短接续或完整交接材料。
 - `pm-prototype-packager`（规划中）：检查并整理可独立运行的原型交付包。
 
 ### 可选 Vue 工程模板
@@ -103,11 +104,10 @@ maintainers/                   本仓库治理、状态和检查工具
 - [x] 建立 README、开源边界和基础模板
 - [x] 建立长期治理、分级维护和接力协议
 - [x] 分离产品使用入口与仓库自管理入口
-- [x] 发布 `pm-prototype-memory` 与材料申报前两轮离线虚构案例
+- [x] 发布 `pm-prototype-memory` 与材料申报三轮离线虚构案例（第三轮为模拟接续练习）
 - [x] 交付可选的 Tg Studio Vue 原型工程模板
-- [ ] 发布 `pm-prototype-handover`
+- [x] 交付 `pm-prototype-handover`
 - [ ] 发布 `pm-prototype-packager`
-- [ ] 完成材料申报案例第三轮迭代，演示交接与交付
 - [ ] 完善 `gov-enterprise-cn` Profile 并完成 v0.1 验收
 
 ## 贡献与许可
