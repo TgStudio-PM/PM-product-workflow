@@ -14,6 +14,7 @@ import html.parser
 import json
 import os
 import re
+import stat
 import sys
 import tempfile
 import zipfile
@@ -375,8 +376,8 @@ def verify(archive_path: Path) -> None:
             names = [info.filename for info in infos]
             if len(names) != len(set(name.casefold() for name in names)):
                 raise PackageError("VERIFY-01 archive has duplicate or case-colliding paths")
-            if any(info.is_dir() for info in infos):
-                raise PackageError("VERIFY-02 archive contains directory entries")
+            if any(_is_directory_or_special_entry(info) for info in infos):
+                raise PackageError("VERIFY-02 archive contains directory or non-regular file entries")
             for name in names:
                 _safe_relative(name, "archive")
                 _check_sensitive_filename(PurePosixPath(name))
@@ -424,6 +425,19 @@ def verify(archive_path: Path) -> None:
         raise
     except (OSError, zipfile.BadZipFile, UnicodeError, json.JSONDecodeError, KeyError, RuntimeError):
         raise PackageError("VERIFY-09 archive is unreadable or malformed") from None
+
+
+def _is_directory_or_special_entry(info: zipfile.ZipInfo) -> bool:
+    """Reject directory and non-regular filesystem entries from ZIP metadata."""
+    if info.is_dir() or info.external_attr & 0x10:
+        return True
+
+    if info.create_system == 3:
+        unix_mode = info.external_attr >> 16
+        file_type = stat.S_IFMT(unix_mode)
+        return file_type not in (0, stat.S_IFREG)
+
+    return False
 
 
 def main(argv: list[str] | None = None) -> int:
