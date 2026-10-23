@@ -283,6 +283,76 @@ def _audit_static(files: dict[str, bytes], profile: dict) -> None:
             raise PackageError("ASSET-06 each static-preview page must be an included HTML file")
 
 
+_MARKDOWN_INLINE_LINK = re.compile(
+    r"!?\[[^\]\n]*\]\(\s*(?:<([^>\n]*)>|([^\s)]+))(?:\s+[^)\n]*)?\s*\)"
+)
+
+
+def _strip_markdown_code(text: str) -> str:
+    """Blank fenced and inline code so link-like examples are not audited."""
+    lines: list[str] = []
+    fence_char: str | None = None
+    fence_length = 0
+    for line in text.splitlines(keepends=True):
+        match = re.match(r"^ {0,3}(`{3,}|~{3,})", line)
+        if match:
+            marker = match.group(1)
+            if fence_char is None:
+                fence_char, fence_length = marker[0], len(marker)
+            elif marker[0] == fence_char and len(marker) >= fence_length:
+                fence_char, fence_length = None, 0
+            lines.append("\n" if line.endswith(("\n", "\r")) else "")
+            continue
+        if fence_char is not None:
+            lines.append("\n" if line.endswith(("\n", "\r")) else "")
+            continue
+
+        # Inline code spans are excluded too. Match equal-length backtick runs.
+        line = re.sub(r"(`+)(.*?)\1", lambda match: " " * len(match.group(0)), line)
+        lines.append(line)
+    return "".join(lines)
+
+
+def _audit_markdown(files: dict[str, bytes]) -> None:
+    """Check common inline relative Markdown links against exact archive paths."""
+    archive_paths = set(files)
+    for name, content in files.items():
+        if PurePosixPath(name).suffix.casefold() != ".md":
+            continue
+        try:
+            text = _strip_markdown_code(content.decode("utf-8"))
+        except UnicodeError:
+            raise PackageError(f"MARKDOWN-03 unable to parse UTF-8 Markdown file: {name}") from None
+        for match in _MARKDOWN_INLINE_LINK.finditer(text):
+            target = match.group(1) if match.group(1) is not None else match.group(2)
+            if not target:
+                continue
+            parts = urlsplit(target)
+            # External URLs, absolute URLs, and fragment-only links are outside
+            # this package-relative audit.
+            if parts.scheme or parts.netloc or target.startswith(("/", "\\")) or not parts.path:
+                continue
+            decoded = unquote(parts.path)
+            components = list(PurePosixPath(name).parent.parts)
+            escaped = False
+            for part in decoded.replace("\\", "/").split("/"):
+                if part in ("", "."):
+                    continue
+                if part == "..":
+                    if not components:
+                        escaped = True
+                        break
+                    components.pop()
+                else:
+                    components.append(part)
+            line = text.count("\n", 0, match.start()) + 1
+            if escaped:
+                raise PackageError(f"MARKDOWN-02 relative link escapes bundle root: {name}:{line}")
+            resolved = PurePosixPath(*components).as_posix()
+            if resolved not in archive_paths:
+                raise PackageError(f"MARKDOWN-01 unresolved relative link in package: {name}:{line}")
+
+
 def _sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
@@ -336,6 +406,7 @@ def build(source: Path, profile_path: Path, output: Path | None = None) -> None:
         _audit_static(files, profile)
     readme = _readme(profile, files)
     files["README.md"] = readme
+    _audit_markdown(files)
     manifest = {
         "schema_version": SCHEMA_VERSION,
         "kind": profile["kind"],
@@ -411,6 +482,7 @@ def verify(archive_path: Path) -> None:
             expected_sums = "".join(f"{digest}  {name}\n" for name, digest in sorted(normalized.items())).encode("utf-8")
             if archive.read("SHA256SUMS") != expected_sums:
                 raise PackageError("VERIFY-08 SHA256SUMS does not match manifest")
+            _audit_markdown({name: archive.read(name) for name in expected})
             entry = _safe_relative(manifest["entry"], "manifest entry").as_posix()
             required_paths = [_safe_relative(path, "manifest required").as_posix() for path in manifest["required"]]
             if entry not in normalized or entry not in required_paths:

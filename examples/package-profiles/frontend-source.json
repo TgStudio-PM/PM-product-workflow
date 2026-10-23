@@ -14,6 +14,7 @@
     "scripts",
     "tests",
     "docs/ADD_PAGE.md",
+    "docs/ADD_PAGE_TRIAL.md",
     "docs/FRONTEND_HANDOFF.md",
     "docs/BACKEND_HANDOFF.md"
   ],
@@ -33,6 +34,7 @@
     "scripts/verify-preview.mjs",
     "tests/verify-preview.test.mjs",
     "docs/ADD_PAGE.md",
+    "docs/ADD_PAGE_TRIAL.md",
     "docs/FRONTEND_HANDOFF.md",
     "docs/BACKEND_HANDOFF.md"
   ],

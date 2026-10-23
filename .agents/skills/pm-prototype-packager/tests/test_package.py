@@ -80,6 +80,47 @@ class PackageTests(unittest.TestCase):
         with self.assertRaisesRegex(package.PackageError, "SOURCE-05"):
             package.build(self.source, self.profile_path, self.output)
 
+    def test_markdown_relative_links_resolve_inside_package(self) -> None:
+        self.write("docs/guide.md", """[trial](./ADD%5FTRIAL.md#step)\n\n[external](https://example.invalid/missing.md)\n\n[section](#local)\n\n```md\n[example](missing.md)\n```\n""")
+        self.write("docs/ADD_TRIAL.md", "fictional trial")
+        self.profile("frontend-source", ["docs"], ["docs/guide.md"], "docs/guide.md")
+        self.build_and_verify()
+
+    def test_rejects_missing_markdown_relative_link_during_build(self) -> None:
+        self.write("docs/guide.md", "[trial](ADD_PAGE_TRIAL.md)")
+        self.profile("frontend-source", ["docs"], ["docs/guide.md"], "docs/guide.md")
+        with self.assertRaisesRegex(package.PackageError, "MARKDOWN-01.*docs/guide.md:1"):
+            package.build(self.source, self.profile_path, self.output)
+
+    def test_rejects_markdown_relative_link_escaping_bundle(self) -> None:
+        self.write("docs/guide.md", "[outside](../../../outside.md)")
+        self.profile("frontend-source", ["docs"], ["docs/guide.md"], "docs/guide.md")
+        with self.assertRaisesRegex(package.PackageError, "MARKDOWN-02.*docs/guide.md:1"):
+            package.build(self.source, self.profile_path, self.output)
+
+    def test_standalone_verify_rejects_missing_markdown_link(self) -> None:
+        payload = {
+            "README.md": b"Fictional package\n",
+            "entry.md": b"Fictional entry\n",
+            "docs/guide.md": b"[missing](missing.md)\n",
+        }
+        manifest = {
+            "schema_version": 1,
+            "kind": "backend-requirements",
+            "entry": "entry.md",
+            "required": ["entry.md"],
+            "pages": [],
+            "files": {name: package._sha(content) for name, content in payload.items()},
+        }
+        sums = "".join(f"{digest}  {name}\n" for name, digest in sorted(manifest["files"].items())).encode()
+        with zipfile.ZipFile(self.output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+            for name, content in payload.items():
+                archive.writestr(name, content)
+            archive.writestr("manifest.json", json.dumps(manifest).encode())
+            archive.writestr("SHA256SUMS", sums)
+        with self.assertRaisesRegex(package.PackageError, "MARKDOWN-01.*docs/guide.md:1"):
+            package.verify(self.output)
+
     def test_rejects_missing_static_asset(self) -> None:
         self.write("index.html", '<script src="missing.js"></script>')
         self.profile("static-preview", ["index.html"], ["index.html"], "index.html", pages=["index.html"])
