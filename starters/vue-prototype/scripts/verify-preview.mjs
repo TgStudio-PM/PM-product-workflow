@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url'
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const output = path.join(root, 'dist', 'preview')
 const allowedFiles = new Set(['index.html', 'app.js', 'styles.css', 'README.md', 'PAGES.md', 'manifest.json', 'SHA256SUMS'])
+const contentFiles = ['index.html', 'app.js', 'styles.css', 'README.md', 'PAGES.md']
+const hashFiles = [...contentFiles, 'manifest.json']
 const errors = []
 
 function issue(message) { errors.push(message) }
@@ -48,7 +50,9 @@ try {
   if (/\b(?:fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon)\s*\(/.test(app)) issue('运行脚本包含网络请求 API。')
 
   const registry = await readFile(path.join(root, 'src', 'app', 'page-registry.ts'), 'utf8')
-  const registeredRoutes = [...registry.matchAll(/path:\s*['"]([^'"]+)['"]/g)].map((match) => match[1])
+  const registeredPages = [...registry.matchAll(/path:\s*['"]([^'"]+)['"][\s\S]*?title:\s*['"]([^'"]+)['"]/g)]
+    .map(([, route, title]) => ({ route, title }))
+  const registeredRoutes = registeredPages.map(({ route }) => route)
   const findDuplicates = (values) => {
     const counts = new Map()
     for (const value of values) counts.set(value, (counts.get(value) ?? 0) + 1)
@@ -56,31 +60,41 @@ try {
   }
   for (const route of findDuplicates(registeredRoutes)) issue(`源码页面注册表包含重复路由：${route}`)
 
-  const manifestRoutes = Array.isArray(manifest.pages)
-    ? manifest.pages.map((page) => page?.route).filter((route) => typeof route === 'string')
-    : []
+  if (manifest.name !== 'tg-studio-vue-prototype-preview') issue('manifest 名称与离线预览包不一致。')
+  if (JSON.stringify(manifest.files) !== JSON.stringify(contentFiles)) issue('manifest 文件清单与离线包内容文件不一致。')
+  const manifestPages = Array.isArray(manifest.pages) ? manifest.pages : []
+  const manifestRoutes = manifestPages.map((page) => page?.route).filter((route) => typeof route === 'string')
   for (const route of findDuplicates(manifestRoutes)) issue(`manifest 页面清单包含重复路由：${route}`)
 
-  for (const route of registeredRoutes) {
-    if (!manifest.pages?.some((page) => page.route === route) || !app.includes(route) || !(await readFile(path.join(output, 'PAGES.md'), 'utf8')).includes(route)) {
-      issue(`页面路由未完整进入离线包：${route}`)
+  if (manifestPages.length !== registeredPages.length) issue('manifest 页面数量与源码注册表不一致。')
+  for (let index = 0; index < registeredPages.length; index += 1) {
+    const registered = registeredPages[index]
+    const packaged = manifestPages[index]
+    if (packaged?.route !== registered.route || packaged?.title !== registered.title) {
+      issue(`manifest 页面路由或标题与源码页面注册表不一致：${registered.route}`)
     }
+    if (!app.includes(registered.route)) issue(`页面路由未进入离线包脚本：${registered.route}`)
   }
-  if (manifest.pages?.length !== registeredRoutes.length) issue('manifest 页面数量与源码注册表不一致。')
+  const expectedPages = `# 页面清单\n\n| 路由 | 页面 |\n| --- | --- |\n${registeredPages.map(({ route, title }) => `| ${route} | ${title} |`).join('\n')}\n`
+  if ((await readFile(path.join(output, 'PAGES.md'), 'utf8')) !== expectedPages) issue('PAGES.md 与源码页面注册表不一致。')
   for (const dependency of Object.keys(JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8')).dependencies ?? {})) {
     if (!app.includes(dependency.split('/').at(-1))) issue(`运行依赖可能未打入本地 bundle：${dependency}`)
   }
 
-  const sums = new Map(sumsText.trim().split(/\r?\n/).filter(Boolean).map((line) => {
-    const [, hash, file] = line.match(/^([a-f0-9]{64})\s+\*?(.+)$/i) ?? []
-    return [file, hash]
-  }))
+  const sums = new Map()
+  for (const line of sumsText.split(/\r?\n/).filter(Boolean)) {
+    const [, hash, file] = line.match(/^([a-f0-9]{64})\s+\*?([^\s]+)$/i) ?? []
+    if (!hash || !file) { issue('SHA256SUMS 格式无效。'); continue }
+    if (sums.has(file)) { issue(`SHA256SUMS 包含重复条目：${file}`); continue }
+    sums.set(file, hash)
+  }
+  for (const file of sums.keys()) if (!hashFiles.includes(file)) issue(`SHA256SUMS 包含额外文件：${file}`)
+  for (const file of hashFiles) if (!sums.has(file)) issue(`SHA256SUMS 缺少文件：${file}`)
   for (const [file, expected] of sums) {
     if (!allowedFiles.has(file) || !expected) { issue(`SHA256SUMS 格式或文件名无效：${file}`); continue }
     const actual = createHash('sha256').update(await readFile(path.join(output, file))).digest('hex')
     if (actual !== expected) issue(`文件校验值不匹配：${file}`)
   }
-  for (const file of ['index.html', 'app.js', 'styles.css', 'README.md', 'PAGES.md']) if (!sums.has(file)) issue(`SHA256SUMS 缺少文件：${file}`)
 } catch (error) {
   issue(`无法完成离线包审计：${error.message}`)
 }

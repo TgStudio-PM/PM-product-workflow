@@ -54,10 +54,11 @@ npm ci
 npm run typecheck
 npm run preview:pack
 npm run preview:verify
+npm run test:preview-verify
 Pop-Location
 ```
 
-依赖安装和命令运行属于源码包的工程验证。它们不代表产品规则正确，也不替代在接收方目标浏览器和运行环境中的验收。`npm run preview:pack` 产生的静态预览目录可另行按静态预览方式检查。
+依赖安装和命令运行属于源码包的工程验证。`npm run test:preview-verify` 会在隔离临时副本检查正常包及 manifest/摘要异常能否被拒绝。它们不代表产品规则正确，也不替代在接收方目标浏览器和运行环境中的验收。`npm run preview:pack` 产生的静态预览目录可另行按静态预览方式检查。
 
 ### 后端需求材料包
 

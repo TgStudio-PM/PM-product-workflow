@@ -36,6 +36,9 @@ jobs:
       - name: Build and verify Vue starter preview
         run: npm run preview:pack
         working-directory: starters/vue-prototype
+      - name: Test Vue starter preview verifier
+        run: npm run test:preview-verify
+        working-directory: starters/vue-prototype
       - name: Public content and risk
         if: github.event_name == 'pull_request'
         run: python maintainers/scripts/check_public_content.py --root . --base-ref origin/${{ github.base_ref }}

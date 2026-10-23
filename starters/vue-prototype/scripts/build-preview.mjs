@@ -8,6 +8,7 @@ import { build } from 'vite'
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const output = path.join(root, 'dist', 'preview')
 const registry = await readFile(path.join(root, 'src', 'app', 'page-registry.ts'), 'utf8')
+const contentFiles = ['index.html', 'app.js', 'styles.css', 'README.md', 'PAGES.md']
 
 const pages = [...registry.matchAll(/path:\s*['"]([^'"]+)['"][\s\S]*?title:\s*['"]([^'"]+)['"]/g)]
   .map(([, route, title]) => ({ route, title }))
@@ -86,12 +87,14 @@ const script = await readFile(path.join(output, 'app.js'), 'utf8')
 if (/\bimport\s*(?:\(|\{)|\bexport\s|<script[^>]+type=["']module|\bprocess\.env\./i.test(script)) {
   throw new Error('离线包脚本包含模块语法或未替换的 Node 环境变量，不能作为经典脚本交付。')
 }
-const contentFiles = ['index.html', 'app.js', 'styles.css', 'README.md', 'PAGES.md']
+const manifestPath = path.join(output, 'manifest.json')
+const manifest = { name: 'tg-studio-vue-prototype-preview', pages, files: contentFiles }
+await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8')
+
 const hashes = {}
-for (const file of contentFiles) {
+for (const file of [...contentFiles, 'manifest.json']) {
   const content = await readFile(path.join(output, file))
   hashes[file] = createHash('sha256').update(content).digest('hex')
 }
-await writeFile(path.join(output, 'manifest.json'), `${JSON.stringify({ name: 'tg-studio-vue-prototype-preview', pages, files: contentFiles }, null, 2)}\n`, 'utf8')
 await writeFile(path.join(output, 'SHA256SUMS'), `${Object.entries(hashes).map(([file, hash]) => `${hash}  ${file}`).join('\n')}\n`, 'utf8')
 console.log(`离线预览包已生成：${path.relative(root, output)}`)
