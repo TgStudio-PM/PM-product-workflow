@@ -12,6 +12,14 @@
 
 示例 profile 仅使用仓库原创的虚构材料申报页面和 Tg Studio Vue 原型模板。后端需求包刻意不包含页面代码或 mock 数据；材料只是讨论输入，不表示已有生产接口。真实项目交付前，应另行确认授权、保密边界、目标文件清单和接收方要求，不得将真实项目文件复制到本公开案例中。
 
+每个 ZIP 内的 `README.md` 会依据交付类型说明如何使用：静态预览包解压后在目标浏览器打开声明入口；前端源码包先查看声明入口和文件清单，仅当包内确实包含 `package.json` 时才提示进入其所在目录，并按实际脚本和已有项目说明处理依赖或运行；不含 `package.json` 时不假定使用 Node.js 或 npm；后端需求包解压后阅读声明入口中的材料。只有当 ZIP 实际包含 `docs/ADD_PAGE.md` 时，前端包 README 才会链接该新增页面指南。README 只说明使用入口，不代表浏览器、工程或产品验收已经通过。
+
+ZIP README 还会提供可选的独立验包命令。验包脚本属于 PM-product-workflow 仓库，默认不随 ZIP 提供；接收者需先取得该仓库，再将仓库内脚本路径和 ZIP 路径传给 Python：
+
+```text
+python <path-to-PM-product-workflow>/.agents/skills/pm-prototype-packager/scripts/package.py --verify <path-to-archive.zip>
+```
+
 ## 使用示例
 
 以下命令在仓库根目录的 Windows PowerShell 中运行。要求本机可调用 Python 3；打包脚本使用 Python 标准库。命令把产物写入本地忽略目录，避免把生成 ZIP 上传到公开仓库。
