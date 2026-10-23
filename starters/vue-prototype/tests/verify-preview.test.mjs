@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises'
 import { test } from 'node:test'
 import os from 'node:os'
 import path from 'node:path'
@@ -14,10 +14,13 @@ async function createFixture(t) {
 
   await mkdir(path.join(fixtureRoot, 'scripts'), { recursive: true })
   await Promise.all([
+    cp(path.join(starterRoot, 'scripts', 'build-preview.mjs'), path.join(fixtureRoot, 'scripts', 'build-preview.mjs')),
     cp(path.join(starterRoot, 'scripts', 'verify-preview.mjs'), path.join(fixtureRoot, 'scripts', 'verify-preview.mjs')),
+    cp(path.join(starterRoot, 'scripts', 'page-registry.mjs'), path.join(fixtureRoot, 'scripts', 'page-registry.mjs')),
     cp(path.join(starterRoot, 'src'), path.join(fixtureRoot, 'src'), { recursive: true }),
     cp(path.join(starterRoot, 'package.json'), path.join(fixtureRoot, 'package.json')),
     cp(path.join(starterRoot, 'dist', 'preview'), path.join(fixtureRoot, 'dist', 'preview'), { recursive: true }),
+    symlink(path.join(starterRoot, 'node_modules'), path.join(fixtureRoot, 'node_modules'), process.platform === 'win32' ? 'junction' : 'dir'),
   ])
 
   return fixtureRoot
@@ -25,6 +28,13 @@ async function createFixture(t) {
 
 function verify(fixtureRoot) {
   return spawnSync(process.execPath, [path.join(fixtureRoot, 'scripts', 'verify-preview.mjs')], {
+    cwd: fixtureRoot,
+    encoding: 'utf8',
+  })
+}
+
+function buildPreview(fixtureRoot) {
+  return spawnSync(process.execPath, [path.join(fixtureRoot, 'scripts', 'build-preview.mjs')], {
     cwd: fixtureRoot,
     encoding: 'utf8',
   })
@@ -59,6 +69,39 @@ test('valid preview package passes in an isolated copy', async (t) => {
 
   assert.equal(result.status, 0, result.stderr || result.stdout)
   assert.match(result.stdout, /离线包审计通过/)
+})
+
+test('builds and verifies pages when the first registry entry lists title before path', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const registryPath = path.join(fixtureRoot, 'src', 'app', 'page-registry.ts')
+  const registry = await readFile(registryPath, 'utf8')
+  const original = "path: '/overview',\n    title: '原型概览',"
+  assert.ok(registry.includes(original), '测试夹具应包含首个页面的路由和标题')
+  await writeFile(registryPath, registry.replace(original, "title: '原型概览',\n    path: '/overview',"), 'utf8')
+
+  const buildResult = buildPreview(fixtureRoot)
+  assert.equal(buildResult.status, 0, buildResult.stderr || buildResult.stdout)
+  const verifyResult = verify(fixtureRoot)
+  assert.equal(verifyResult.status, 0, verifyResult.stderr || verifyResult.stdout)
+
+  const { manifest } = await readManifest(fixtureRoot)
+  assert.deepEqual(manifest.pages, [
+    { route: '/overview', title: '原型概览' },
+    { route: '/material-submission/apply', title: '材料申报' },
+  ])
+  assert.equal(await readFile(path.join(fixtureRoot, 'dist', 'preview', 'PAGES.md'), 'utf8'),
+    '# 页面清单\n\n| 路由 | 页面 |\n| --- | --- |\n| /overview | 原型概览 |\n| /material-submission/apply | 材料申报 |\n')
+})
+
+test('rejects dynamic page metadata before building an offline package', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const registryPath = path.join(fixtureRoot, 'src', 'app', 'page-registry.ts')
+  const registry = await readFile(registryPath, 'utf8')
+  await writeFile(registryPath, registry.replace("title: '原型概览'", 'title: makePageTitle()'), 'utf8')
+
+  const result = buildPreview(fixtureRoot)
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /title 必须是静态字符串/)
 })
 
 test('rejects a manifest title that differs from the registered page', async (t) => {

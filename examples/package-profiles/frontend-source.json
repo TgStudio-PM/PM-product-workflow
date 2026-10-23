@@ -29,6 +29,7 @@
     "page-template/mock.ts",
     "page-template/RULES.md",
     "scripts/build-preview.mjs",
+    "scripts/page-registry.mjs",
     "scripts/verify-preview.mjs",
     "tests/verify-preview.test.mjs",
     "docs/ADD_PAGE.md",
