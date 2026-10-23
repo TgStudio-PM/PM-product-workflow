@@ -39,6 +39,8 @@ import DemoHelpPage from '../modules/demo-help/pages/guide/Page.vue'
 
 替换组件名、导入路径、唯一的 `path`、标题、菜单名、演示角色和说明。该注册表同时驱动页面切换与导航；通常无需修改 `src/app/router.ts`。保持单一注册项，避免重复路径。
 
+离线预览打包会逐项读取注册表的 `path` 和 `title`。两者请写成确定的字符串，字段先后顺序不限；动态计算的标题或路径会在打包时被明确拒绝。
+
 如果需要与后端协作，在模块 `contracts/` 记录字段结构、样例、校验及待确认问题；不要猜接口 URL、HTTP 方法或认证方式。
 
 ## 4. 验收与离线预览

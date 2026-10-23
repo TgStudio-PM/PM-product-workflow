@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { readdir, readFile, stat } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { readRegisteredPages } from './page-registry.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const output = path.join(root, 'dist', 'preview')
@@ -50,15 +51,12 @@ try {
   if (/\b(?:fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon)\s*\(/.test(app)) issue('运行脚本包含网络请求 API。')
 
   const registry = await readFile(path.join(root, 'src', 'app', 'page-registry.ts'), 'utf8')
-  const registeredPages = [...registry.matchAll(/path:\s*['"]([^'"]+)['"][\s\S]*?title:\s*['"]([^'"]+)['"]/g)]
-    .map(([, route, title]) => ({ route, title }))
-  const registeredRoutes = registeredPages.map(({ route }) => route)
+  const registeredPages = readRegisteredPages(registry)
   const findDuplicates = (values) => {
     const counts = new Map()
     for (const value of values) counts.set(value, (counts.get(value) ?? 0) + 1)
     return [...counts].filter(([, count]) => count > 1).map(([value]) => value)
   }
-  for (const route of findDuplicates(registeredRoutes)) issue(`源码页面注册表包含重复路由：${route}`)
 
   if (manifest.name !== 'tg-studio-vue-prototype-preview') issue('manifest 名称与离线预览包不一致。')
   if (JSON.stringify(manifest.files) !== JSON.stringify(contentFiles)) issue('manifest 文件清单与离线包内容文件不一致。')

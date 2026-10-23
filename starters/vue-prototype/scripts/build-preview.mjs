@@ -4,21 +4,13 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import vue from '@vitejs/plugin-vue'
 import { build } from 'vite'
+import { readRegisteredPages } from './page-registry.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const output = path.join(root, 'dist', 'preview')
 const registry = await readFile(path.join(root, 'src', 'app', 'page-registry.ts'), 'utf8')
 const contentFiles = ['index.html', 'app.js', 'styles.css', 'README.md', 'PAGES.md']
-
-const pages = [...registry.matchAll(/path:\s*['"]([^'"]+)['"][\s\S]*?title:\s*['"]([^'"]+)['"]/g)]
-  .map(([, route, title]) => ({ route, title }))
-if (pages.length === 0) throw new Error('页面注册表没有可打包的页面路由。')
-const routeCounts = new Map()
-for (const { route } of pages) routeCounts.set(route, (routeCounts.get(route) ?? 0) + 1)
-const duplicateRoutes = [...routeCounts].filter(([, count]) => count > 1).map(([route]) => route)
-if (duplicateRoutes.length > 0) {
-  throw new Error(`页面注册表包含重复路由，无法生成离线包：${duplicateRoutes.join('、')}`)
-}
+const pages = readRegisteredPages(registry)
 
 await build({
   configFile: false,
