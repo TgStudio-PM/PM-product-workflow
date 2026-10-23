@@ -12,6 +12,7 @@
     "src",
     "page-template",
     "scripts",
+    "tests",
     "docs/ADD_PAGE.md",
     "docs/FRONTEND_HANDOFF.md",
     "docs/BACKEND_HANDOFF.md"
@@ -29,6 +30,7 @@
     "page-template/RULES.md",
     "scripts/build-preview.mjs",
     "scripts/verify-preview.mjs",
+    "tests/verify-preview.test.mjs",
     "docs/ADD_PAGE.md",
     "docs/FRONTEND_HANDOFF.md",
     "docs/BACKEND_HANDOFF.md"
