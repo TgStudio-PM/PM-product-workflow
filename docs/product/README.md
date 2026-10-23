@@ -43,7 +43,7 @@
 
 - [材料申报离线教学示例](../../examples/material-submission/index.html)：查看完全虚构的单页案例及其[项目事实](../../examples/material-submission/facts/project/PROJECT_CONTEXT.md)和[模块规则](../../examples/material-submission/facts/module/BUSINESS_RULES.md)。下载或克隆仓库后可直接打开 `index.html`；页面交互仅保存在当前浏览器。
 - [pm-prototype-memory](../../.agents/skills/pm-prototype-memory/SKILL.md)：在原型任务中读取项目事实、区分已确认规则与当前实现、同步受影响文档并检查漂移。
-- [第三轮模拟中断与接续练习](../../examples/material-submission/iterations/03-handoff-exercise.md)：查看如何从仓库事实接续任务并记录核对结果。该轮只修正过期事实和补充接续记录，没有修改页面或业务规则；浏览器交互验收沿用第二轮既有记录，本轮未重跑。
+- [第三轮模拟中断与接续练习](../../examples/material-submission/iterations/03-handoff-exercise.md)：其中实际维护验收记录用于说明仓库维护过程；另附普通使用者接续的未实测教学步骤。该轮只修正过期事实和补充接续记录，没有修改页面或业务规则；浏览器交互验收沿用第二轮既有记录，本轮未重跑。
 - [pm-prototype-handover](../../.agents/skills/pm-prototype-handover/SKILL.md)：生成证据支持的短接续或完整交接材料；Skill 已交付。
 - [pm-prototype-packager](../../.agents/skills/pm-prototype-packager/SKILL.md)：按静态预览、前端源码或后端需求材料选择白名单、验证产物并区分验收层次；Skill 已交付。
 
