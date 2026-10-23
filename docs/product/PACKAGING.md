@@ -78,7 +78,7 @@ python .agents/skills/pm-prototype-packager/scripts/package.py `
 
 每个 profile 声明一个交付类型、名称、输出文件名、允许收集的路径、必须存在的路径和入口。路径相对于 `--source`；`include` 只能列出明确文件或子目录，不能指向整个项目根目录。`required` 和 `entry` 必须被 `include` 覆盖。静态预览还可声明 `pages`，用于要求页面入口存在。Profile 中的 `output` 是相对 profile 所在目录的默认 ZIP 路径；使用上面的 `--output` 可将产物存到忽略目录或其他安全位置。
 
-打包器拒绝路径逃逸、符号链接、profile 选入的常见临时/依赖目录、重复 ZIP 路径和不完整必需文件，并在包中生成 `README.md`、`manifest.json` 与 `SHA256SUMS`。若白名单目录递归遇到 `node_modules`、`dist` 等禁入路径，打包会失败，不会静默跳过这些内容；应调整 `include` 白名单。静态预览会检查 HTML/CSS 中可识别的本地资源引用，并拒绝可识别的远程或绝对资源引用、JavaScript 模块加载，以及常见 JavaScript 网络 API 的静态特征。该启发式扫描无法证明所有动态代码都不会联网，也不能代替浏览器网络检查。源码 profile 可显式包含需要交付的源代码和锁文件，但不能选择禁入目录。
+打包器拒绝路径逃逸、符号链接、profile 选入的常见临时/依赖目录、重复 ZIP 路径和不完整必需文件，并在包中生成 `README.md`、`manifest.json` 与 `SHA256SUMS`。打包和独立验包会检查 Markdown 常见行内相对链接指向的包内文件；外链、纯片段和代码示例会跳过。这不是完整 Markdown 解析器，不覆盖引用式链接等所有语法。若白名单目录递归遇到 `node_modules`、`dist` 等禁入路径，打包会失败，不会静默跳过这些内容；应调整 `include` 白名单。静态预览会检查 HTML/CSS 中可识别的本地资源引用，并拒绝可识别的远程或绝对资源引用、JavaScript 模块加载，以及常见 JavaScript 网络 API 的静态特征。该启发式扫描无法证明所有动态代码都不会联网，也不能代替浏览器网络检查。源码 profile 可显式包含需要交付的源代码和锁文件，但不能选择禁入目录。
 
 必须区分三种结论：
 
