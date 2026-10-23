@@ -64,15 +64,46 @@ class PackageTests(unittest.TestCase):
                 self.profile(kind, required, required, entry, **extra)
                 self.build_and_verify()
                 with zipfile.ZipFile(self.output) as archive:
+                    readme = archive.read("README.md").decode("utf-8")
                     self.assertIn("README.md", archive.namelist())
                     self.assertIn("manifest.json", archive.namelist())
                     self.assertIn("SHA256SUMS", archive.namelist())
                     self.assertNotIn("unlisted.txt", archive.namelist())
                     self.assertIn(b"file contents are not scanned", archive.read("README.md"))
+                    self.assertNotIn("python package.py --verify", readme)
+                    self.assertIn("not included in this ZIP by default", readme)
+                    self.assertIn("<path-to-PM-product-workflow>", readme)
                     if kind == "static-preview":
                         self.assertIn(b"cannot prove arbitrary JavaScript", archive.read("README.md"))
+                        self.assertIn("open the declared entry in the target browser", readme)
+                    elif kind == "frontend-source":
+                        self.assertIn("directory containing `package.json`", readme)
+                        self.assertNotIn("docs/ADD_PAGE.md", readme)
+                    else:
+                        self.assertIn("read the requirements at the declared entry", readme)
                 for name in files:
                     (self.source / name).unlink()
+
+    def test_frontend_readme_mentions_optional_page_guide_only_when_included(self) -> None:
+        self.write("package.json", '{"scripts":{}}')
+        self.write("docs/ADD_PAGE.md", "Fictional page guide")
+        self.profile("frontend-source", ["package.json", "docs/ADD_PAGE.md"], ["package.json"], "package.json")
+        self.build_and_verify()
+        with zipfile.ZipFile(self.output) as archive:
+            readme = archive.read("README.md").decode("utf-8")
+        self.assertIn("docs/ADD_PAGE.md", readme)
+
+    def test_frontend_readme_without_package_json_does_not_assume_node_or_npm(self) -> None:
+        self.write("index.html", "<main>Fictional static source</main>")
+        self.write("styles.css", "main { color: black; }")
+        self.profile("frontend-source", ["index.html", "styles.css"], ["index.html"], "index.html")
+        self.build_and_verify()
+        with zipfile.ZipFile(self.output) as archive:
+            readme = archive.read("README.md").decode("utf-8")
+        self.assertIn("read the declared entry above", readme)
+        self.assertIn("does not specify Node.js or npm", readme)
+        self.assertNotIn("directory containing `package.json`", readme)
+        self.assertNotIn("install dependencies", readme)
 
     def test_rejects_missing_required_file(self) -> None:
         self.write("index.html", "ok")

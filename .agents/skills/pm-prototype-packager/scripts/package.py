@@ -358,6 +358,34 @@ def _sha(data: bytes) -> str:
 
 
 def _readme(profile: dict, filenames: Iterable[str]) -> bytes:
+    filename_set = set(filenames)
+    kind = profile["kind"]
+    if kind == "static-preview":
+        usage = [
+            "解压本包后，在目标浏览器打开声明入口。实际页面和交互仍需由接收者在目标环境检查。",
+            "Extract this archive and open the declared entry in the target browser. The recipient still needs to check the page and interactions in the target environment.",
+        ]
+    elif kind == "frontend-source":
+        if "package.json" in filename_set:
+            usage = [
+                "解压本包后，进入包含 `package.json` 的目录；如有项目说明，先阅读，再按实际脚本与说明处理依赖和运行方式。",
+                "Extract this archive and open the directory containing `package.json`. Read any included project instructions, then use only the scripts and setup steps actually provided.",
+            ]
+        else:
+            usage = [
+                "解压本包后，先阅读上方声明入口和包内项目说明，再按实际内容使用；本包未声明 Node.js 或 npm 安装步骤。",
+                "Extract this archive and first read the declared entry above and any included project instructions. Follow the actual contents; this package does not specify Node.js or npm installation steps.",
+            ]
+        if "docs/ADD_PAGE.md" in filename_set:
+            usage.extend([
+                "新增页面说明见包内 `docs/ADD_PAGE.md`。",
+                "For instructions on adding a page, see `docs/ADD_PAGE.md` in this archive.",
+            ])
+    else:
+        usage = [
+            "解压本包后，阅读上方声明入口中的需求材料；未确认事项仍需相关人员评审。",
+            "Extract this archive and read the requirements at the declared entry above. Items marked unconfirmed still need review by the relevant people.",
+        ]
     lines = [
         f"# {profile['name']}", "",
         f"交付类型 / Delivery kind: `{profile['kind']}`.",
@@ -368,7 +396,8 @@ def _readme(profile: dict, filenames: Iterable[str]) -> bytes:
         "Common secret and certificate filenames are rejected, but file contents are not scanned and this does not prove that the archive contains no secrets.",
         "", "## 文件清单 / Included files", "",
     ]
-    lines.extend(f"- `{name}`" for name in sorted(filenames))
+    lines.extend(f"- `{name}`" for name in sorted(filename_set))
+    lines.extend(["", "## 使用说明 / How to use", "", *usage])
     if profile.get("limitations"):
         lines.extend(["", "## 已知限制 / Limitations", "", profile["limitations"].strip()])
     if profile["kind"] == "static-preview":
@@ -377,7 +406,12 @@ def _readme(profile: dict, filenames: Iterable[str]) -> bytes:
             "静态离线检查只覆盖常见 HTML/CSS 资源引用、JavaScript 模块加载和常见网络 API 特征；它不能证明任意 JavaScript 都不会联网，仍须在目标浏览器验收。",
             "Static offline checks cover common HTML/CSS resource references, JavaScript module loading, and common network APIs. They are heuristic and cannot prove arbitrary JavaScript has no network behavior; browser testing is still required.",
         ])
-    lines.extend(["", "验包 / Verify the archive: `python package.py --verify <archive.zip>`.", ""])
+    lines.extend([
+        "", "## 可选独立验包 / Optional independent archive verification", "",
+        "独立验包脚本属于 PM-product-workflow 仓库，默认不包含在本 ZIP 中。若已取得该仓库，可在仓库外调用脚本并将本包路径作为参数：",
+        "The standalone verification script belongs to the PM-product-workflow repository and is not included in this ZIP by default. If you have that repository, call its script from outside this archive and pass this archive's path:",
+        "", "`python <path-to-PM-product-workflow>/.agents/skills/pm-prototype-packager/scripts/package.py --verify <path-to-archive.zip>`", "",
+    ])
     return "\n".join(lines).encode("utf-8")
 
 
