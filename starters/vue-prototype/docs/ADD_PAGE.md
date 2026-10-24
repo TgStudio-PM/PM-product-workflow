@@ -16,7 +16,7 @@ npm run page:new -- demo-help guide "演示帮助"
 
 脚手架只处理目录和注册表的重复工作。请继续按页面需求修改 `mock.ts`、`Page.vue` 和 `RULES.md`：mock 保存虚构展示数据，页面组件负责交互与呈现，规则索引记录验收点并链接模块事实。字段或规则变化时同步对应事实文档。
 
-如果需要与后端协作，在模块 `contracts/` 记录字段结构、样例、校验及待确认问题；不要猜接口 URL、HTTP 方法或认证方式。
+如果新模块需要与后端协作讨论服务端数据或行为，按需复制仓库的[可选模块 API 对接记录模板](../../../templates/optional/API_HANDOFF.md)到使用者模块的 `contracts/API_HANDOFF.md`。它不随 `templates/module/` 整目录复制自动带入；该文件是模块对接细节的单一权威位置，服务端字段和接口实现由前后端确认，业务含义与规则依据模块事实并由产品负责人确认。本工程没有生产后端，不能猜接口 URL、HTTP 方法、认证方式或生产字段。已有材料申报虚构案例的 `src/modules/material-submission/contracts/README.md` 是该案例自己的讨论材料，不是生产契约，也不需要为了新增模块改写或复制其案例事实。
 
 ## 手动新增方式
 
