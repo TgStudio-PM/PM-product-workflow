@@ -99,6 +99,21 @@ test('rejects an already registered route before writing files', async (t) => {
   assert.equal(await readdir(path.join(root, 'src', 'modules')).catch((error) => error.code), 'ENOENT')
 })
 
+test('rejects an invalid original registry without creating page files or changing the registry', async (t) => {
+  const root = await createProjectFixture(t)
+  const registryPath = path.join(root, 'src', 'app', 'page-registry.ts')
+  const before = `${await readFile(registryPath, 'utf8')}\nconst =\n`
+  await writeFile(registryPath, before, 'utf8')
+
+  await assert.rejects(
+    createPage({ root, module: 'demo-help', page: 'guide', title: '演示帮助' }),
+    /无法安全读取 page-registry\.ts：页面注册表包含 TypeScript 语法错误/,
+  )
+
+  assert.equal(await readFile(registryPath, 'utf8'), before)
+  assert.equal(await readdir(path.join(root, 'src', 'modules')).catch((error) => error.code), 'ENOENT')
+})
+
 test('refuses to overwrite an existing page directory', async (t) => {
   const root = await createProjectFixture(t)
   const target = path.join(root, 'src', 'modules', 'demo-help', 'pages', 'guide')

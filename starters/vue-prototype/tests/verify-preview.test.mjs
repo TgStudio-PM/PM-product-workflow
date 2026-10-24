@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
 import { spawnSync } from 'node:child_process'
-import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises'
+import { cp, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises'
 import { test } from 'node:test'
 import os from 'node:os'
 import path from 'node:path'
@@ -65,6 +66,17 @@ async function updateContentHash(fixtureRoot, file) {
 
 async function updateManifestHash(fixtureRoot) {
   await updateContentHash(fixtureRoot, 'manifest.json')
+}
+
+async function snapshotPreviewFiles(fixtureRoot) {
+  const previewRoot = path.join(fixtureRoot, 'dist', 'preview')
+  const entries = await readdir(previewRoot, { withFileTypes: true })
+  const files = await Promise.all(entries.filter((entry) => entry.isFile()).map(async ({ name }) => {
+    const content = await readFile(path.join(previewRoot, name))
+    const hash = createHash('sha256').update(content).digest('hex')
+    return [name, hash]
+  }))
+  return Object.fromEntries(files)
 }
 
 test('valid preview package passes in an isolated copy', async (t) => {
@@ -136,6 +148,34 @@ test('rejects dynamic page metadata before building an offline package', async (
   const result = buildPreview(fixtureRoot)
   assert.equal(result.status, 1)
   assert.match(result.stderr, /title 必须是静态字符串/)
+})
+
+test('rejects a syntactically invalid registry during offline verification without modifying the package', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const registryPath = path.join(fixtureRoot, 'src', 'app', 'page-registry.ts')
+  const registry = await readFile(registryPath, 'utf8')
+  const originalPackage = await snapshotPreviewFiles(fixtureRoot)
+  await writeFile(registryPath, `${registry}\nconst =\n`, 'utf8')
+
+  const result = verify(fixtureRoot)
+
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /页面注册表包含 TypeScript 语法错误/)
+  assert.deepEqual(await snapshotPreviewFiles(fixtureRoot), originalPackage, '验包失败不应修改离线包文件或其 SHA 清单')
+})
+
+test('rejects a syntactically invalid registry during direct preview build before replacing the package', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const registryPath = path.join(fixtureRoot, 'src', 'app', 'page-registry.ts')
+  const registry = await readFile(registryPath, 'utf8')
+  const originalPackage = await snapshotPreviewFiles(fixtureRoot)
+  await writeFile(registryPath, `${registry}\nconst =\n`, 'utf8')
+
+  const result = buildPreview(fixtureRoot)
+
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /页面注册表包含 TypeScript 语法错误/)
+  assert.deepEqual(await snapshotPreviewFiles(fixtureRoot), originalPackage, '构建失败不应修改离线包文件或其 SHA 清单')
 })
 
 test('rejects a manifest title that differs from the registered page', async (t) => {

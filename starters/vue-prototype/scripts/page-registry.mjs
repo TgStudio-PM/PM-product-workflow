@@ -31,6 +31,10 @@ export function formatPagesMarkdown(pages) {
 
 export function readRegisteredPages(registrySource) {
   const sourceFile = ts.createSourceFile('page-registry.ts', registrySource, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS)
+  if (sourceFile.parseDiagnostics.length > 0) {
+    const message = ts.flattenDiagnosticMessageText(sourceFile.parseDiagnostics[0].messageText, ' ')
+    throw new Error(`页面注册表包含 TypeScript 语法错误，无法安全读取：${message}`)
+  }
   const declarations = []
 
   function unwrapExpression(expression) {
