@@ -53,7 +53,7 @@
 
 预设包含 [Profile 说明](../../profiles/gov-enterprise-cn/PROFILE.md) 和[页面评审模板](../../profiles/gov-enterprise-cn/REVIEW_TEMPLATE.md)。使用评审模板时，只有项目提供了可核验的权威条款，才能将问题判为“平台不合规”；不得臆造官方规范。业务错误须有已确认规则或可复现缺陷作为依据，证据不足时标为待确认，审美建议单独列出。
 
-可参照[完全虚构的材料申报页面评审示例](../../examples/material-submission/reviews/gov-enterprise-cn.md)：它展示如何核对证据、标记不适用的检查点，并诚实记录未运行的浏览器验收。
+可参照两份完全虚构的评审示例：[材料申报表单](../../examples/material-submission/reviews/gov-enterprise-cn.md)和 [Vue 概览页查询与表格](../../profiles/gov-enterprise-cn/EXAMPLE_OVERVIEW_REVIEW.md)。它们分别展示表单及材料检查、查询与表格检查，均区分静态证据和未运行的浏览器验收；Vue 概览页是工程教学页，不代表政务业务台账。
 
 ### 可选 Vue 原型工程模板
 
