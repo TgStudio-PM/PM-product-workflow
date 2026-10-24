@@ -1,5 +1,34 @@
 import ts from 'typescript'
 
+const markdownCellEntities = new Map([
+  ['&', '&amp;'],
+  ['<', '&lt;'],
+  ['>', '&gt;'],
+  ['|', '&#124;'],
+  ['\\', '&#92;'],
+  ['`', '&#96;'],
+  ['*', '&#42;'],
+  ['_', '&#95;'],
+  ['~', '&#126;'],
+  ['[', '&#91;'],
+  [']', '&#93;'],
+  ['(', '&#40;'],
+  [')', '&#41;'],
+  ['!', '&#33;'],
+])
+
+export function formatMarkdownTableCell(value) {
+  return String(value)
+    .replace(/\r\n|[\r\n]|[&<>|\\`*_~\[\]()!]/g, (character) => {
+      if (character === '\r\n' || character === '\r' || character === '\n') return '<br>'
+      return markdownCellEntities.get(character)
+    })
+}
+
+export function formatPagesMarkdown(pages) {
+  return `# 页面清单\n\n| 路由 | 页面 |\n| --- | --- |\n${pages.map(({ route, title }) => `| ${formatMarkdownTableCell(route)} | ${formatMarkdownTableCell(title)} |`).join('\n')}\n`
+}
+
 export function readRegisteredPages(registrySource) {
   const sourceFile = ts.createSourceFile('page-registry.ts', registrySource, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS)
   const declarations = []

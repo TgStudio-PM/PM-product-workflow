@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 import { readdir, readFile, stat } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { readRegisteredPages } from './page-registry.mjs'
+import { formatPagesMarkdown, readRegisteredPages } from './page-registry.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const output = path.join(root, 'dist', 'preview')
@@ -73,7 +73,7 @@ try {
     }
     if (!app.includes(registered.route)) issue(`页面路由未进入离线包脚本：${registered.route}`)
   }
-  const expectedPages = `# 页面清单\n\n| 路由 | 页面 |\n| --- | --- |\n${registeredPages.map(({ route, title }) => `| ${route} | ${title} |`).join('\n')}\n`
+  const expectedPages = formatPagesMarkdown(registeredPages)
   if ((await readFile(path.join(output, 'PAGES.md'), 'utf8')) !== expectedPages) issue('PAGES.md 与源码页面注册表不一致。')
   for (const dependency of Object.keys(JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8')).dependencies ?? {})) {
     if (!app.includes(dependency.split('/').at(-1))) issue(`运行依赖可能未打入本地 bundle：${dependency}`)
