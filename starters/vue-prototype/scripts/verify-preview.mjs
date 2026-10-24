@@ -13,6 +13,35 @@ const errors = []
 
 function issue(message) { errors.push(message) }
 
+function hasRasterSignature(mime, bytes) {
+  if (mime === 'png') return bytes.length >= 8 && bytes.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))
+  if (mime === 'jpeg') return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff
+  if (mime === 'gif') return bytes.length >= 6 && ['GIF87a', 'GIF89a'].includes(bytes.toString('ascii', 0, 6))
+  if (mime === 'webp') return bytes.length >= 12 && bytes.toString('ascii', 0, 4) === 'RIFF' && bytes.toString('ascii', 8, 12) === 'WEBP'
+  if (mime === 'avif') return bytes.length >= 12 && bytes.toString('ascii', 4, 8) === 'ftyp' && ['avif', 'avis'].includes(bytes.toString('ascii', 8, 12))
+  return false
+}
+
+function stripValidatedRasterDataUrls(stylesheet) {
+  const dataUrlPattern = /url\(\s*(?:"([^"]*)"|'([^']*)'|([^)]*))\s*\)/gi
+  return stylesheet.replace(dataUrlPattern, (match, doubleQuoted, singleQuoted, unquoted) => {
+    const value = (doubleQuoted ?? singleQuoted ?? unquoted ?? '').trim()
+    if (!/^data:/i.test(value)) return match
+
+    const parsed = /^data:image\/(png|jpeg|gif|webp|avif);base64,([\s\S]*)$/i.exec(value)
+    if (!parsed) return match
+
+    const [, mime, payload] = parsed
+    const canonicalBase64 = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(payload)
+    const bytes = canonicalBase64 ? Buffer.from(payload, 'base64') : Buffer.alloc(0)
+    if (!canonicalBase64 || bytes.toString('base64') !== payload || !hasRasterSignature(mime.toLowerCase(), bytes)) {
+      issue('样式表包含格式无效或 MIME 不匹配的栅格图片 data URI。')
+      return match
+    }
+    return 'url(embedded-raster-image)'
+  })
+}
+
 try {
   const entries = await readdir(output, { withFileTypes: true })
   const names = new Set(entries.map((entry) => entry.name))
@@ -47,7 +76,8 @@ try {
   if (!references.includes('./app.js') || !references.includes('./styles.css')) issue('入口必须引用本地 app.js 和 styles.css。')
   if (/\bimport\s*(?:\(|\{)|\bexport\s|\bprocess\.env\./i.test(app)) issue('JavaScript 仍含模块语法或未替换环境变量。')
   if (/<script[^>]+type=["']module|https?:\/\//i.test(html)) issue('HTML 仍含模块脚本或外部资源。')
-  if (/https?:\/\//i.test(css) || /url\(\s*["']?(?:data:|https?:|\/\/)/i.test(css)) issue('样式表包含外部或非本地 URL。')
+  const checkedCss = stripValidatedRasterDataUrls(css)
+  if (/https?:\/\//i.test(checkedCss) || /url\(\s*["']?(?:data:|https?:|\/\/)/i.test(checkedCss)) issue('样式表包含外部或非本地 URL。')
   if (/\b(?:fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon)\s*\(/.test(app)) issue('运行脚本包含网络请求 API。')
 
   const registry = await readFile(path.join(root, 'src', 'app', 'page-registry.ts'), 'utf8')

@@ -42,6 +42,8 @@ npm run preview:pack
 
 命令构建经典 JavaScript 脚本，整理页面清单、使用说明和文件校验值，并自动执行离线包审计。通过后，可尝试双击 `dist/preview/index.html`，也可把 `dist/preview/` 放到静态服务器。包仅依赖随包提供的本地文件，不需要 Node 服务或 CDN。每个目标浏览器的 `file://` 行为仍需实测。
 
+CSS 中的本地 PNG、JPEG、GIF、WebP 和 AVIF 图片会由 Vite 内嵌为 base64；离线包审计会检查受支持的 MIME、base64 编码和对应文件签名。SVG 数据 URI、非图片数据 URI 和远程资源会被拒绝；该范围不代表其他资源类型已支持。公开仓库中的图片仍须确认来源、授权并排除真实项目截图或数据。
+
 ```bash
 npm run preview:verify
 ```
