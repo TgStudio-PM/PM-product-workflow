@@ -164,6 +164,65 @@ class PackageTests(unittest.TestCase):
         with self.assertRaisesRegex(package.PackageError, "ASSET-01"):
             package.build(self.source, self.profile_path, self.output)
 
+    def test_rejects_executable_data_uri_contexts_during_build(self) -> None:
+        cases = [
+            ("script", '<script src="data:text/javascript,fetch(1)"></script>', None),
+            ("iframe", '<iframe src="data:text/html,%3Cscript%3Efetch(1)%3C/script%3E"></iframe>', None),
+            ("srcdoc", '<iframe srcdoc="&lt;script&gt;fetch(1)&lt;/script&gt;"></iframe>', None),
+            ("object", '<object data="data:text/html,%3Cscript%3Efetch(1)%3C/script%3E"></object>', None),
+            ("embed", '<embed src="data:text/html,%3Cscript%3Efetch(1)%3C/script%3E">', None),
+            ("stylesheet-link", '<link rel="stylesheet" href="data:text/css,body%7Bcolor:red%7D">', None),
+            ("modulepreload-link", '<link rel="modulepreload" href="data:text/javascript,fetch(1)">', None),
+            ("css-import", '<link rel="stylesheet" href="style.css">', '@import url("data:text/css,body%7Bcolor:red%7D");'),
+        ]
+        for index, (label, html, css) in enumerate(cases):
+            with self.subTest(context=label):
+                entry = f"index-{index}.html"
+                included = [entry]
+                self.write(entry, html)
+                if css is not None:
+                    stylesheet = f"style-{index}.css"
+                    self.write(entry, html.replace('href="style.css"', f'href="{stylesheet}"'))
+                    self.write(stylesheet, css)
+                    included.append(stylesheet)
+                self.profile("static-preview", included, [entry], entry, pages=[entry])
+                with self.assertRaisesRegex(package.PackageError, "ASSET-10"):
+                    package.build(self.source, self.profile_path, self.output)
+
+    def test_allows_non_executable_embedded_raster_images(self) -> None:
+        data_uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/hXcAAAAASUVORK5CYII="
+        self.write("index.html", f'<img alt="fictional pixel" src="{data_uri}"><div class="pixel"></div>')
+        self.write("style.css", f'.pixel {{ background-image: url("{data_uri}"); }}')
+        self.profile("static-preview", ["index.html", "style.css"], ["index.html"], "index.html", pages=["index.html"])
+        self.build_and_verify()
+
+    def test_verify_reaudits_executable_data_uri_in_resigned_static_archive(self) -> None:
+        self.write("index.html", '<main>Fictional preview</main>')
+        self.profile("static-preview", ["index.html"], ["index.html"], "index.html", pages=["index.html"])
+        self.build_and_verify()
+        forged = self.root / "resigned-active-data.zip"
+        with zipfile.ZipFile(self.output) as original:
+            payload = {name: original.read(name) for name in original.namelist() if name not in {"manifest.json", "SHA256SUMS"}}
+        payload["index.html"] = b'<script src="data:text/javascript,fetch(1)"></script>'
+        manifest = {
+            "schema_version": 1,
+            "kind": "static-preview",
+            "name": "Fictional fixture",
+            "entry": "index.html",
+            "required": ["index.html"],
+            "pages": ["index.html"],
+            "files": {name: package._sha(data) for name, data in sorted(payload.items())},
+        }
+        manifest_bytes = (json.dumps(manifest, indent=2) + "\n").encode("utf-8")
+        sums = "".join(f"{digest}  {name}\n" for name, digest in sorted(manifest["files"].items())).encode("utf-8")
+        with zipfile.ZipFile(forged, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+            for name, data in payload.items():
+                archive.writestr(name, data)
+            archive.writestr("manifest.json", manifest_bytes)
+            archive.writestr("SHA256SUMS", sums)
+        with self.assertRaisesRegex(package.PackageError, "ASSET-10"):
+            package.verify(forged)
+
     def test_rejects_missing_inline_css_asset(self) -> None:
         self.write("index.html", '<div style="background:url(./missing.png)"></div>')
         self.profile("static-preview", ["index.html"], ["index.html"], "index.html", pages=["index.html"])

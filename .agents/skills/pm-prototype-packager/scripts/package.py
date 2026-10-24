@@ -156,11 +156,19 @@ class _ReferenceParser(html.parser.HTMLParser):
         self._inside_style = False
         self._inside_script = False
         self.has_module_script = False
+        self.has_executable_data_reference = False
+
+    def _check_active_data_reference(self, value: str | None) -> None:
+        if value and value.lstrip().casefold().startswith("data:"):
+            self.has_executable_data_reference = True
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         values = dict(attrs)
+        tag_name = tag.casefold()
         if values.get("src"):
             self.refs.append(("src", values["src"] or ""))
+            if tag_name in {"script", "iframe", "embed"}:
+                self._check_active_data_reference(values["src"])
         if values.get("srcset"):
             for candidate in (values["srcset"] or "").split(","):
                 ref = candidate.strip().split()
@@ -168,16 +176,27 @@ class _ReferenceParser(html.parser.HTMLParser):
                     self.refs.append(("srcset", ref[0]))
         if values.get("style"):
             self.inline_css.append(values["style"] or "")
-        if tag.casefold() == "style":
+        if tag_name == "object":
+            self._check_active_data_reference(values.get("data"))
+        if tag_name == "iframe" and values.get("srcdoc") is not None:
+            self.has_executable_data_reference = True
+        if tag_name == "style":
             self._inside_style = True
-        if tag.casefold() == "script":
+        if tag_name == "script":
             self._inside_script = True
             script_type = (values.get("type") or "").split(";", 1)[0].strip().casefold()
             if script_type == "module":
                 self.has_module_script = True
         href = values.get("href")
         rel = (values.get("rel") or "").casefold().split()
-        if href and (tag.casefold() != "a" or any(item in rel for item in ("stylesheet", "icon", "preload", "modulepreload"))):
+        preload_as = (values.get("as") or "").casefold()
+        active_link = tag_name == "link" and (
+            any(item in rel for item in ("stylesheet", "modulepreload", "import"))
+            or "preload" in rel and preload_as in {"script", "style", "document", "fetch"}
+        )
+        if active_link:
+            self._check_active_data_reference(href)
+        if href and (tag_name != "a" or any(item in rel for item in ("stylesheet", "icon", "preload", "modulepreload"))):
             self.refs.append(("href", href))
 
     def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
@@ -241,7 +260,10 @@ def _audit_static(files: dict[str, bytes], profile: dict) -> None:
         for match in css_url.finditer(text):
             _resolve_reference(filename, match.group(2), files)
         for match in css_import.finditer(text):
-            _resolve_reference(filename, match.group(1) or match.group(2), files)
+            imported = match.group(1) or match.group(2)
+            if imported.lstrip().casefold().startswith("data:"):
+                raise PackageError("ASSET-10 static preview contains an executable or importable data URI")
+            _resolve_reference(filename, imported, files)
 
     def audit_js(text: str) -> None:
         if js_module.search(text):
@@ -258,6 +280,8 @@ def _audit_static(files: dict[str, bytes], profile: dict) -> None:
                 parser.close()
             except (UnicodeError, ValueError):
                 raise PackageError("ASSET-04 unable to parse UTF-8 HTML resource references") from None
+            if parser.has_executable_data_reference:
+                raise PackageError("ASSET-10 static preview contains an executable or importable data URI")
             if parser.has_module_script:
                 raise PackageError("ASSET-07 static preview contains a module script")
             for _, ref in parser.refs:
