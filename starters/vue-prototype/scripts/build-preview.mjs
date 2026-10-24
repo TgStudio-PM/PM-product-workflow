@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import vue from '@vitejs/plugin-vue'
 import { build } from 'vite'
-import { readRegisteredPages } from './page-registry.mjs'
+import { formatPagesMarkdown, readRegisteredPages } from './page-registry.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const output = path.join(root, 'dist', 'preview')
@@ -73,7 +73,7 @@ const previewReadme = [
   '',
 ].join('\n')
 await writeFile(path.join(output, 'README.md'), previewReadme, 'utf8')
-await writeFile(path.join(output, 'PAGES.md'), `# 页面清单\n\n| 路由 | 页面 |\n| --- | --- |\n${pages.map(({ route, title }) => `| ${route} | ${title} |`).join('\n')}\n`, 'utf8')
+await writeFile(path.join(output, 'PAGES.md'), formatPagesMarkdown(pages), 'utf8')
 
 const script = await readFile(path.join(output, 'app.js'), 'utf8')
 if (/\bimport\s*(?:\(|\{)|\bexport\s|<script[^>]+type=["']module|\bprocess\.env\./i.test(script)) {

@@ -50,17 +50,21 @@ async function writeManifest(fixtureRoot, manifestPath, manifest) {
   await updateManifestHash(fixtureRoot)
 }
 
-async function updateManifestHash(fixtureRoot) {
+async function updateContentHash(fixtureRoot, file) {
   const previewRoot = path.join(fixtureRoot, 'dist', 'preview')
-  const manifest = await readFile(path.join(previewRoot, 'manifest.json'))
+  const content = await readFile(path.join(previewRoot, file))
   const { createHash } = await import('node:crypto')
-  const digest = createHash('sha256').update(manifest).digest('hex')
+  const digest = createHash('sha256').update(content).digest('hex')
   const sumsPath = path.join(previewRoot, 'SHA256SUMS')
   const lines = (await readFile(sumsPath, 'utf8')).trimEnd().split(/\r?\n/)
-  const index = lines.findIndex((line) => /\s+manifest\.json$/.test(line))
-  assert.notEqual(index, -1, '测试夹具应包含 manifest.json 摘要')
-  lines[index] = `${digest}  manifest.json`
+  const index = lines.findIndex((line) => line.endsWith(`  ${file}`))
+  assert.notEqual(index, -1, `测试夹具应包含 ${file} 摘要`)
+  lines[index] = `${digest}  ${file}`
   await writeFile(sumsPath, `${lines.join('\n')}\n`, 'utf8')
+}
+
+async function updateManifestHash(fixtureRoot) {
+  await updateContentHash(fixtureRoot, 'manifest.json')
 }
 
 test('valid preview package passes in an isolated copy', async (t) => {
@@ -91,6 +95,36 @@ test('builds and verifies pages when the first registry entry lists title before
   ])
   assert.equal(await readFile(path.join(fixtureRoot, 'dist', 'preview', 'PAGES.md'), 'utf8'),
     '# 页面清单\n\n| 路由 | 页面 |\n| --- | --- |\n| /overview | 原型概览 |\n| /material-submission/apply | 材料申报 |\n')
+})
+
+test('formats punctuation and multiline titles as safe table cells while preserving manifest values', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const registryPath = path.join(fixtureRoot, 'src', 'app', 'page-registry.ts')
+  const registry = await readFile(registryPath, 'utf8')
+  const title = '演示 | <指南> *强调* _字段_ [链接](地址) `代码` &\r\n第二行'
+  await writeFile(registryPath, registry.replace("title: '材料申报'", `title: ${JSON.stringify(title)}`), 'utf8')
+
+  const buildResult = buildPreview(fixtureRoot)
+  assert.equal(buildResult.status, 0, buildResult.stderr || buildResult.stdout)
+  const verifyResult = verify(fixtureRoot)
+  assert.equal(verifyResult.status, 0, verifyResult.stderr || verifyResult.stdout)
+
+  const { manifest } = await readManifest(fixtureRoot)
+  assert.equal(manifest.pages[1].title, title)
+  assert.equal(await readFile(path.join(fixtureRoot, 'dist', 'preview', 'PAGES.md'), 'utf8'),
+    '# 页面清单\n\n| 路由 | 页面 |\n| --- | --- |\n| /overview | 原型概览 |\n| /material-submission/apply | 演示 &#124; &lt;指南&gt; &#42;强调&#42; &#95;字段&#95; &#91;链接&#93;&#40;地址&#41; &#96;代码&#96; &amp;<br>第二行 |\n')
+})
+
+test('rejects a modified PAGES.md even when its checksum is updated', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const pagesPath = path.join(fixtureRoot, 'dist', 'preview', 'PAGES.md')
+  const original = await readFile(pagesPath, 'utf8')
+  await writeFile(pagesPath, original.replace('| /overview | 原型概览 |', '| /overview | 原型 | 概览 |'), 'utf8')
+  await updateContentHash(fixtureRoot, 'PAGES.md')
+  const result = verify(fixtureRoot)
+
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /PAGES\.md 与源码页面注册表不一致/)
 })
 
 test('rejects dynamic page metadata before building an offline package', async (t) => {
