@@ -89,6 +89,8 @@ test('valid preview package passes in an isolated copy', async (t) => {
 
 test('builds and verifies pages when the first registry entry lists title before path', async (t) => {
   const fixtureRoot = await createFixture(t)
+  const baseline = await readManifest(fixtureRoot)
+  const baselinePages = await readFile(path.join(fixtureRoot, 'dist', 'preview', 'PAGES.md'), 'utf8')
   const registryPath = path.join(fixtureRoot, 'src', 'app', 'page-registry.ts')
   const registry = await readFile(registryPath, 'utf8')
   const original = "path: '/overview',\n    title: '原型概览',"
@@ -101,16 +103,14 @@ test('builds and verifies pages when the first registry entry lists title before
   assert.equal(verifyResult.status, 0, verifyResult.stderr || verifyResult.stdout)
 
   const { manifest } = await readManifest(fixtureRoot)
-  assert.deepEqual(manifest.pages, [
-    { route: '/overview', title: '原型概览' },
-    { route: '/material-submission/apply', title: '材料申报' },
-  ])
-  assert.equal(await readFile(path.join(fixtureRoot, 'dist', 'preview', 'PAGES.md'), 'utf8'),
-    '# 页面清单\n\n| 路由 | 页面 |\n| --- | --- |\n| /overview | 原型概览 |\n| /material-submission/apply | 材料申报 |\n')
+  assert.deepEqual(manifest.pages, baseline.manifest.pages)
+  assert.equal(await readFile(path.join(fixtureRoot, 'dist', 'preview', 'PAGES.md'), 'utf8'), baselinePages)
 })
 
 test('formats punctuation and multiline titles as safe table cells while preserving manifest values', async (t) => {
   const fixtureRoot = await createFixture(t)
+  const baseline = await readManifest(fixtureRoot)
+  const baselinePages = await readFile(path.join(fixtureRoot, 'dist', 'preview', 'PAGES.md'), 'utf8')
   const registryPath = path.join(fixtureRoot, 'src', 'app', 'page-registry.ts')
   const registry = await readFile(registryPath, 'utf8')
   const title = '演示 | <指南> *强调* _字段_ [链接](地址) `代码` &\r\n第二行'
@@ -122,9 +122,61 @@ test('formats punctuation and multiline titles as safe table cells while preserv
   assert.equal(verifyResult.status, 0, verifyResult.stderr || verifyResult.stdout)
 
   const { manifest } = await readManifest(fixtureRoot)
-  assert.equal(manifest.pages[1].title, title)
-  assert.equal(await readFile(path.join(fixtureRoot, 'dist', 'preview', 'PAGES.md'), 'utf8'),
-    '# 页面清单\n\n| 路由 | 页面 |\n| --- | --- |\n| /overview | 原型概览 |\n| /material-submission/apply | 演示 &#124; &lt;指南&gt; &#42;强调&#42; &#95;字段&#95; &#91;链接&#93;&#40;地址&#41; &#96;代码&#96; &amp;<br>第二行 |\n')
+  const targetRoute = '/material-submission/apply'
+  const expectedPages = baseline.manifest.pages.map((page) => (
+    page.route === targetRoute ? { ...page, title } : page
+  ))
+  const targetIndex = baseline.manifest.pages.findIndex((page) => page.route === targetRoute)
+  assert.equal(targetIndex, 1, '基线中的目标页应是第二页')
+  assert.deepEqual(manifest.pages, expectedPages)
+
+  const originalRow = '| /material-submission/apply | 材料申报 |'
+  const expectedRow = '| /material-submission/apply | 演示 &#124; &lt;指南&gt; &#42;强调&#42; &#95;字段&#95; &#91;链接&#93;&#40;地址&#41; &#96;代码&#96; &amp;<br>第二行 |'
+  assert.ok(baselinePages.includes(originalRow), '基线页面清单应包含被修改页的原始行')
+  assert.equal(
+    await readFile(path.join(fixtureRoot, 'dist', 'preview', 'PAGES.md'), 'utf8'),
+    baselinePages.replace(originalRow, expectedRow),
+  )
+})
+
+test('builds and verifies an additional page without colliding with existing routes', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const baseline = await readManifest(fixtureRoot)
+  const baselinePages = await readFile(path.join(fixtureRoot, 'dist', 'preview', 'PAGES.md'), 'utf8')
+  const registryPath = path.join(fixtureRoot, 'src', 'app', 'page-registry.ts')
+  const registry = await readFile(registryPath, 'utf8')
+  const marker = '] as const'
+  assert.ok(registry.includes(marker), '测试夹具应包含静态页面注册表结尾')
+  const existingRoutes = new Set(baseline.manifest.pages.map((page) => page.route))
+  const routeBase = '/demo-help/guide'
+  let route = routeBase
+  let suffix = 1
+  while (existingRoutes.has(route)) route = `${routeBase}-${suffix++}`
+  assert.equal(existingRoutes.has(route), false, '附加页面应使用当前注册表中未占用的路由')
+  const title = '附加测试页'
+  const addedPage = [
+    '  {',
+    `    path: ${JSON.stringify(route)},`,
+    `    title: ${JSON.stringify(title)},`,
+    `    menuLabel: ${JSON.stringify(title)},`,
+    "    demoRole: '教学案例使用者',",
+    "    description: '虚构的附加页面回归测试。',",
+    '    component: OverviewPage,',
+    '  },',
+  ].join('\n')
+  await writeFile(registryPath, registry.replace(marker, `${addedPage}\n${marker}`), 'utf8')
+
+  const buildResult = buildPreview(fixtureRoot)
+  assert.equal(buildResult.status, 0, buildResult.stderr || buildResult.stdout)
+  const verifyResult = verify(fixtureRoot)
+  assert.equal(verifyResult.status, 0, verifyResult.stderr || verifyResult.stdout)
+
+  const { manifest } = await readManifest(fixtureRoot)
+  assert.deepEqual(manifest.pages, [...baseline.manifest.pages, { route, title }])
+  assert.equal(
+    await readFile(path.join(fixtureRoot, 'dist', 'preview', 'PAGES.md'), 'utf8'),
+    `${baselinePages}| ${route} | ${title} |\n`,
+  )
 })
 
 test('rejects a modified PAGES.md even when its checksum is updated', async (t) => {
