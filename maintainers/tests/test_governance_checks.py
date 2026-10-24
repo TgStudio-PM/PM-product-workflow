@@ -143,6 +143,12 @@ class MarkdownLinkTests(unittest.TestCase):
 
 
 class VueStarterDistributionTests(unittest.TestCase):
+    PROFILE_SOURCES = {
+        "static-preview.json": "examples/material-submission",
+        "frontend-source.json": "starters/vue-prototype",
+        "backend-requirements.json": "starters/vue-prototype",
+    }
+
     def test_distributed_templates_match_canonical_templates(self) -> None:
         pairs = {
             ROOT / "templates/module/CURRENT.md": ROOT / "starters/vue-prototype/module-template/facts/module/CURRENT.md",
@@ -172,74 +178,58 @@ class VueStarterDistributionTests(unittest.TestCase):
                 self.assertIn(path.split("/")[0], included)
                 self.assertIn(path, required)
 
-    def test_frontend_profile_builds_and_independently_verifies_zip(self) -> None:
+    def test_all_delivery_profiles_build_and_independently_verify_zip(self) -> None:
         packager = ROOT / ".agents/skills/pm-prototype-packager/scripts/package.py"
-        source = ROOT / "starters/vue-prototype"
-        profile = ROOT / "examples/package-profiles/frontend-source.json"
-        with tempfile.TemporaryDirectory() as directory:
-            archive = Path(directory) / "frontend-source.zip"
-            build = subprocess.run(
-                [
-                    sys.executable,
-                    str(packager),
-                    "--source",
-                    str(source),
-                    "--profile",
-                    str(profile),
-                    "--output",
-                    str(archive),
-                ],
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-            )
-            self.assertEqual(build.returncode, 0, build.stdout + build.stderr)
-            self.assertTrue(archive.is_file())
+        profile_dir = ROOT / "examples/package-profiles"
+        actual_profiles = {path.name for path in profile_dir.glob("*.json")}
+        self.assertEqual(actual_profiles, set(self.PROFILE_SOURCES))
 
-            verify = subprocess.run(
-                [sys.executable, str(packager), "--verify", str(archive)],
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-            )
-            self.assertEqual(verify.returncode, 0, verify.stdout + verify.stderr)
+        for profile_name, source_relative in self.PROFILE_SOURCES.items():
+            with self.subTest(profile=profile_name), tempfile.TemporaryDirectory() as directory:
+                profile = profile_dir / profile_name
+                source = ROOT / source_relative
+                config = json.loads(profile.read_text(encoding="utf-8"))
+                self.assertTrue(source.is_dir())
 
-    def test_backend_profile_builds_and_verifies_without_page_source(self) -> None:
-        packager = ROOT / ".agents/skills/pm-prototype-packager/scripts/package.py"
-        source = ROOT / "starters/vue-prototype"
-        profile = ROOT / "examples/package-profiles/backend-requirements.json"
-        with tempfile.TemporaryDirectory() as directory:
-            archive = Path(directory) / "backend-requirements.zip"
-            build = subprocess.run(
-                [
-                    sys.executable,
-                    str(packager),
-                    "--source",
-                    str(source),
-                    "--profile",
-                    str(profile),
-                    "--output",
-                    str(archive),
-                ],
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-            )
-            self.assertEqual(build.returncode, 0, build.stdout + build.stderr)
-            self.assertTrue(archive.is_file())
+                archive = Path(directory) / f"{profile.stem}.zip"
+                build = subprocess.run(
+                    [
+                        sys.executable,
+                        str(packager),
+                        "--source",
+                        str(source),
+                        "--profile",
+                        str(profile),
+                        "--output",
+                        str(archive),
+                    ],
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                )
+                self.assertEqual(build.returncode, 0, build.stdout + build.stderr)
+                self.assertTrue(archive.is_file())
 
-            verify = subprocess.run(
-                [sys.executable, str(packager), "--verify", str(archive)],
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-            )
-            self.assertEqual(verify.returncode, 0, verify.stdout + verify.stderr)
+                verify = subprocess.run(
+                    [sys.executable, str(packager), "--verify", str(archive)],
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                )
+                self.assertEqual(verify.returncode, 0, verify.stdout + verify.stderr)
 
-            with zipfile.ZipFile(archive) as package:
-                names = package.namelist()
-            self.assertIn("api-template/API_HANDOFF.md", names)
-            self.assertFalse(any("/pages/" in name or name.endswith(("Page.vue", "mock.ts")) for name in names))
+                with zipfile.ZipFile(archive) as package:
+                    names = set(package.namelist())
+                self.assertIn(config["entry"], names)
+                for required in config["required"]:
+                    with self.subTest(profile=profile_name, required=required):
+                        self.assertIn(required, names)
+
+                if config["kind"] == "backend-requirements":
+                    self.assertIn("api-template/API_HANDOFF.md", names)
+                    self.assertFalse(
+                        any("pages" in name.split("/") or name.endswith((".vue", "mock.ts")) for name in names)
+                    )
 
 
 if __name__ == "__main__":
