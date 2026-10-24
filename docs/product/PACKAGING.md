@@ -68,7 +68,10 @@ Pop-Location
 
 依赖安装和命令运行属于源码包的工程验证。`npm run test:preview-verify` 会在隔离临时副本检查正常包及 manifest/摘要异常能否被拒绝。它们不代表产品规则正确，也不替代在接收方目标浏览器和运行环境中的验收。`npm run preview:pack` 产生的静态预览目录可另行按静态预览方式检查。
 
+<a id="backend-requirements-package"></a>
 ### 后端需求材料包
+
+> **下面的原始示例命令只打包材料申报模块。** 要打包新模块，请先完成下方的 [新模块定制步骤](#customize-backend-requirements)，不要直接运行这组示例命令。
 
 ```powershell
 python .agents/skills/pm-prototype-packager/scripts/package.py `
@@ -80,7 +83,41 @@ python .agents/skills/pm-prototype-packager/scripts/package.py `
   --verify .codex-local/packages/material-submission-backend-requirements.zip
 ```
 
-将解压后的 `docs/BACKEND_HANDOFF.md`、合同说明和模块事实交给相关人员逐项评审。确认 API 地址、HTTP 方法、身份权限、字段可空性、错误结构、持久化和审计要求等事项前，保持为待确认。页面上的按钮名称或 mock 结构不能单独证明后端行为。
+将解压后的 `docs/BACKEND_HANDOFF.md`、合同说明和材料申报模块事实交给相关人员逐项评审。确认 API 地址、HTTP 方法、身份权限、字段可空性、错误结构、持久化和审计要求等事项前，保持为待确认。页面上的按钮名称或 mock 结构不能单独证明后端行为。
+
+<a id="customize-backend-requirements"></a>
+#### 为新模块定制后端需求包
+
+当前 `backend-requirements.json` 是材料申报虚构案例的固定白名单。它不会跟随 `page:new` 或新建模块自动改变；直接用它打包，只会交付 Profile 明列的材料申报事实与合同内容，不代表其他新模块已交付。要为新模块准备包，按以下步骤复制并调整 Profile：
+
+1. 将 `examples/package-profiles/backend-requirements.json` 复制到本机忽略目录。下面使用虚构模块标识 `demo-help`；实际操作时将其替换为目标模块标识，不要把个人交付配置提交到公开仓库：
+
+```powershell
+New-Item -ItemType Directory -Force .codex-local/profiles | Out-Null
+Copy-Item examples/package-profiles/backend-requirements.json .codex-local/profiles/demo-help-backend-requirements.json
+```
+
+2. 在 `include` 和 `required` 中保留通用入口 `docs/BACKEND_HANDOFF.md` 及它链接的 `api-template/API_HANDOFF.md`，避免包内相对链接断开。
+3. 将 Profile 中 `src/modules/material-submission/...` 项替换为目标 `src/modules/<module>/...`，并更新 `name` 与 `limitations` 以描述目标模块和待确认边界。`include` 可包含目标模块的 `facts/module/` 和实际存在的 `contracts/API_HANDOFF.md`；`required` 则逐项列出入口、通用 API 模板及目标模块实际存在的规则事实文件。完整模块模板通常含 `CURRENT.md`、`BUSINESS_RULES.md`、`PAGE_FLOW.md`、`DECISIONS.md`、`ERROR_LEDGER.md`。模块 API 记录是可选文件：已创建时须同时列入 `include` 和 `required`，未创建时两处都省略；不要根据页面或 mock 猜接口、权限或持久化。
+4. 用 `--output` 将 ZIP 写入 `.codex-local/packages/`，再运行独立验包：
+
+```powershell
+New-Item -ItemType Directory -Force .codex-local/packages | Out-Null
+
+python .agents/skills/pm-prototype-packager/scripts/package.py `
+  --source starters/vue-prototype `
+  --profile .codex-local/profiles/demo-help-backend-requirements.json `
+  --output .codex-local/packages/demo-help-backend-requirements.zip
+
+python .agents/skills/pm-prototype-packager/scripts/package.py `
+  --verify .codex-local/packages/demo-help-backend-requirements.zip
+
+python -m zipfile -l .codex-local/packages/demo-help-backend-requirements.zip
+```
+
+5. 查看 ZIP 清单，确认 `docs/BACKEND_HANDOFF.md`、通用模板及目标模块事实均在包内；同时确认没有误带入 `material-submission`、页面源码或 mock。实际 API 和业务语义仍需产品及前后端责任人确认。
+
+该新模块适配步骤已用完全虚构模块的隔离 Profile 验证：ZIP 生成与独立验包通过，清单只含目标模块文件、共享交接文档和 API 模板，没有材料申报模块、页面源码或 mock。该结果只验证白名单打包和包结构，不代表接口或产品验收。
 
 ## Profile 与白名单
 
