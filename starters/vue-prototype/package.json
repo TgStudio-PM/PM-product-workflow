@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "preview:pack": "node scripts/build-preview.mjs && node scripts/verify-preview.mjs",
+    "preview:pack": "npm run typecheck && node scripts/build-preview.mjs && node scripts/verify-preview.mjs",
     "preview:verify": "node scripts/verify-preview.mjs",
     "typecheck": "vue-tsc --noEmit",
-    "test:preview-verify": "node --test tests/verify-preview.test.mjs"
+    "test:preview-verify": "node --test tests/verify-preview.test.mjs tests/preview-pack.test.mjs"
   },
   "dependencies": {
     "vue": "^3.5.43"
