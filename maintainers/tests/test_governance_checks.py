@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 import subprocess
 import tempfile
@@ -138,6 +139,69 @@ class MarkdownLinkTests(unittest.TestCase):
             source.write_text("[Rules](docs/Rules.md)\n", encoding="utf-8")
             (root / "docs" / "rules.md").write_text("# Rules\n", encoding="utf-8")
             self.assertEqual(check_file(source, root), [(1, "docs/Rules.md")])
+
+
+class VueStarterDistributionTests(unittest.TestCase):
+    def test_distributed_templates_match_canonical_templates(self) -> None:
+        pairs = {
+            ROOT / "templates/module/CURRENT.md": ROOT / "starters/vue-prototype/module-template/facts/module/CURRENT.md",
+            ROOT / "templates/module/BUSINESS_RULES.md": ROOT / "starters/vue-prototype/module-template/facts/module/BUSINESS_RULES.md",
+            ROOT / "templates/module/PAGE_FLOW.md": ROOT / "starters/vue-prototype/module-template/facts/module/PAGE_FLOW.md",
+            ROOT / "templates/module/DECISIONS.md": ROOT / "starters/vue-prototype/module-template/facts/module/DECISIONS.md",
+            ROOT / "templates/module/ERROR_LEDGER.md": ROOT / "starters/vue-prototype/module-template/facts/module/ERROR_LEDGER.md",
+            ROOT / "templates/optional/API_HANDOFF.md": ROOT / "starters/vue-prototype/api-template/API_HANDOFF.md",
+        }
+        for canonical, distributed in pairs.items():
+            with self.subTest(template=canonical.name):
+                self.assertEqual(canonical.read_bytes(), distributed.read_bytes())
+
+    def test_frontend_profile_includes_required_distributed_templates(self) -> None:
+        profile = json.loads((ROOT / "examples/package-profiles/frontend-source.json").read_text(encoding="utf-8"))
+        included = set(profile["include"])
+        required = set(profile["required"])
+        for path in (
+            "module-template/facts/module/CURRENT.md",
+            "module-template/facts/module/BUSINESS_RULES.md",
+            "module-template/facts/module/PAGE_FLOW.md",
+            "module-template/facts/module/DECISIONS.md",
+            "module-template/facts/module/ERROR_LEDGER.md",
+            "api-template/API_HANDOFF.md",
+        ):
+            with self.subTest(path=path):
+                self.assertIn(path.split("/")[0], included)
+                self.assertIn(path, required)
+
+    def test_frontend_profile_builds_and_independently_verifies_zip(self) -> None:
+        packager = ROOT / ".agents/skills/pm-prototype-packager/scripts/package.py"
+        source = ROOT / "starters/vue-prototype"
+        profile = ROOT / "examples/package-profiles/frontend-source.json"
+        with tempfile.TemporaryDirectory() as directory:
+            archive = Path(directory) / "frontend-source.zip"
+            build = subprocess.run(
+                [
+                    sys.executable,
+                    str(packager),
+                    "--source",
+                    str(source),
+                    "--profile",
+                    str(profile),
+                    "--output",
+                    str(archive),
+                ],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+            )
+            self.assertEqual(build.returncode, 0, build.stdout + build.stderr)
+            self.assertTrue(archive.is_file())
+
+            verify = subprocess.run(
+                [sys.executable, str(packager), "--verify", str(archive)],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+            )
+            self.assertEqual(verify.returncode, 0, verify.stdout + verify.stderr)
 
 
 if __name__ == "__main__":
