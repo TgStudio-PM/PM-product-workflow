@@ -2,14 +2,14 @@
 
 本文件只记录 PM-product-workflow 仓库自身状态。使用者项目的模块状态使用 `templates/module/CURRENT.md`，两者不能混用。
 
-最后更新：2026-10-21
+最后更新：2026-10-24
 
 ## 当前版本
 
 - 版本：v0.1，开发中
 - 里程碑：A 公开骨架 → B 工作流闭环 → C 首版发布
 - 当前阶段：里程碑 A 完成；里程碑 B 事实治理 Skill、离线案例三轮记录、可选 Vue 原型工程模板、`pm-prototype-handover` 与 `pm-prototype-packager` Skill 已交付；第三轮为模拟接续练习
-- 稳定基线：远端 `main` 上已合并且经验证的产品能力；产品使用入口与仓库自管理入口已分层
+- 稳定基线：远端 `main` 上已合并且经验证的产品能力；产品使用入口与仓库自管理入口已分层；PR 合并决策授权见 [ADR 0002](decisions/0002-delegated-merge-authority.md)
 
 ## 最近完成
 
