@@ -17,10 +17,15 @@ npm run dev
 
 这是面向简单页面的操作目标；实际用时取决于页面交互和规则复杂度。“不超过五分钟”仍是目标，尚未经过非开发产品经理计时验收。需要复做时，请使用[新增页面人测卡](docs/ADD_PAGE_TRIAL.md)。
 
-1. 复制 `page-template/` 到 `src/modules/<模块>/pages/<页面>/`。
-2. 在目录的 `mock.ts` 和 `RULES.md` 填入虚构演示数据与已确认/待确认规则，再实现 `Page.vue`。
-3. 在 `src/app/page-registry.ts` 注册路由、标题、菜单名、角色说明和页面组件。
-4. 运行 `npm run typecheck`，用 `npm run dev` 打开新路由检查。
+可运行页面脚手架命令，自动复制模板并注册页面：
+
+```bash
+npm run page:new -- demo-help guide "演示帮助"
+```
+
+`demo-help` 是模块标识，`guide` 是页面标识，`演示帮助` 是页面标题。命令会生成 `src/modules/demo-help/pages/guide/`，把标题写入 mock，并将页面加入注册表。它拒绝不安全标识、已存在的路由或目录，不覆盖现有内容。角色和说明使用明确的教学占位文字，需按已确认需求核对。
+
+接着在页面目录的 `mock.ts`、`RULES.md` 和 `Page.vue` 中补齐虚构演示内容和交互，再运行 `npm run typecheck`，用 `npm run dev` 打开新路由检查。也可以按[手动新增步骤](docs/ADD_PAGE.md#手动新增方式)复制模板并编辑注册表。五分钟仍是目标，尚未经过非开发产品经理计时验收；需要复做时请使用[新增页面人测卡](docs/ADD_PAGE_TRIAL.md)。
 
 可照着 `src/modules/overview/pages/home/` 和 `src/modules/material-submission/pages/apply/` 阅读。使用共享组件可参考 `src/shared/components/`。如果字段要交给后端确认，先记录到模块 `contracts/`；未确认的 URL、HTTP 方法、认证和持久化策略保持待定。
 

@@ -33,6 +33,9 @@ jobs:
       - name: Check Vue starter types
         run: npm run typecheck
         working-directory: starters/vue-prototype
+      - name: Test Vue starter page scaffolder
+        run: npm run test:page-new
+        working-directory: starters/vue-prototype
       - name: Build and verify Vue starter preview
         run: npm run preview:pack
         working-directory: starters/vue-prototype
