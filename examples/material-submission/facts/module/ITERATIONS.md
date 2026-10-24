@@ -36,6 +36,7 @@
 
 ### 输入与基线
 
+- 边界：本轮记录同时保存了使用虚构案例进行的本仓库维护验收；它不规定普通使用者必须采用仓库维护流程。普通使用者复做步骤见[第三轮接续练习](../../iterations/03-handoff-exercise.md)，目前仅为未实测的教学指引。
 - 任务：GitHub Issue #18，练习只依赖仓库事实与任务接力块继续工作；不读取旧聊天。
 - 本地基线：分支 `feature/fictional-handover-iteration`，HEAD `7250a470ea62bed92744b6cf51536b6824baf3b8`；该提交与本地 `main`、`origin/main` 一致。Issue #18 当前为 Open。
 - 核对输入：根 `AGENTS.md`、项目宪章、开源边界、当前状态、治理规则、接力流程、Issue #18、模拟中断快照、项目与模块事实、`index.html`、`app.js`。
