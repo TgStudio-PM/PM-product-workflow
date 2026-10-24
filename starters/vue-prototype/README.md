@@ -40,7 +40,7 @@ npm run dev
 npm run preview:pack
 ```
 
-命令构建经典 JavaScript 脚本，整理页面清单、使用说明和文件校验值，并自动执行离线包审计。通过后，可尝试双击 `dist/preview/index.html`，也可把 `dist/preview/` 放到静态服务器。包仅依赖随包提供的本地文件，不需要 Node 服务或 CDN。每个目标浏览器的 `file://` 行为仍需实测。
+命令先运行 Vue 类型检查，再构建经典 JavaScript 脚本、整理页面清单、使用说明和文件校验值，最后执行离线包结构审计。类型检查失败时不会生成新的预览包。通过后，可尝试双击 `dist/preview/index.html`，也可把 `dist/preview/` 放到静态服务器。包仅依赖随包提供的本地文件，不需要 Node 服务或 CDN。每个目标浏览器的 `file://` 行为仍需实测。
 
 ```bash
 npm run preview:verify
