@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import json
-import sys
 import subprocess
+import sys
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 
@@ -202,6 +203,43 @@ class VueStarterDistributionTests(unittest.TestCase):
                 encoding="utf-8",
             )
             self.assertEqual(verify.returncode, 0, verify.stdout + verify.stderr)
+
+    def test_backend_profile_builds_and_verifies_without_page_source(self) -> None:
+        packager = ROOT / ".agents/skills/pm-prototype-packager/scripts/package.py"
+        source = ROOT / "starters/vue-prototype"
+        profile = ROOT / "examples/package-profiles/backend-requirements.json"
+        with tempfile.TemporaryDirectory() as directory:
+            archive = Path(directory) / "backend-requirements.zip"
+            build = subprocess.run(
+                [
+                    sys.executable,
+                    str(packager),
+                    "--source",
+                    str(source),
+                    "--profile",
+                    str(profile),
+                    "--output",
+                    str(archive),
+                ],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+            )
+            self.assertEqual(build.returncode, 0, build.stdout + build.stderr)
+            self.assertTrue(archive.is_file())
+
+            verify = subprocess.run(
+                [sys.executable, str(packager), "--verify", str(archive)],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+            )
+            self.assertEqual(verify.returncode, 0, verify.stdout + verify.stderr)
+
+            with zipfile.ZipFile(archive) as package:
+                names = package.namelist()
+            self.assertIn("api-template/API_HANDOFF.md", names)
+            self.assertFalse(any("/pages/" in name or name.endswith(("Page.vue", "mock.ts")) for name in names))
 
 
 if __name__ == "__main__":
