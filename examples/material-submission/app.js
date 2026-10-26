@@ -76,7 +76,21 @@
     if (state) {
       description.value = state.description;
       checkboxes.forEach(box => { box.checked = state.materials.includes(box.value); });
-      setStatus(state.status);
+      const invalidSubmittedState = state.status === "已提交" && (
+        !state.description.trim() || requiredCheckboxes.some(box => !state.materials.includes(box.value))
+      );
+      if (invalidSubmittedState) {
+        const correctedState = { ...state, status: "草稿" };
+        setStatus("草稿");
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(correctedState));
+          indicator.innerHTML = "<span></span>无效的已提交记录已按草稿恢复，并已更正保存到当前浏览器";
+        } catch {
+          indicator.innerHTML = "<span></span>无效的已提交记录已按草稿恢复，但更正未能保存到当前浏览器";
+        }
+      } else {
+        setStatus(state.status);
+      }
     } else {
       setStatus("草稿");
       indicator.innerHTML = "<span></span>新建草稿";

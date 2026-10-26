@@ -62,3 +62,11 @@
 
 - 产品验收：本轮未执行浏览器 `file://` 产品验收。第二轮已留存的产品验收不等同于本轮重测。
 - 机器验证：`python maintainers/scripts/check_markdown_links.py .` 通过；`python maintainers/scripts/check_public_content.py --root .` 报告 `Public-content check passed`，同时显示 `Change risk: NOT-EVALUATED`（未提供 PR base-ref，故不作为风险分类结论）；`git diff --check` 与 `node --check examples/material-submission/app.js` 通过。这些检查不证明浏览器交互、全部 BR 回归或生产能力。
+
+## 第四轮：异常本地状态恢复修复
+
+- 输入：[Issue #127](https://github.com/TgStudio-PM/PM-product-workflow/issues/127)；案例 BR-002、BR-003、BR-005 要求说明非空且两项必备材料确认后才能进入“已提交”。
+- 漂移：旧版 `readState()` 仅按存储中的状态标记恢复“已提交”；虚构空说明、空材料记录被 Node VM 复现为锁定状态，与提交前提冲突。
+- 修正：无效“已提交”记录保留可用内容、恢复为可编辑草稿，尝试更正本地记录并提示写入结果；有效记录仍保持只读。不改变正常提交、材料必备范围或离线边界。
+- 事实同步：更新 BR-005、PAGE_FLOW、CURRENT、项目背景和模块清单；这是一项既有规则的一致性修复，不新增真实业务事实或 API。
+- 验证：Node VM 定向测试 7 项通过、0 跳过，覆盖无效/有效记录、写入成败和重开稳定；原生静态预览 Profile 构建与独立验包通过。CI 结果见关联 PR。第二轮 Chrome `file://` 验收是历史证据，本轮未做目标浏览器复验，也不把 VM 结果当作浏览器产品验收。
