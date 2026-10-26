@@ -47,7 +47,27 @@ try {
   if (!references.includes('./app.js') || !references.includes('./styles.css')) issue('入口必须引用本地 app.js 和 styles.css。')
   if (/\bimport\s*(?:\(|\{)|\bexport\s|\bprocess\.env\./i.test(app)) issue('JavaScript 仍含模块语法或未替换环境变量。')
   if (/<script[^>]+type=["']module|https?:\/\//i.test(html)) issue('HTML 仍含模块脚本或外部资源。')
-  if (/https?:\/\//i.test(css) || /url\(\s*["']?(?:data:|https?:|\/\/)/i.test(css)) issue('样式表包含外部或非本地 URL。')
+  const cssUrlPattern = /url\(\s*(["']?)(.*?)\1\s*\)/gi
+  for (const match of css.matchAll(cssUrlPattern)) {
+    const reference = match[2].trim()
+    if (!reference || reference.startsWith('#')) continue
+    if (/^(?:[a-z][a-z\d+.-]*:|\/\/|\/|\\)/i.test(reference)) {
+      issue(`样式表包含外部或绝对 URL：${reference}`)
+      continue
+    }
+    let decoded
+    try {
+      decoded = decodeURIComponent(reference.split(/[?#]/)[0])
+    } catch {
+      issue(`样式表资源引用编码无效：${reference}`)
+      continue
+    }
+    const resolved = path.resolve(output, decoded)
+    if (!resolved.startsWith(`${output}${path.sep}`) || !(await stat(resolved).catch(() => null))?.isFile()) {
+      issue(`样式表资源不存在或越界：${reference}`)
+    }
+  }
+  if (/@import\b/i.test(css)) issue('离线预览 CSS 不支持 @import；请将样式合并至 styles.css。')
   if (/\b(?:fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon)\s*\(/.test(app)) issue('运行脚本包含网络请求 API。')
 
   const registry = await readFile(path.join(root, 'src', 'app', 'page-registry.ts'), 'utf8')
