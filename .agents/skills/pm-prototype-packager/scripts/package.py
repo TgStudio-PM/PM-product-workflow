@@ -64,7 +64,7 @@ def _load_profile(path: Path) -> dict:
         raise PackageError(f"PROFILE-03 unable to read profile ({type(exc).__name__})") from None
     if not isinstance(data, dict) or data.get("schema_version") != SCHEMA_VERSION:
         raise PackageError("PROFILE-04 unsupported or invalid schema_version")
-    if data.get("kind") not in KINDS:
+    if not isinstance(data.get("kind"), str) or data["kind"] not in KINDS:
         raise PackageError("PROFILE-05 kind must be static-preview, frontend-source, or backend-requirements")
     output_path = _safe_relative(data.get("output"), "output")
     if output_path.suffix.casefold() != ".zip":
@@ -561,7 +561,8 @@ def verify(archive_path: Path) -> None:
             if (not isinstance(expected, dict) or "README.md" not in expected
                     or type(manifest.get("schema_version")) is not int
                     or manifest["schema_version"] != SCHEMA_VERSION
-                    or manifest.get("kind") not in KINDS or not isinstance(manifest.get("entry"), str)
+                    or not isinstance(manifest.get("kind"), str) or manifest["kind"] not in KINDS
+                    or not isinstance(manifest.get("entry"), str)
                     or not isinstance(manifest.get("required"), list)
                     or not isinstance(manifest.get("pages", []), list)):
                 raise PackageError("VERIFY-04 manifest is invalid")

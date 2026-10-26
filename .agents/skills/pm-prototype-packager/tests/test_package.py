@@ -410,6 +410,13 @@ class PackageTests(unittest.TestCase):
         with self.assertRaisesRegex(package.PackageError, "PROFILE-01"):
             package.build(self.source, self.profile_path, self.output)
 
+    def test_rejects_non_string_profile_kind(self) -> None:
+        for kind in ({"unexpected": "object"}, ["static-preview"]):
+            with self.subTest(kind=kind):
+                self.profile(kind, ["index.html"], ["index.html"], "index.html")
+                with self.assertRaisesRegex(package.PackageError, "PROFILE-05"):
+                    package._load_profile(self.profile_path)
+
     def test_rejects_symlink_source(self) -> None:
         self.write("real.txt")
         try:
@@ -560,6 +567,26 @@ class PackageTests(unittest.TestCase):
                 archive.writestr(name, data)
         with self.assertRaisesRegex(package.PackageError, "VERIFY-04"):
             package.verify(forged)
+
+    def test_verify_rejects_non_string_manifest_kind(self) -> None:
+        self.write("contract.md", "fictional")
+        self.profile("backend-requirements", ["contract.md"], ["contract.md"], "contract.md")
+        self.build_and_verify()
+        with zipfile.ZipFile(self.output) as original:
+            base_items = {name: original.read(name) for name in original.namelist()}
+
+        for index, kind in enumerate(({"unexpected": "object"}, ["backend-requirements"])):
+            with self.subTest(kind=kind):
+                items = dict(base_items)
+                manifest = json.loads(items["manifest.json"])
+                manifest["kind"] = kind
+                items["manifest.json"] = (json.dumps(manifest, indent=2) + "\n").encode("utf-8")
+                forged = self.root / f"non-string-manifest-kind-{index}.zip"
+                with zipfile.ZipFile(forged, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+                    for name, data in items.items():
+                        archive.writestr(name, data)
+                with self.assertRaisesRegex(package.PackageError, "VERIFY-04"):
+                    package.verify(forged)
 
     def test_rejects_sensitive_allowlisted_filenames(self) -> None:
         for rel in (".env.local", "private.pem", "client.p12", "service-account.json"):
