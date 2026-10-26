@@ -117,6 +117,25 @@ class PublicContentTests(unittest.TestCase):
         self.assertEqual(findings[0].path, "sample.md")
         self.assertEqual(findings[0].line, 1)
 
+    def test_short_secret_placeholder_is_not_flagged(self) -> None:
+        sample = "The example " + "api" + "_key=" + "demo" + " is a short placeholder.\n"
+        self.assertEqual(scan_text("sample.md", sample), [])
+
+    def test_detects_quoted_secret_keys_and_multiline_assignments(self) -> None:
+        samples = (
+            "{" + '"' + "api_key" + '"' + ": " + '"' + "exampleSecret123" + '"' + "}\n",
+            "{" + "'" + "access_token" + "'" + "   =   " + "'" + "exampleSecret123" + "'" + "}\n",
+            "{" + '"' + "client_secret" + '"' + "\n : \n" + '"' + "exampleSecret123" + '"' + "}\n",
+            "{" + "password" + "\n=\n" + "exampleSecret123" + "}\n",
+        )
+
+        for sample in samples:
+            with self.subTest(sample=sample):
+                findings = scan_text("sample.json", sample)
+                self.assertEqual([item.rule for item in findings], ["SECRET_ASSIGNMENT"])
+                self.assertEqual(findings[0].path, "sample.json")
+                self.assertEqual(findings[0].line, 1)
+
     def test_private_denylist_reports_only_rule_index(self) -> None:
         findings = scan_text("sample.md", "Restricted Example", ("Restricted Example",))
         self.assertEqual(findings[0].rule, "PRIVATE_DENYLIST_001")
