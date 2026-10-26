@@ -27,6 +27,8 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: starters/vue-prototype/package-lock.json
+      - name: Test native fictional example state recovery
+        run: node --test examples/material-submission/tests/state-recovery.test.mjs
       - name: Install Vue starter dependencies
         run: npm ci
         working-directory: starters/vue-prototype
