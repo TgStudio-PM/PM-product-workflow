@@ -177,7 +177,12 @@ class _ReferenceParser(html.parser.HTMLParser):
         if values.get("style"):
             self.inline_css.append(values["style"] or "")
         if tag_name == "object":
-            self._check_active_data_reference(values.get("data"))
+            data_reference = values.get("data")
+            self._check_active_data_reference(data_reference)
+            if data_reference:
+                self.refs.append(("data", data_reference))
+        if tag_name == "video" and values.get("poster"):
+            self.refs.append(("poster", values["poster"] or ""))
         if tag_name == "iframe" and values.get("srcdoc") is not None:
             self.has_executable_data_reference = True
         if tag_name == "style":
