@@ -8,6 +8,10 @@ PM-product-workflow keeps requirements, business rules, prototypes, reviews, val
 
 > Repository is memory. Conversation is working context.
 
+### Try it
+
+You do not need to be a product manager or developer. Read the [external trial guide](docs/product/EXTERNAL_TRIAL.md), choose the no-tool basic trial or an optional AI/engineering track, and record what you actually did in the [feedback template](docs/product/TRIAL_REPORT_TEMPLATE.md). The guide is currently in Chinese.
+
 ## Choose your path
 
 ### Use the product workflow

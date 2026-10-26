@@ -2,6 +2,10 @@
 
 本目录面向使用 PM-product-workflow 的产品经理和协作开发者。根目录 `AGENTS.md`、`maintainers/` 和 `.github/` 用于维护本开源仓库，不是产品工作流的必读内容。
 
+## 参与外部试用
+
+未参与开发的朋友可以从[外部试用手册](EXTERNAL_TRIAL.md)开始；不要求产品经理身份或开发环境。按实际参与方式选择基础、AI 辅助、AI-only 静态评审或工程轨，并使用[试用反馈模板](TRIAL_REPORT_TEMPLATE.md)记录结果。AI 静态评审不能替代真人操作或浏览器验证。
+
 ## 建立自己的项目事实源
 
 1. 将 `templates/project/` 复制到自己的项目仓库，填写项目背景、模块清单和设计规范。
