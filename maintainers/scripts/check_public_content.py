@@ -36,7 +36,7 @@ PATTERNS = (
     ("WINDOWS_HOME_PATH", re.compile(r"(?i)(?:[A-Z]:[\\/](?:Users|Documents and Settings)[\\/][^\\/\s]+)")),
     ("UNIX_HOME_PATH", re.compile(r"/(?:home|Users)/[A-Za-z0-9._-]+/")),
     ("PRIVATE_KEY", re.compile("-" * 5 + r"BEGIN (?:RSA |OPENSSH |EC )?PRIVATE KEY")),
-    ("SECRET_ASSIGNMENT", re.compile(r"(?i)\b(?:api[_-]?key|access[_-]?token|client[_-]?secret|password)\s*[:=]\s*['\"]?[A-Za-z0-9_+\-/=]{8,}")),
+    ("SECRET_ASSIGNMENT", re.compile(r"(?i)(?:['\"]?\b(?:api[_-]?key|access[_-]?token|client[_-]?secret|password)\b['\"]?)\s*[:=]\s*['\"]?[A-Za-z0-9_+\-/=]{8,}")),
     ("PRIVATE_IPV4", re.compile(r"(?<!\d)(?:10(?:\.\d{1,3}){3}|192\.168(?:\.\d{1,3}){2}|172\.(?:1[6-9]|2\d|3[01])(?:\.\d{1,3}){2})(?!\d)")),
     ("CN_MOBILE", re.compile(r"(?<!\d)1[3-9]\d{9}(?!\d)")),
     ("CN_ID", re.compile(r"(?<!\d)[1-9]\d{5}(?:19|20)\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{3}[0-9Xx](?!\d)")),
