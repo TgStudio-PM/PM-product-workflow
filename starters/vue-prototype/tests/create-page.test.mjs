@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { mkdtemp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
+import { mkdtemp, mkdir, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import { test } from 'node:test'
@@ -25,6 +25,19 @@ async function createProjectFixture(t, { registry } = {}) {
     registry ?? `import OverviewPage from '../modules/overview/pages/home/Page.vue'\n\nexport const pageRegistry = [\n  {\n    path: '/overview',\n    title: '原型概览',\n    menuLabel: '原型概览',\n    demoRole: '教学案例使用者',\n    description: '查看虚构页面。',\n    component: OverviewPage,\n  },\n] as const\n`,
   )
   return root
+}
+
+async function createSymlinkOrSkip(t, target, linkPath, type = 'dir') {
+  try {
+    await symlink(target, linkPath, process.platform === 'win32' && type === 'dir' ? 'junction' : type)
+    return true
+  } catch (error) {
+    if (process.platform === 'win32' && ['EACCES', 'EPERM', 'ERROR_PRIVILEGE_NOT_HELD'].includes(error?.code)) {
+      t.skip(`Windows 当前权限不允许创建符号链接：${error.code}`)
+      return false
+    }
+    throw error
+  }
 }
 
 test('creates a page, fills its mock title, and registers static metadata', async (t) => {
@@ -135,4 +148,70 @@ test('rejects an import identifier collision without changing files', async (t) 
   await assert.rejects(createPage({ root, module: 'demo-help', page: 'guide', title: '演示帮助' }), /导入名 .* 已存在/)
   assert.equal(await readFile(registryPath, 'utf8'), before)
   assert.equal(await readdir(path.join(root, 'src', 'modules')).catch((error) => error.code), 'ENOENT')
+})
+
+test('rejects a symlinked module output parent without writing outside the project', async (t) => {
+  const root = await createProjectFixture(t)
+  const outside = await mkdtemp(path.join(os.tmpdir(), 'tg-studio-page-new-outside-'))
+  t.after(() => rm(outside, { recursive: true, force: true }))
+  const externalModules = path.join(outside, 'modules')
+  await mkdir(externalModules)
+  await writeFile(path.join(externalModules, 'keep.txt'), 'external content')
+  if (!await createSymlinkOrSkip(t, externalModules, path.join(root, 'src', 'modules'))) return
+
+  await assert.rejects(createPage({ root, module: 'demo-help', page: 'guide', title: '演示帮助' }), /路径包含符号链接/)
+  assert.equal(await readFile(path.join(externalModules, 'keep.txt'), 'utf8'), 'external content')
+  assert.deepEqual(await readdir(externalModules), ['keep.txt'])
+})
+
+test('rejects a symlinked page template directory without reading or writing external files', async (t) => {
+  const root = await createProjectFixture(t)
+  const outside = await mkdtemp(path.join(os.tmpdir(), 'tg-studio-page-new-template-'))
+  t.after(() => rm(outside, { recursive: true, force: true }))
+  const externalTemplate = path.join(outside, 'page-template')
+  await mkdir(externalTemplate)
+  for (const filename of ['Page.vue', 'mock.ts', 'RULES.md']) {
+    await writeFile(path.join(externalTemplate, filename), `external ${filename}`)
+  }
+  await rm(path.join(root, 'page-template'), { recursive: true })
+  if (!await createSymlinkOrSkip(t, externalTemplate, path.join(root, 'page-template'))) return
+  const registryPath = path.join(root, 'src', 'app', 'page-registry.ts')
+  const registryBefore = await readFile(registryPath, 'utf8')
+
+  await assert.rejects(createPage({ root, module: 'demo-help', page: 'guide', title: '演示帮助' }), /路径包含符号链接/)
+  assert.deepEqual((await readdir(externalTemplate)).sort(), ['Page.vue', 'RULES.md', 'mock.ts'])
+  assert.equal(await readFile(path.join(externalTemplate, 'mock.ts'), 'utf8'), 'external mock.ts')
+  assert.equal(await readFile(registryPath, 'utf8'), registryBefore)
+})
+
+test('rejects a symlinked registry parent without modifying the external registry', async (t) => {
+  const root = await createProjectFixture(t)
+  const outside = await mkdtemp(path.join(os.tmpdir(), 'tg-studio-page-new-registry-'))
+  t.after(() => rm(outside, { recursive: true, force: true }))
+  const externalApp = path.join(outside, 'app')
+  await mkdir(externalApp)
+  const externalRegistry = path.join(externalApp, 'page-registry.ts')
+  await writeFile(externalRegistry, 'external registry')
+  await rm(path.join(root, 'src', 'app'), { recursive: true })
+  if (!await createSymlinkOrSkip(t, externalApp, path.join(root, 'src', 'app'))) return
+
+  await assert.rejects(createPage({ root, module: 'demo-help', page: 'guide', title: '演示帮助' }), /路径包含符号链接/)
+  assert.equal(await readFile(externalRegistry, 'utf8'), 'external registry')
+  assert.deepEqual(await readdir(externalApp), ['page-registry.ts'])
+})
+
+test('rejects a dangling target symlink without replacing it or writing outside', async (t) => {
+  const root = await createProjectFixture(t)
+  const outside = await mkdtemp(path.join(os.tmpdir(), 'tg-studio-page-new-dangling-'))
+  t.after(() => rm(outside, { recursive: true, force: true }))
+  const externalTarget = path.join(outside, 'does-not-exist')
+  const target = path.join(root, 'src', 'modules', 'demo-help', 'pages', 'guide')
+  await mkdir(path.dirname(target), { recursive: true })
+  if (!await createSymlinkOrSkip(t, externalTarget, target, 'file')) return
+  const registryPath = path.join(root, 'src', 'app', 'page-registry.ts')
+  const registryBefore = await readFile(registryPath, 'utf8')
+
+  await assert.rejects(createPage({ root, module: 'demo-help', page: 'guide', title: '演示帮助' }), /路径包含符号链接/)
+  assert.equal(await readFile(registryPath, 'utf8'), registryBefore)
+  await assert.rejects(readFile(externalTarget), { code: 'ENOENT' })
 })

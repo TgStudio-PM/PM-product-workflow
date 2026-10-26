@@ -1,4 +1,4 @@
-import { access, mkdir, mkdtemp, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises'
+import { lstat, mkdir, mkdtemp, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 import ts from 'typescript'
@@ -97,13 +97,39 @@ function applyInsertions(source, insertions) {
   return result
 }
 
-async function exists(filePath) {
+async function lstatIfExists(filePath) {
   try {
-    await access(filePath)
-    return true
+    return await lstat(filePath)
   } catch (error) {
-    if (error?.code === 'ENOENT') return false
+    if (error?.code === 'ENOENT') return undefined
     throw error
+  }
+}
+
+async function assertNoSymlinkComponents(root, targetPath) {
+  const relativePath = path.relative(root, targetPath)
+  if (path.isAbsolute(relativePath) || relativePath === '..' || relativePath.startsWith(`..${path.sep}`)) {
+    throw new Error(`检查路径超出工程目录：${targetPath}`)
+  }
+
+  const components = [root]
+  let currentPath = root
+  for (const component of relativePath.split(path.sep).filter(Boolean)) {
+    currentPath = path.join(currentPath, component)
+    components.push(currentPath)
+  }
+  for (let index = 0; index < components.length; index += 1) {
+    const componentPath = components[index]
+    const stat = await lstatIfExists(componentPath)
+    if (!stat) return
+    if (stat.isSymbolicLink()) {
+      const displayPath = path.relative(root, componentPath).split(path.sep).join('/') || '.'
+      throw new Error(`路径包含符号链接，为保护工程外文件已拒绝：${displayPath}`)
+    }
+    if (index < components.length - 1 && !stat.isDirectory()) {
+      const displayPath = path.relative(root, componentPath).split(path.sep).join('/') || '.'
+      throw new Error(`路径父项不是目录，无法安全写入：${displayPath}`)
+    }
   }
 }
 
@@ -126,7 +152,10 @@ export async function createPage({ root = process.cwd(), module, page, title }) 
   const templateRoot = path.join(projectRoot, 'page-template')
   const targetDirectory = path.join(projectRoot, 'src', 'modules', module, 'pages', page)
   const registryPath = path.join(projectRoot, 'src', 'app', 'page-registry.ts')
-  if (await exists(targetDirectory)) throw new Error(`目标目录已存在，不会覆盖：src/modules/${module}/pages/${page}`)
+  await assertNoSymlinkComponents(projectRoot, templateRoot)
+  await assertNoSymlinkComponents(projectRoot, targetDirectory)
+  await assertNoSymlinkComponents(projectRoot, registryPath)
+  if (await lstatIfExists(targetDirectory)) throw new Error(`目标目录已存在，不会覆盖：src/modules/${module}/pages/${page}`)
 
   const templateEntries = await readdir(templateRoot, { withFileTypes: true })
   for (const file of requiredTemplateFiles) {
@@ -175,26 +204,40 @@ export async function createPage({ root = process.cwd(), module, page, title }) 
   templateFiles.set('mock.ts', replaceTemplateTitle(templateFiles.get('mock.ts'), title.trim()))
 
   const parentDirectory = path.dirname(targetDirectory)
+  await assertNoSymlinkComponents(projectRoot, parentDirectory)
   await mkdir(parentDirectory, { recursive: true })
+  await assertNoSymlinkComponents(projectRoot, parentDirectory)
   const stagingDirectory = await mkdtemp(path.join(parentDirectory, `.page-new-${page}-`))
   const registryTempPath = `${registryPath}.page-new-${process.pid}-${Date.now()}`
   let stagingExists = true
   let registryTempExists = false
   try {
     for (const [file, content] of templateFiles) {
+      await assertNoSymlinkComponents(projectRoot, templateRoot)
+      await assertNoSymlinkComponents(projectRoot, stagingDirectory)
       await writeFile(path.join(stagingDirectory, file), content, { encoding: 'utf8', flag: 'wx' })
     }
+    await assertNoSymlinkComponents(projectRoot, path.dirname(registryPath))
+    await assertNoSymlinkComponents(projectRoot, registryPath)
     await writeFile(registryTempPath, nextRegistry, { encoding: 'utf8', flag: 'wx' })
     registryTempExists = true
 
-    if (await exists(targetDirectory)) throw new Error('目标目录在操作期间出现变化；未覆盖现有内容。')
+    await assertNoSymlinkComponents(projectRoot, parentDirectory)
+    await assertNoSymlinkComponents(projectRoot, targetDirectory)
+    if (await lstatIfExists(targetDirectory)) throw new Error('目标目录在操作期间出现变化；未覆盖现有内容。')
+    await assertNoSymlinkComponents(projectRoot, path.dirname(registryPath))
+    await assertNoSymlinkComponents(projectRoot, registryPath)
     if ((await readFile(registryPath, 'utf8')) !== registrySource) {
       throw new Error('page-registry.ts 在操作期间发生变化；请检查并重试。')
     }
 
+    await assertNoSymlinkComponents(projectRoot, parentDirectory)
+    await assertNoSymlinkComponents(projectRoot, targetDirectory)
     await rename(stagingDirectory, targetDirectory)
     stagingExists = false
     try {
+      await assertNoSymlinkComponents(projectRoot, path.dirname(registryPath))
+      await assertNoSymlinkComponents(projectRoot, registryPath)
       await rename(registryTempPath, registryPath)
       registryTempExists = false
     } catch (error) {
