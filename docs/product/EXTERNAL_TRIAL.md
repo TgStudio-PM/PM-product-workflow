@@ -34,7 +34,7 @@
 
 如果某一步之前就受阻，后续步骤标“未执行”或“受阻”，不要假设其结果。每一步失败或未做都要记录；通过只表示你在所记录的环境中观察到预期结果。
 
-随后可阅读 `examples/material-submission/facts/module/ITERATIONS.md`、`DECISIONS.md` 和页面，比较案例三轮：第一轮初始决定、第二轮材料规则变化、第三轮只做事实核对/接续记录且没有改页面。阅读 `examples/material-submission/iterations/03-handoff-exercise.md`，辨认模拟接续记录与第三轮未重跑的浏览器验收。把难以区分的轮次、事实和当前页面表现也写入模板。
+随后可阅读 `examples/material-submission/facts/module/ITERATIONS.md`、`DECISIONS.md` 和页面，比较案例四轮：第一轮初始决定、第二轮材料规则变化、第三轮只做事实核对/接续记录且没有改页面、第四轮修复无效本地“已提交”状态恢复。阅读 `examples/material-submission/iterations/03-handoff-exercise.md`，辨认模拟接续记录与第三轮未重跑的浏览器验收。第四轮的定向 Node VM 测试不等于目标浏览器复验；本手册的正常操作不要求人为制造损坏的本地存储记录。把难以区分的轮次、事实和当前页面表现也写入模板。
 
 ### 判断与反馈
 
@@ -70,7 +70,7 @@
 ```text
 请对 PM-product-workflow 的公开产品资料做 AI-only 静态评审。我不会运行页面或命令。只依据你当前实际能够访问或我实际提供的仓库内容，不要假定能访问整个仓库。
 
-先列出你实际打开的 URL 和精确文件路径；把无法访问的路径单独列出。检查范围应包括：README/README.en.md、本外部试用手册与反馈模板、docs/product/README.md、项目/模块/可选模板、材料申报虚构案例的页面与三轮事实记录、第三轮接续练习、pm-prototype-handover 接续材料、交付指南、pm-prototype-packager 与 package-profiles。逐条注明哪些材料实际可访问；不要把未打开的路径当作已审查。
+先列出你实际打开的 URL 和精确文件路径；把无法访问的路径单独列出。检查范围应包括：README/README.en.md、本外部试用手册与反馈模板、docs/product/README.md、项目/模块/可选模板、材料申报虚构案例的页面与四轮事实记录、第三轮接续练习、pm-prototype-handover 接续材料、交付指南、pm-prototype-packager 与 package-profiles。逐条注明哪些材料实际可访问；不要把未打开的路径当作已审查。
 
 按宪章的四项 v0.1 成功标准分别评审：1) 新使用者能否从虚构案例理解完整迭代与交付流程；2) 能否使用模板建立项目事实源；3) 能否在新会话正确接续并避免重复已否定方案；4) 能否获得可离线运行并通过验包的交付物。每项给出可定位的文件路径和标题/段落作为支持证据，指出静态阅读无法验证的部分，并列出具体问题或待确认项。区分仓库明确事实、你的推断、无法确认；说明你没有做的运行或真人验收。不要声称运行了 HTML、浏览器或命令，不要编造试用者行为、反馈、测试结果或正式发布状态。
 

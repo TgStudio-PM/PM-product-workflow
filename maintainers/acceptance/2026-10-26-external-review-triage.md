@@ -22,7 +22,7 @@
 
 本项目继续从作者的真实需求变化、原型迭代、Skill/Agent 协作与前后端交付实践中**提炼方法**；真实项目的源码、规则、截图、数据和对话留在私有工作区。公开产品只保留重新创作的虚构案例、通用模板和可验证的工作流。核心路径仍是“需求与证据 → 事实源 → 原型迭代 → 评审和验证 → 交接 → 按接收者交付”；[Vue starter](../../starters/vue-prototype/README.md)为可选工程示范。
 
-后续按序处理：针对其余资源与异常恢复线索建立最小复现并分别修复 → 收集外部试用反馈 → 补独立非开发产品经理试用与计时。每次只让新增检查或文件服务于一个已证实的使用障碍。四项 v0.1 成功标准以[项目宪章](../PROJECT_CHARTER.md)为准；正式发布另行判断。
+后续按序处理：复验第四轮原生案例在目标浏览器的异常状态恢复 → 收集外部试用反馈 → 补独立非开发产品经理试用与计时。每次只让新增检查或文件服务于一个已证实的使用障碍。四项 v0.1 成功标准以[项目宪章](../PROJECT_CHARTER.md)为准；正式发布另行判断。
 
 ## 2026-10-26 复核进展
 
@@ -30,4 +30,4 @@
 - 通用静态打包器漏验 `object.data`、`video.poster` 已用虚构 HTML 复现并定向修复，见[Issue #123](https://github.com/TgStudio-PM/PM-product-workflow/issues/123)与[ERR-20261026-005](../errors/ERR-20261026-005.md)。本地三类虚构 Profile 构建及独立验包通过；[PR #124](https://github.com/TgStudio-PM/PM-product-workflow/pull/124) 最新提交的 Linux CI 通过后已合并。
 - Vue 预览 CSS 本地资源漏验已在虚构隔离包复现：原包与更新摘要后的缺资源包均被旧验包器接受。见[Issue #125](https://github.com/TgStudio-PM/PM-product-workflow/issues/125)与[ERR-20261026-006](../errors/ERR-20261026-006.md)；[PR #126](https://github.com/TgStudio-PM/PM-product-workflow/pull/126) 最新 CI 通过后已合并。
 - 原生案例无效“已提交”恢复也已用当前 `app.js` 和虚构 Node VM 输入独立复现，见[Issue #127](https://github.com/TgStudio-PM/PM-product-workflow/issues/127)与[ERR-20261026-007](../errors/ERR-20261026-007.md)；[PR #128](https://github.com/TgStudio-PM/PM-product-workflow/pull/128) 的最新 CI 通过后已合并。VM 测试不代表目标浏览器验收。
-- 畸形交付 Profile 的 `kind` 对象会触发未受控 TypeError；同类 ZIP manifest 输入也已独立复现。见[Issue #129](https://github.com/TgStudio-PM/PM-product-workflow/issues/129)与[ERR-20261026-008](../errors/ERR-20261026-008.md)；受控报错修复和本地回归已完成，合并仍以关联 PR 的最新 CI 为准。非 PM 或 AI 试用仍不能替代目标用户人测。
+- 畸形交付 Profile 的 `kind` 对象会触发未受控 TypeError；同类 ZIP manifest 输入也已独立复现。见[Issue #129](https://github.com/TgStudio-PM/PM-product-workflow/issues/129)与[ERR-20261026-008](../errors/ERR-20261026-008.md)；受控报错修复和本地回归已完成，[PR #130](https://github.com/TgStudio-PM/PM-product-workflow/pull/130) 的最新 CI 通过后已合并。非 PM 或 AI 试用仍不能替代目标用户人测。
