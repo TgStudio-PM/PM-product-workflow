@@ -66,7 +66,7 @@ gov-enterprise-cn
 | 虚构页面评审示例 | 可用，内容见示例文件 | `examples/material-submission/reviews/gov-enterprise-cn.md` |
 | 产品方法与快速开始 | 可用 | `docs/product/` |
 | `pm-prototype-memory` Skill | 已交付 | `.agents/skills/pm-prototype-memory/SKILL.md` |
-| 材料申报虚构案例 | 三轮记录已提供；第三轮为模拟中断后的事实核对与接续练习，不改页面或业务规则 | `examples/material-submission/` |
+| 材料申报虚构案例 | 四轮记录已提供：前两轮迭代页面规则，第三轮演练中断接续，第四轮修复无效本地提交状态恢复 | `examples/material-submission/` |
 | Tg Studio Vue 原型工程模板 | 已交付，可选使用 | `starters/vue-prototype/` |
 | `pm-prototype-handover` Skill | 已交付 | `.agents/skills/pm-prototype-handover/SKILL.md` |
 | 三类交付 Profile 与使用说明 | 已交付 | `examples/package-profiles/`、`docs/product/PACKAGING.md` |
@@ -115,13 +115,13 @@ maintainers/                   本仓库治理、状态和检查工具
 - [x] 建立 README、开源边界和基础模板
 - [x] 建立长期治理、分级维护和接力协议
 - [x] 分离产品使用入口与仓库自管理入口
-- [x] 发布 `pm-prototype-memory` 与材料申报三轮离线虚构案例（第三轮为模拟接续练习）
+- [x] 发布 `pm-prototype-memory` 与材料申报四轮离线虚构案例（第三轮为模拟接续练习，第四轮修复异常状态恢复）
 - [x] 交付可选的 Tg Studio Vue 原型工程模板
 - [x] 交付 `pm-prototype-handover`
 - [x] 交付三类虚构交付 Profile、使用说明与 `pm-prototype-packager`
 - [ ] 完善 `gov-enterprise-cn` Profile 并完成 v0.1 验收
 
-空白上下文试用与后续静态包浏览器补验收见[2026-10-21 v0.1 产品验收记录](maintainers/acceptance/2026-10-21-v01-product-audit.md)。当前静态包已通过 Chrome、Edge 的 `file://` 交互与离线检查；非开发产品经理人测仍待完成，项目尚未正式发布 v0.1。
+Chrome、Edge 的历史 `file://` 浏览器验收记录见[2026-10-21 v0.1 产品验收记录](maintainers/acceptance/2026-10-21-v01-product-audit.md)，对应当时重新生成的静态包。第四轮原生案例修复已通过 Node VM 定向测试、静态预览包构建与独立验包及 CI；最新变更后的目标浏览器 `file://` 交互尚未复验。非开发产品经理人测仍待完成，项目尚未正式发布 v0.1。
 
 ## 贡献与许可
 

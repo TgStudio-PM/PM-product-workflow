@@ -63,7 +63,7 @@ At the end of each iteration, the project repository should answer:
 | Fictional page review example | Available; see the example file | `examples/material-submission/reviews/gov-enterprise-cn.md` |
 | Product method and quick start | Available | `docs/product/` |
 | `pm-prototype-memory` Skill | Delivered | `.agents/skills/pm-prototype-memory/SKILL.md` |
-| Fictional material-submission example | Three iterations documented; iteration three is a simulated interruption and fact-reconciliation exercise that changes no page or business rule | `examples/material-submission/` |
+| Fictional material-submission example | Four iterations documented: the first two revise page rules, the third practices interruption handoff, and the fourth fixes recovery from an invalid local submission state | `examples/material-submission/` |
 | Tg Studio Vue prototype starter | Delivered; optional to use | `starters/vue-prototype/` |
 | `pm-prototype-handover` Skill | Delivered | `.agents/skills/pm-prototype-handover/SKILL.md` |
 | Three delivery profiles and guide | Delivered | `examples/package-profiles/`, `docs/product/PACKAGING.md` |
@@ -112,13 +112,13 @@ See the complete [open-source boundary](maintainers/OPEN_SOURCE_BOUNDARY.md). Pr
 - [x] Establish the README, publication boundary, and base templates.
 - [x] Establish durable governance, tiered maintenance, and continuation rules.
 - [x] Separate the product entry from repository self-management.
-- [x] Publish `pm-prototype-memory` and three offline fictional material-submission iterations (the third is a simulated continuation exercise).
+- [x] Publish `pm-prototype-memory` and four offline fictional material-submission iterations (the third practices continuation; the fourth fixes invalid-state recovery).
 - [x] Deliver the optional Tg Studio Vue prototype starter.
 - [x] Deliver `pm-prototype-handover`.
 - [x] Deliver three fictional delivery profiles, the packaging guide, and `pm-prototype-packager`.
 - [ ] Complete the `gov-enterprise-cn` profile and v0.1 acceptance.
 
-See the [October 21, 2026 v0.1 acceptance record](maintainers/acceptance/2026-10-21-v01-product-audit.md) for the blank-context review and subsequent browser check. The current static package passed `file://` interaction and offline checks in Chrome and Edge; testing by a non-developer product manager remains pending, and v0.1 has not been formally released.
+The historical Chrome and Edge `file://` browser check is documented in the [October 21, 2026 v0.1 acceptance record](maintainers/acceptance/2026-10-21-v01-product-audit.md) and applies to the static package rebuilt at that time. The fourth iteration's native-case fix passed targeted Node VM tests, static preview package build and independent verification, and CI; `file://` interaction in target browsers has not been rechecked after this latest change. Testing by a non-developer product manager remains pending, and v0.1 has not been formally released.
 
 ## Contributing and license
 
