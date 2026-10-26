@@ -22,4 +22,10 @@
 
 本项目继续从作者的真实需求变化、原型迭代、Skill/Agent 协作与前后端交付实践中**提炼方法**；真实项目的源码、规则、截图、数据和对话留在私有工作区。公开产品只保留重新创作的虚构案例、通用模板和可验证的工作流。核心路径仍是“需求与证据 → 事实源 → 原型迭代 → 评审和验证 → 交接 → 按接收者交付”；[Vue starter](../../starters/vue-prototype/README.md)为可选工程示范。
 
-后续按序处理：[Issue #118](https://github.com/TgStudio-PM/PM-product-workflow/issues/118) 的路径边界 → 针对资源与异常恢复线索建立最小复现并分别修复 → 收集外部试用反馈 → 补独立非开发产品经理试用与计时。每次只让新增检查或文件服务于一个已证实的使用障碍。四项 v0.1 成功标准以[项目宪章](../PROJECT_CHARTER.md)为准；正式发布另行判断。
+后续按序处理：针对其余资源与异常恢复线索建立最小复现并分别修复 → 收集外部试用反馈 → 补独立非开发产品经理试用与计时。每次只让新增检查或文件服务于一个已证实的使用障碍。四项 v0.1 成功标准以[项目宪章](../PROJECT_CHARTER.md)为准；正式发布另行判断。
+
+## 2026-10-26 复核进展
+
+- `page:new` 的工程外路径链接反例已在隔离虚构工程复现并修复，见[Issue #118](https://github.com/TgStudio-PM/PM-product-workflow/issues/118)与[ERR-20261026-004](../errors/ERR-20261026-004.md)；Linux CI 的新增链接用例实际运行通过。
+- 通用静态打包器漏验 `object.data`、`video.poster` 已用虚构 HTML 复现并定向修复，见[Issue #123](https://github.com/TgStudio-PM/PM-product-workflow/issues/123)与[ERR-20261026-005](../errors/ERR-20261026-005.md)。本地三类虚构 Profile 构建及独立验包通过；[PR #124](https://github.com/TgStudio-PM/PM-product-workflow/pull/124) 的首次 Linux CI 运行 45 项打包器测试全部通过，合并仍以最新提交的检查为准。
+- Vue 预览 CSS 引用、原生案例异常状态恢复和畸形 Profile 提示仍是待独立复现的外部线索；非 PM 或 AI 试用仍不能替代目标用户人测。
