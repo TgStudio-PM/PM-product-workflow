@@ -11,6 +11,10 @@
 > Repository is memory. Conversation is working context.  
 > 仓库保存经过确认的项目事实，对话承载当前工作上下文。
 
+### 参与试用
+
+不是产品经理或开发者也可以参与。查看[外部朋友试用手册](docs/product/EXTERNAL_TRIAL.md)，选择无需开发环境的基础试用，或可选的 AI / 工程试用，并用[反馈模板](docs/product/TRIAL_REPORT_TEMPLATE.md)记录实际操作。
+
 ## 选择入口 / Choose your path
 
 ### 使用产品工作流
