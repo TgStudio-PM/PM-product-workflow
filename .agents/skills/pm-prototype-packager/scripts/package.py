@@ -310,6 +310,15 @@ def _audit_static(files: dict[str, bytes], profile: dict) -> None:
 _MARKDOWN_INLINE_LINK = re.compile(
     r"!?\[[^\]\n]*\]\(\s*(?:<([^>\n]*)>|([^\s)]+))(?:\s+[^)\n]*)?\s*\)"
 )
+_MARKDOWN_REFERENCE_DEFINITION = re.compile(
+    r"^ {0,3}\[([^\]\n]+)\]:[ \t]*(?:<([^>\n]*)>|(\S+))"
+    r"(?:[ \t]+(?:\"[^\"\n]*\"|'[^'\n]*'|\([^\)\n]*\)))?[ \t]*$"
+)
+_MARKDOWN_REFERENCE_USE = re.compile(r"!?\[([^\]\n]+)\]\[([^\]\n]*)\]")
+
+
+def _normalize_markdown_label(label: str) -> str:
+    return " ".join(label.split()).casefold()
 
 
 def _strip_markdown_code(text: str) -> str:
@@ -338,7 +347,7 @@ def _strip_markdown_code(text: str) -> str:
 
 
 def _audit_markdown(files: dict[str, bytes]) -> None:
-    """Check common inline relative Markdown links against exact archive paths."""
+    """Check common inline and used reference-style relative links in Markdown."""
     archive_paths = set(files)
     for name, content in files.items():
         if PurePosixPath(name).suffix.casefold() != ".md":
@@ -347,15 +356,29 @@ def _audit_markdown(files: dict[str, bytes]) -> None:
             text = _strip_markdown_code(content.decode("utf-8"))
         except UnicodeError:
             raise PackageError(f"MARKDOWN-03 unable to parse UTF-8 Markdown file: {name}") from None
-        for match in _MARKDOWN_INLINE_LINK.finditer(text):
-            target = match.group(1) if match.group(1) is not None else match.group(2)
-            if not target:
-                continue
+
+        # Keep the first definition for each normalized label, as Markdown
+        # reference labels are case-insensitive and collapse internal spaces.
+        definitions: dict[str, str] = {}
+        body_lines: list[str] = []
+        for line_text in text.splitlines(keepends=True):
+            definition = _MARKDOWN_REFERENCE_DEFINITION.match(line_text.rstrip("\r\n"))
+            if definition:
+                label = _normalize_markdown_label(definition.group(1))
+                target = definition.group(2) if definition.group(2) is not None else definition.group(3)
+                if label and target and label not in definitions:
+                    definitions[label] = target
+                body_lines.append("\n" if line_text.endswith(("\n", "\r")) else "")
+            else:
+                body_lines.append(line_text)
+        body = "".join(body_lines)
+
+        def audit_target(target: str, offset: int) -> None:
             parts = urlsplit(target)
             # External URLs, absolute URLs, and fragment-only links are outside
             # this package-relative audit.
             if parts.scheme or parts.netloc or target.startswith(("/", "\\")) or not parts.path:
-                continue
+                return
             decoded = unquote(parts.path)
             components = list(PurePosixPath(name).parent.parts)
             escaped = False
@@ -369,12 +392,23 @@ def _audit_markdown(files: dict[str, bytes]) -> None:
                     components.pop()
                 else:
                     components.append(part)
-            line = text.count("\n", 0, match.start()) + 1
+            line = body.count("\n", 0, offset) + 1
             if escaped:
                 raise PackageError(f"MARKDOWN-02 relative link escapes bundle root: {name}:{line}")
             resolved = PurePosixPath(*components).as_posix()
             if resolved not in archive_paths:
                 raise PackageError(f"MARKDOWN-01 unresolved relative link in package: {name}:{line}")
+
+        for match in _MARKDOWN_INLINE_LINK.finditer(body):
+            target = match.group(1) if match.group(1) is not None else match.group(2)
+            if not target:
+                continue
+            audit_target(target, match.start())
+        for match in _MARKDOWN_REFERENCE_USE.finditer(body):
+            label = match.group(2) or match.group(1)
+            target = definitions.get(_normalize_markdown_label(label))
+            if target is not None:
+                audit_target(target, match.start())
 
 
 def _sha(data: bytes) -> str:
