@@ -209,6 +209,42 @@ class PackageTests(unittest.TestCase):
         with self.assertRaisesRegex(package.PackageError, "ASSET-03"):
             package.build(self.source, self.profile_path, self.output)
 
+    def test_rejects_missing_object_data_and_video_poster(self) -> None:
+        cases = [
+            ('<object data="missing.pdf"></object>', "object data"),
+            ('<video poster="missing.png"></video>', "video poster"),
+        ]
+        for index, (html, label) in enumerate(cases):
+            with self.subTest(reference=label):
+                entry = f"index-{index}.html"
+                self.write(entry, html)
+                self.profile("static-preview", [entry], [entry], entry, pages=[entry])
+                with self.assertRaisesRegex(package.PackageError, "ASSET-03"):
+                    package.build(self.source, self.profile_path, self.output)
+
+    def test_rejects_remote_and_absolute_object_data_and_video_poster(self) -> None:
+        references = [
+            '<object data="https://example.invalid/file.pdf"></object>',
+            '<object data="/files/file.pdf"></object>',
+            '<video poster="https://example.invalid/poster.png"></video>',
+            '<video poster="/images/poster.png"></video>',
+        ]
+        for index, html in enumerate(references):
+            with self.subTest(html=html):
+                entry = f"index-{index}.html"
+                self.write(entry, html)
+                self.profile("static-preview", [entry], [entry], entry, pages=[entry])
+                with self.assertRaisesRegex(package.PackageError, "ASSET-01"):
+                    package.build(self.source, self.profile_path, self.output)
+
+    def test_allows_local_object_data_and_video_poster_resources(self) -> None:
+        data_uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/hXcAAAAASUVORK5CYII="
+        self.write("index.html", f'<object data="docs/guide.pdf"></object><video poster="images/poster.png"></video><video poster="{data_uri}"></video>')
+        self.write("docs/guide.pdf", "Fictional embedded guide")
+        self.write("images/poster.png", "Fictional poster image")
+        self.profile("static-preview", ["index.html", "docs/guide.pdf", "images/poster.png"], ["index.html"], "index.html", pages=["index.html"])
+        self.build_and_verify()
+
     def test_rejects_remote_runtime_resource(self) -> None:
         self.write("index.html", '<script src="https://example.invalid/app.js"></script>')
         self.profile("static-preview", ["index.html"], ["index.html"], "index.html", pages=["index.html"])
@@ -273,6 +309,47 @@ class PackageTests(unittest.TestCase):
             archive.writestr("SHA256SUMS", sums)
         with self.assertRaisesRegex(package.PackageError, "ASSET-10"):
             package.verify(forged)
+
+    def test_verify_reaudits_missing_object_data_and_video_poster_in_resigned_archive(self) -> None:
+        self.write("index.html", '<main>Fictional preview</main>')
+        self.profile("static-preview", ["index.html"], ["index.html"], "index.html", pages=["index.html"])
+        self.build_and_verify()
+        with zipfile.ZipFile(self.output) as original:
+            base_payload = {
+                name: original.read(name)
+                for name in original.namelist()
+                if name not in {"manifest.json", "SHA256SUMS"}
+            }
+
+        cases = [
+            ("resigned-missing-object-data.zip", b'<object data="missing.pdf"></object>'),
+            ("resigned-missing-video-poster.zip", b'<video poster="missing.png"></video>'),
+        ]
+        for filename, html in cases:
+            with self.subTest(archive=filename):
+                payload = dict(base_payload)
+                payload["index.html"] = html
+                manifest = {
+                    "schema_version": 1,
+                    "kind": "static-preview",
+                    "name": "Fictional fixture",
+                    "entry": "index.html",
+                    "required": ["index.html"],
+                    "pages": ["index.html"],
+                    "files": {name: package._sha(data) for name, data in sorted(payload.items())},
+                }
+                manifest_bytes = (json.dumps(manifest, indent=2) + "\n").encode("utf-8")
+                sums = "".join(
+                    f"{digest}  {name}\n" for name, digest in sorted(manifest["files"].items())
+                ).encode("utf-8")
+                forged = self.root / filename
+                with zipfile.ZipFile(forged, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+                    for name, content in payload.items():
+                        archive.writestr(name, content)
+                    archive.writestr("manifest.json", manifest_bytes)
+                    archive.writestr("SHA256SUMS", sums)
+                with self.assertRaisesRegex(package.PackageError, "ASSET-03"):
+                    package.verify(forged)
 
     def test_rejects_missing_inline_css_asset(self) -> None:
         self.write("index.html", '<div style="background:url(./missing.png)"></div>')
