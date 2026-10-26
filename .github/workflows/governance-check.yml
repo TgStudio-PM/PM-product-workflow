@@ -36,6 +36,9 @@ jobs:
       - name: Test Vue starter page scaffolder
         run: npm run test:page-new
         working-directory: starters/vue-prototype
+      - name: Test Vue starter module fact scaffolder
+        run: npm run test:facts-new
+        working-directory: starters/vue-prototype
       - name: Build and verify Vue starter preview
         run: npm run preview:pack
         working-directory: starters/vue-prototype

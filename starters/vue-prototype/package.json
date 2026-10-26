@@ -6,9 +6,11 @@
   "scripts": {
     "dev": "vite",
     "page:new": "node scripts/create-page.mjs",
+    "facts:new": "node scripts/create-facts.mjs",
     "preview:pack": "npm run typecheck && node scripts/build-preview.mjs && node scripts/verify-preview.mjs",
     "preview:verify": "node scripts/verify-preview.mjs",
     "test:page-new": "node --test tests/create-page.test.mjs",
+    "test:facts-new": "node --test tests/create-facts.test.mjs",
     "typecheck": "vue-tsc --noEmit",
     "test:preview-verify": "node --test tests/verify-preview.test.mjs tests/preview-pack.test.mjs"
   },

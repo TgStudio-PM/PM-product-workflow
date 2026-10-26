@@ -27,7 +27,13 @@ npm run page:new -- demo-help guide "演示帮助"
 
 接着在页面目录的 `mock.ts`、`RULES.md` 和 `Page.vue` 中补齐虚构演示内容和交互，再运行 `npm run typecheck`，用 `npm run dev` 打开新路由检查。也可以按[手动新增步骤](docs/ADD_PAGE.md#手动新增方式)复制模板并编辑注册表。五分钟仍是目标，尚未经过非开发产品经理计时验收；需要复做时请使用[新增页面人测卡](docs/ADD_PAGE_TRIAL.md)。
 
-首次在新模块下加页时，还需将 `module-template/facts/module/` 复制到 `src/modules/<module>/facts/module/`，并让页面 `RULES.md` 链接到 `../../facts/module/BUSINESS_RULES.md`。`page:new` 不会创建模块事实文件；详见[新增页面说明](docs/ADD_PAGE.md)。
+首次在新模块下加页时，可先运行可选命令复制五份空白模块事实模板：
+
+```bash
+npm run facts:new -- demo-help
+```
+
+命令会创建 `src/modules/demo-help/facts/module/`，只复制模板原文；若目标目录已存在则拒绝覆盖。它不会填写或确认业务规则。也可继续按[新增页面说明](docs/ADD_PAGE.md#手动新增方式)手工复制。新增页面时，页面 `RULES.md` 应链接到 `../../facts/module/BUSINESS_RULES.md`。`page:new` 与 `facts:new` 是独立可选命令，详见[新增页面说明](docs/ADD_PAGE.md)。
 
 可照着 `src/modules/overview/pages/home/` 和 `src/modules/material-submission/pages/apply/` 阅读。使用共享组件可参考 `src/shared/components/`。如果字段要交给后端确认，先记录到模块 `contracts/`；未确认的 URL、HTTP 方法、认证和持久化策略保持待定。
 
