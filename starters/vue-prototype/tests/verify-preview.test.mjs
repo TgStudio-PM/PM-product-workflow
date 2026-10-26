@@ -87,6 +87,57 @@ test('valid preview package passes in an isolated copy', async (t) => {
   assert.match(result.stdout, /离线包审计通过/)
 })
 
+test('rejects missing CSS url resources after the checksum is updated', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const cssPath = path.join(fixtureRoot, 'dist', 'preview', 'styles.css')
+  const css = `${await readFile(cssPath, 'utf8')}\n.broken { background: url('./missing.png'); }\n`
+  await writeFile(cssPath, css, 'utf8')
+  await updateContentHash(fixtureRoot, 'styles.css')
+
+  const result = verify(fixtureRoot)
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /样式表资源不存在或越界：\.\/missing\.png/)
+})
+
+test('rejects missing CSS imports after the checksum is updated', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const cssPath = path.join(fixtureRoot, 'dist', 'preview', 'styles.css')
+  const css = `${await readFile(cssPath, 'utf8')}\n@import './missing.css';\n`
+  await writeFile(cssPath, css, 'utf8')
+  await updateContentHash(fixtureRoot, 'styles.css')
+
+  const result = verify(fixtureRoot)
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /离线预览 CSS 不支持 @import/)
+})
+
+test('rejects remote, absolute, and escaping CSS url resources', async (t) => {
+  for (const reference of ['https://example.invalid/image.png', '/image.png', '../../outside.png']) {
+    await t.test(reference, async (t) => {
+      const fixtureRoot = await createFixture(t)
+      const cssPath = path.join(fixtureRoot, 'dist', 'preview', 'styles.css')
+      const css = `${await readFile(cssPath, 'utf8')}\n.fixture { background: url('${reference}'); }\n`
+      await writeFile(cssPath, css, 'utf8')
+      await updateContentHash(fixtureRoot, 'styles.css')
+
+      const result = verify(fixtureRoot)
+      assert.equal(result.status, 1)
+      assert.match(result.stderr, /样式表包含外部或绝对 URL|样式表资源不存在或越界/)
+    })
+  }
+})
+
+test('allows CSS local fragment references', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const cssPath = path.join(fixtureRoot, 'dist', 'preview', 'styles.css')
+  const css = `${await readFile(cssPath, 'utf8')}\n.fixture { filter: url(#local-filter); }\n`
+  await writeFile(cssPath, css, 'utf8')
+  await updateContentHash(fixtureRoot, 'styles.css')
+
+  const result = verify(fixtureRoot)
+  assert.equal(result.status, 0, result.stderr || result.stdout)
+})
+
 test('builds and verifies pages when the first registry entry lists title before path', async (t) => {
   const fixtureRoot = await createFixture(t)
   const baseline = await readManifest(fixtureRoot)
