@@ -117,6 +117,57 @@ class PackageTests(unittest.TestCase):
         self.profile("frontend-source", ["docs"], ["docs/guide.md"], "docs/guide.md")
         self.build_and_verify()
 
+    def test_reference_markdown_links_resolve_with_normalized_labels_and_titles(self) -> None:
+        self.write("docs/guide.md", """[setup][  INSTALL   Steps ]\n\n[space path][]\n\n[INSTALL steps]: <setup.md> \"Setup guide\"\n[space path]: <path with spaces.md> 'A title'\n""")
+        self.write("docs/setup.md", "setup")
+        self.write("docs/path with spaces.md", "spaces")
+        self.profile("frontend-source", ["docs"], ["docs/guide.md"], "docs/guide.md")
+        self.build_and_verify()
+
+    def test_rejects_missing_reference_markdown_target_during_build(self) -> None:
+        self.write("docs/guide.md", "[setup][steps]\n\n[steps]: missing.md\n")
+        self.profile("frontend-source", ["docs"], ["docs/guide.md"], "docs/guide.md")
+        with self.assertRaisesRegex(package.PackageError, "MARKDOWN-01.*docs/guide.md:1"):
+            package.build(self.source, self.profile_path, self.output)
+
+    def test_rejects_reference_markdown_target_escaping_bundle(self) -> None:
+        self.write("docs/guide.md", "[setup][]\n\n[setup]: ../../../outside.md\n")
+        self.profile("frontend-source", ["docs"], ["docs/guide.md"], "docs/guide.md")
+        with self.assertRaisesRegex(package.PackageError, "MARKDOWN-02.*docs/guide.md:1"):
+            package.build(self.source, self.profile_path, self.output)
+
+    def test_ignores_unused_reference_definitions_and_non_links_in_code(self) -> None:
+        self.write("docs/guide.md", """An ordinary [bracketed] word.\n\n`[example][code]`\n\n```md\n[other][sample]\n[sample]: missing-in-fence.md\n```\n\n[unused]: absent.md\n[code]: missing-inline-code.md\n""")
+        self.profile("frontend-source", ["docs"], ["docs/guide.md"], "docs/guide.md")
+        self.build_and_verify()
+
+    def test_reference_external_and_fragment_targets_are_skipped(self) -> None:
+        self.write("docs/guide.md", """[external][url]\n[section][anchor]\n\n[url]: https://example.invalid/missing.md \"Remote\"\n[anchor]: #section\n""")
+        self.profile("frontend-source", ["docs"], ["docs/guide.md"], "docs/guide.md")
+        self.build_and_verify()
+
+    def test_standalone_verify_rejects_resigned_missing_reference_link(self) -> None:
+        self.write("docs/guide.md", "[setup][steps]\n\n[steps]: present.md\n")
+        self.write("docs/present.md", "present")
+        self.profile("backend-requirements", ["docs"], ["docs/guide.md"], "docs/guide.md")
+        self.build_and_verify()
+
+        forged = self.root / "resigned-reference-link.zip"
+        with zipfile.ZipFile(self.output) as original:
+            items = {name: original.read(name) for name in original.namelist()}
+        items["docs/guide.md"] = b"[setup][steps]\n\n[steps]: missing.md\n"
+        manifest = json.loads(items["manifest.json"])
+        manifest["files"]["docs/guide.md"] = package._sha(items["docs/guide.md"])
+        items["manifest.json"] = (json.dumps(manifest, indent=2) + "\n").encode("utf-8")
+        items["SHA256SUMS"] = "".join(
+            f"{digest}  {name}\n" for name, digest in sorted(manifest["files"].items())
+        ).encode("utf-8")
+        with zipfile.ZipFile(forged, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+            for name, data in items.items():
+                archive.writestr(name, data)
+        with self.assertRaisesRegex(package.PackageError, "MARKDOWN-01.*docs/guide.md:1"):
+            package.verify(forged)
+
     def test_rejects_missing_markdown_relative_link_during_build(self) -> None:
         self.write("docs/guide.md", "[trial](ADD_PAGE_TRIAL.md)")
         self.profile("frontend-source", ["docs"], ["docs/guide.md"], "docs/guide.md")
