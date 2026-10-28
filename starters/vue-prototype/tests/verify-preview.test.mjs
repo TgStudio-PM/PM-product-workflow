@@ -3,11 +3,46 @@ import { createHash } from 'node:crypto'
 import { spawnSync } from 'node:child_process'
 import { cp, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises'
 import { test } from 'node:test'
+import { deflateSync } from 'node:zlib'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const starterRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+
+function createOnePixelPng() {
+  function crc32(bytes) {
+    let crc = 0xffffffff
+    for (const byte of bytes) {
+      crc ^= byte
+      for (let bit = 0; bit < 8; bit += 1) crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0)
+    }
+    return (crc ^ 0xffffffff) >>> 0
+  }
+
+  function chunk(type, data) {
+    const typeBytes = Buffer.from(type, 'ascii')
+    const content = Buffer.concat([typeBytes, data])
+    const length = Buffer.alloc(4)
+    const checksum = Buffer.alloc(4)
+    length.writeUInt32BE(data.length)
+    checksum.writeUInt32BE(crc32(content))
+    return Buffer.concat([length, content, checksum])
+  }
+
+  const header = Buffer.alloc(13)
+  header.writeUInt32BE(1, 0)
+  header.writeUInt32BE(1, 4)
+  header[8] = 8
+  header[9] = 6
+
+  return Buffer.concat([
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    chunk('IHDR', header),
+    chunk('IDAT', deflateSync(Buffer.from([0, 32, 120, 184, 255]))),
+    chunk('IEND', Buffer.alloc(0)),
+  ])
+}
 
 async function createFixture(t) {
   const fixtureRoot = await mkdtemp(path.join(os.tmpdir(), 'tg-studio-preview-verify-'))
@@ -136,6 +171,80 @@ test('allows CSS local fragment references', async (t) => {
 
   const result = verify(fixtureRoot)
   assert.equal(result.status, 0, result.stderr || result.stdout)
+})
+
+test('builds and verifies a local PNG background inlined by Vite', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const assetsPath = path.join(fixtureRoot, 'src', 'assets')
+  await mkdir(assetsPath, { recursive: true })
+  await writeFile(path.join(assetsPath, 'pixel.png'), createOnePixelPng())
+
+  const sourceCssPath = path.join(fixtureRoot, 'src', 'style.css')
+  const sourceCss = await readFile(sourceCssPath, 'utf8')
+  await writeFile(sourceCssPath, `${sourceCss}\n.fixture { background-image: url('./assets/pixel.png'); }\n`, 'utf8')
+
+  const buildResult = buildPreview(fixtureRoot)
+  assert.equal(buildResult.status, 0, buildResult.stderr || buildResult.stdout)
+
+  const outputCss = await readFile(path.join(fixtureRoot, 'dist', 'preview', 'styles.css'), 'utf8')
+  assert.match(outputCss, /url\(data:image\/png;base64,[A-Za-z0-9+/]+=*\)/)
+  const verifyResult = verify(fixtureRoot)
+  assert.equal(verifyResult.status, 0, verifyResult.stderr || verifyResult.stdout)
+})
+
+test('allows canonical base64 data URIs for supported raster MIME types', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const cssPath = path.join(fixtureRoot, 'dist', 'preview', 'styles.css')
+  const uris = ['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/avif']
+    .map((mime, index) => `.fixture-${index} { background-image: url('data:${mime};base64,AQIDBA=='); }`)
+    .join('\n')
+  const css = `${await readFile(cssPath, 'utf8')}\n${uris}\n`
+  await writeFile(cssPath, css, 'utf8')
+  await updateContentHash(fixtureRoot, 'styles.css')
+
+  const result = verify(fixtureRoot)
+  assert.equal(result.status, 0, result.stderr || result.stdout)
+})
+
+test('rejects unsupported and malformed CSS data URIs without echoing their contents', async (t) => {
+  const references = [
+    'data:image/svg+xml;base64,PHN2Zz4=',
+    'data:text/html;base64,PGgxPk5vPC9oMT4=',
+    'data:image/png,AQIDBA==',
+    'data:image/png;base64,',
+    'data:image/png;base64,AQIDBA',
+    'data:image/png;base64,AQIDBA===',
+    'data:image/png;base64,AQ!D',
+    'data:image/png;base64,AQIDBA==extra',
+    'data:image/png;charset=utf-8;base64,AQIDBA==',
+  ]
+  const fixtureRoot = await createFixture(t)
+  const cssPath = path.join(fixtureRoot, 'dist', 'preview', 'styles.css')
+  const baselineCss = await readFile(cssPath, 'utf8')
+
+  for (const [index, reference] of references.entries()) {
+    await t.test(`${index + 1}: ${reference.split(',')[0]}`, async () => {
+      const css = `${baselineCss}\n.fixture { background-image: url('${reference}'); }\n`
+      await writeFile(cssPath, css, 'utf8')
+      await updateContentHash(fixtureRoot, 'styles.css')
+
+      const result = verify(fixtureRoot)
+      assert.equal(result.status, 1)
+      assert.match(result.stderr, /样式表包含不支持或格式无效的数据 URI/)
+      assert.doesNotMatch(result.stderr, /PHN2Zz|PGgx|AQIDBA/)
+    })
+  }
+
+  await t.test('valid raster data URI is still rejected in @import', async () => {
+    const dataUri = `data:image/png;base64,${createOnePixelPng().toString('base64')}`
+    await writeFile(cssPath, `${baselineCss}\n@import url('${dataUri}');\n`, 'utf8')
+    await updateContentHash(fixtureRoot, 'styles.css')
+
+    const result = verify(fixtureRoot)
+    assert.equal(result.status, 1)
+    assert.match(result.stderr, /离线预览 CSS 不支持 @import/)
+    assert.doesNotMatch(result.stderr, /AQIDBA/)
+  })
 })
 
 test('builds and verifies pages when the first registry entry lists title before path', async (t) => {

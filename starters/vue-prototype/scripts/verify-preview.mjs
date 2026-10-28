@@ -13,6 +13,14 @@ const errors = []
 
 function issue(message) { errors.push(message) }
 
+function isSupportedRasterDataUri(reference) {
+  const match = reference.match(/^data:image\/(?:png|jpeg|gif|webp|avif);base64,([A-Za-z0-9+/]+={0,2})$/i)
+  if (!match || match[1].length % 4 !== 0) return false
+
+  const bytes = Buffer.from(match[1], 'base64')
+  return bytes.length > 0 && bytes.toString('base64') === match[1]
+}
+
 try {
   const entries = await readdir(output, { withFileTypes: true })
   const names = new Set(entries.map((entry) => entry.name))
@@ -51,6 +59,12 @@ try {
   for (const match of css.matchAll(cssUrlPattern)) {
     const reference = match[2].trim()
     if (!reference || reference.startsWith('#')) continue
+    if (/^data:/i.test(reference)) {
+      if (!isSupportedRasterDataUri(reference)) {
+        issue('样式表包含不支持或格式无效的数据 URI；仅允许合法的内嵌栅格图片。')
+      }
+      continue
+    }
     if (/^(?:[a-z][a-z\d+.-]*:|\/\/|\/|\\)/i.test(reference)) {
       issue(`样式表包含外部或绝对 URL：${reference}`)
       continue
