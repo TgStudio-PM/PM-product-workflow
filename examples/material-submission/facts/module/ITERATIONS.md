@@ -70,3 +70,11 @@
 - 修正：无效“已提交”记录保留可用内容、恢复为可编辑草稿，尝试更正本地记录并提示写入结果；有效记录仍保持只读。不改变正常提交、材料必备范围或离线边界。
 - 事实同步：更新 BR-005、PAGE_FLOW、CURRENT、项目背景和模块清单；这是一项既有规则的一致性修复，不新增真实业务事实或 API。
 - 验证：Node VM 定向测试 7 项通过、0 跳过，覆盖无效/有效记录、写入成败和重开稳定；原生静态预览 Profile 构建与独立验包通过。CI 结果见关联 PR。第二轮 Chrome `file://` 验收是历史证据，本轮未做目标浏览器复验，也不把 VM 结果当作浏览器产品验收。
+
+### 2026-10-28 补充：手机提示布局与政务蓝
+
+- 输入：[Issue #140](https://github.com/TgStudio-PM/PM-product-workflow/issues/140)。用户确认政务蓝与可读性偏好；本轮 Agent 浏览器检查发现 390px 窄屏上的长状态提示挤压标题。未引入业务规则。
+- 初轮浏览器证据：Chrome 155.0.8059.86 与 Edge 155.0.4283.62，在本地 HTTP、390×844/DSF 1 均复现。有效更正保存提示 `scrollWidth=452`，受控 `Storage.prototype.setItem` 写入失败提示 `scrollWidth=464`，容器 `clientWidth=390`。写入失败为专用 key 的控制性抛错，不是自然环境存储故障。无效记录状态本身恢复为可编辑草稿，更正成功后刷新仍稳定。
+- 修复：提交 `0f4653d2c0873a1f7b2e37c4bfd30aba1d77cbcd` 仅修改 CSS/HTML。手机长提示完整换行，标题/提示与材料计数改为上下排；移除固定材料卡高度以避免字体放大时裁切。主色为 `#1d63b8`、hover 为 `#174f93`；辅助文字至少 12px、常用文字 14px、按钮高 40px、宽屏容器最大 1600px。HTML 增加空 favicon。JS、业务文案、BR 与材料规则未变。
+- 机器验证：Node 状态恢复回归 7 项、`node --check examples/material-submission/app.js` 和差异检查通过。此前原生 HTTP 预览的 `/favicon.ico` 404 是伴随请求问题，空 favicon 声明沿用 [ERR-20261028-003](../../../../maintainers/errors/ERR-20261028-003.md) 所述入口防护经验，不代表 Vue 回归。
+- 浏览器验收：修复后的 `static-preview` 包独立验包通过；Chrome、Edge HTTP 恢复矩阵及 1280×800、390×844、2048×1050/DSF 1.25 视口检查通过，390px 长提示完整换行。验收摘要与包哈希见 [ERR-20261028-004](../../../../maintainers/errors/ERR-20261028-004.md)；截图证据复采与旧证据保护结果见 [ERR-20261028-002](../../../../maintainers/errors/ERR-20261028-002.md)。HTTP 不等同 `file://` 离线验收；2048px/DSF 1.25 不等同 Windows 真机 125% 缩放；AI/非 PM 结果不替代独立非开发 PM 人测，也不代表正式 Release。
