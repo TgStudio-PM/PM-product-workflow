@@ -59,7 +59,7 @@ npm run preview:pack
 npm run preview:verify
 ```
 
-单独重跑包审计。检查入口引用、相对资源、已注册路由、包目录白名单、文件哈希、模块脚本/外部资源引用及依赖声明。预览包只输出一份 `styles.css`，因此不支持 CSS `@import`；CSS `url()` 的相对目标须在预览包内。审计通过代表静态结构符合规则，不代替浏览器交互验收。
+单独重跑包审计。检查入口引用、相对资源、已注册路由、包目录白名单、文件哈希、模块脚本/外部资源引用及依赖声明。预览包只输出一份 `styles.css`，因此不支持 CSS `@import`；CSS `url()` 的相对目标须在预览包内，也允许 Vite 内嵌的 PNG、JPEG、GIF、WebP、AVIF 栅格图片 data URI。审计只检查资源引用的静态格式，不验证图片能否实际解码或渲染，也不代替浏览器交互与离线验收。
 
 从旧版本升级后，请先重新运行 `npm run preview:pack`。新版审计会核对 `manifest.json` 的页面标题、文件清单及其 SHA-256，并核对 `PAGES.md` 的 Markdown 安全转义；包含表格分隔符、换行或 Markdown/HTML 特殊字符标题的旧包应重新生成。
 
