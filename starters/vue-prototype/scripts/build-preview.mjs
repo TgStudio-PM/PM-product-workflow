@@ -40,6 +40,7 @@ const html = `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Tg Studio 虚构原型工程离线预览。">
     <title>Tg Studio · 原型工程示例</title>
+    <link rel="icon" href="data:,">
     <link rel="stylesheet" href="./styles.css">
     <script defer src="./app.js"></script>
   </head>
