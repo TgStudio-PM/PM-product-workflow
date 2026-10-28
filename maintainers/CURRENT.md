@@ -38,8 +38,9 @@
 - PR #122 关闭 `page:new` 经路径链接写入工程外的反例；Linux CI 四项新增链接用例实际运行并通过，见[错误记录](errors/ERR-20261026-004.md)。
 - 第四轮修复原生虚构案例无效本地“已提交”状态的误锁定，Node VM 定向回归、静态包构建与独立验包及 CI 通过；最新浏览器交互仍待复验，见[错误记录](errors/ERR-20261026-007.md)。
 - 完成 Issue #75 内嵌 PNG 离线预览的外部 Chrome、Edge `file://` 浏览器复验；结果、哈希和验收边界见[记录](acceptance/2026-10-28-issue75-browser-review.md)。该复验不替代独立非开发产品经理人测或原生案例第四轮复验。
-- 完成 Issue #134 Vue starter 政务蓝与可读性调整的 Chrome 自动化复验；视口、交互、字号检查和验收限制见[记录](acceptance/2026-10-28-vue-blue-layout.md)。2K/125% 为设备像素比模拟，真机 Windows 缩放及新样式 Edge、`file://` 尚未验收。
+- 完成 Issue #134 Vue starter 政务蓝与可读性调整的 Chrome 自动化复验；视口、交互、字号检查和验收限制见[记录](acceptance/2026-10-28-vue-blue-layout.md)。2K/125% 为设备像素比模拟，真机 Windows 缩放及新样式 `file://` 尚未验收。
 - 审阅四份外部建议并以 [ADR 0003](decisions/0003-prototype-navigation-scope.md) 记录导航范围；完成 Issue #136 轻量 Hash 导航反馈与截图证据闭环，机器验证和 HTTP 浏览器验收边界见 [ERR-20261028-001](errors/ERR-20261028-001.md) 与 [ERR-20261028-002](errors/ERR-20261028-002.md)。
+- 完成 Issue #138 favicon 最小修复及独立源码包 Edge HTTP 复验，验收边界与哈希见 [记录](acceptance/2026-10-28-vue-blue-layout.md) 和 [ERR-20261028-003](errors/ERR-20261028-003.md)。
 
 ## 下一步
 
@@ -53,7 +54,7 @@
 
 ## 未关闭错误
 
-- 无。Issue #136 路由反馈与其截图证据整理已分别闭环，见[ERR-20261028-001](errors/ERR-20261028-001.md)和[ERR-20261028-002](errors/ERR-20261028-002.md)。非字符串交付 `kind` 的受控错误已完成定向修复和本地回归，见[ERR-20261026-008](errors/ERR-20261026-008.md)。原生虚构案例本轮目标浏览器复验仍待做，见[ERR-20261026-007](errors/ERR-20261026-007.md)。
+- 无。Issue #138 构建预览 favicon 404 已在独立源码包 HTTP Edge 复验后闭环，见 [ERR-20261028-003](errors/ERR-20261028-003.md)。Issue #136 路由反馈与其截图证据整理已分别闭环，见[ERR-20261028-001](errors/ERR-20261028-001.md)和[ERR-20261028-002](errors/ERR-20261028-002.md)。非字符串交付 `kind` 的受控错误已完成定向修复和本地回归，见[ERR-20261026-008](errors/ERR-20261026-008.md)。原生虚构案例本轮目标浏览器复验仍待做，见[ERR-20261026-007](errors/ERR-20261026-007.md)。
 
 ## 更新规则
 
