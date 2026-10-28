@@ -37,6 +37,8 @@ npm run facts:new -- demo-help
 
 可照着 `src/modules/overview/pages/home/` 和 `src/modules/material-submission/pages/apply/` 阅读。使用共享组件可参考 `src/shared/components/`。如果字段要交给后端确认，先记录到模块 `contracts/`；未确认的 URL、HTTP 方法、认证和持久化策略保持待定。
 
+默认界面采用政务蓝、14px 常用正文和适配宽屏的布局；样式集中在 `src/style.css`，可按具体项目的设计规范调整颜色、字号和布局。CSS 视口下的适配检查不等同于 Windows 125% 缩放或目标浏览器的实机验收。
+
 详细步骤：[`docs/ADD_PAGE.md`](docs/ADD_PAGE.md)。
 
 ## 与前后端协作
