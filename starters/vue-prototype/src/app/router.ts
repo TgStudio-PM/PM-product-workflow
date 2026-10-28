@@ -1,17 +1,16 @@
-import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { pageRegistry, type PagePath } from './page-registry'
-
-function pathFromLocation(): PagePath {
-  const path = window.location.hash.replace(/^#/, '')
-  return pageRegistry.some((page) => page.path === path) ? path as PagePath : pageRegistry[0].path
-}
+import { computed, onMounted, onUnmounted, ref, shallowRef } from 'vue'
+import { pageRegistry } from './page-registry'
+import { resolveHashLocation } from './hash-location'
 
 export function useHashRouter() {
-  const currentPath = ref<PagePath>(pageRegistry[0].path)
-  const activePage = computed(() => pageRegistry.find((page) => page.path === currentPath.value) ?? pageRegistry[0])
+  const currentPath = ref<string>(pageRegistry[0].path)
+  const query = shallowRef(new URLSearchParams())
+  const activePage = computed(() => pageRegistry.find((page) => page.path === currentPath.value))
 
   function readLocation() {
-    currentPath.value = pathFromLocation()
+    const location = resolveHashLocation(window.location.hash, pageRegistry.map((page) => page.path))
+    currentPath.value = location.path
+    query.value = location.query
   }
 
   onMounted(() => {
@@ -21,5 +20,5 @@ export function useHashRouter() {
 
   onUnmounted(() => window.removeEventListener('hashchange', readLocation))
 
-  return { currentPath, activePage }
+  return { currentPath, query, activePage }
 }

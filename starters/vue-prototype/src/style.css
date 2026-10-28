@@ -801,6 +801,23 @@ body {
   font-size:14px;
   line-height:1.7;
 }
+.not-found-path {
+  display:block;
+  margin-top:8px;
+  overflow-wrap:anywhere;
+}
+.not-found-panel h1 {
+  margin:0;
+  color:var(--ink);
+  font-size:22px;
+  font-weight:600;
+}
+.not-found-links a {
+  color:var(--primary);
+}
+.not-found-links a:hover {
+  color:var(--primary-dark);
+}
 
 @media(max-width:1100px) {
   .layout {

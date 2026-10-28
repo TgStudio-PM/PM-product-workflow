@@ -88,7 +88,12 @@ export function readRegisteredPages(registrySource) {
       }
     }
 
-    return { route: metadata.get('path'), title: metadata.get('title') }
+    const route = metadata.get('path')
+    if (route.includes('?')) {
+      throw new Error(`页面注册表第 ${index + 1} 项的登记 path 只写静态路径，查询参数放页面链接。`)
+    }
+
+    return { route, title: metadata.get('title') }
   })
 
   if (pages.length === 0) throw new Error('页面注册表没有可打包的页面路由。')
