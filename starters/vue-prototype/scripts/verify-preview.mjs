@@ -40,7 +40,8 @@ try {
   const manifest = JSON.parse(await readFile(path.join(output, 'manifest.json'), 'utf8'))
   const sumsText = await readFile(path.join(output, 'SHA256SUMS'), 'utf8')
 
-  const references = [...html.matchAll(/(?:src|href)=["']([^"']+)["']/gi)].map((match) => match[1])
+  const htmlForResourceScan = html.replace('<link rel="icon" href="data:,">', '')
+  const references = [...htmlForResourceScan.matchAll(/(?:src|href)=["']([^"']+)["']/gi)].map((match) => match[1])
   for (const reference of references) {
     if (/^(?:[a-z]+:|\/\/|\/|#)/i.test(reference)) {
       issue(`入口包含非相对资源引用：${reference}`)

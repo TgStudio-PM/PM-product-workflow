@@ -122,6 +122,52 @@ test('valid preview package passes in an isolated copy', async (t) => {
   assert.match(result.stdout, /离线包审计通过/)
 })
 
+test('builds the exact empty favicon declaration and verifies the generated package', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const buildResult = buildPreview(fixtureRoot)
+  assert.equal(buildResult.status, 0, buildResult.stderr || buildResult.stdout)
+
+  const html = await readFile(path.join(fixtureRoot, 'dist', 'preview', 'index.html'), 'utf8')
+  assert.ok(html.includes('<link rel="icon" href="data:,">'))
+  const result = verify(fixtureRoot)
+  assert.equal(result.status, 0, result.stderr || result.stdout)
+})
+
+test('continues to verify an existing package without a favicon declaration', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const htmlPath = path.join(fixtureRoot, 'dist', 'preview', 'index.html')
+  const html = await readFile(htmlPath, 'utf8')
+  await writeFile(htmlPath, html.replace('<link rel="icon" href="data:,">\n', ''), 'utf8')
+  await updateContentHash(fixtureRoot, 'index.html')
+
+  const result = verify(fixtureRoot)
+  assert.equal(result.status, 0, result.stderr || result.stdout)
+})
+
+test('rejects data and remote HTML resource references after the checksum is updated', async (t) => {
+  const references = [
+    ['script src data URI', '<script defer src="data:,"></script>'],
+    ['stylesheet href data URI', '<link rel="stylesheet" href="data:,"></link>'],
+    ['nonempty data favicon', '<link rel="icon" href="data:image/png;base64,AQIDBA==">'],
+    ['SVG data favicon', '<link rel="icon" href="data:image/svg+xml,<svg>">'],
+    ['remote favicon', '<link rel="icon" href="https://example.invalid/favicon.ico">'],
+  ]
+
+  for (const [name, reference] of references) {
+    await t.test(name, async (t) => {
+      const fixtureRoot = await createFixture(t)
+      const htmlPath = path.join(fixtureRoot, 'dist', 'preview', 'index.html')
+      const html = await readFile(htmlPath, 'utf8')
+      await writeFile(htmlPath, html.replace('</head>', `${reference}\n  </head>`), 'utf8')
+      await updateContentHash(fixtureRoot, 'index.html')
+
+      const result = verify(fixtureRoot)
+      assert.equal(result.status, 1)
+      assert.match(result.stderr, /入口包含非相对资源引用：/)
+    })
+  }
+})
+
 test('rejects missing CSS url resources after the checksum is updated', async (t) => {
   const fixtureRoot = await createFixture(t)
   const cssPath = path.join(fixtureRoot, 'dist', 'preview', 'styles.css')
