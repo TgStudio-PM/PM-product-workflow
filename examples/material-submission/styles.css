@@ -2,14 +2,15 @@
   font-family: "DM Sans","Noto Sans SC","Microsoft YaHei",sans-serif;
   color: #172c35;
   background: #f4f7f7;
+  font-size: 14px;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   --ink: #172c35;
   --muted: #74848a;
   --line: #e4ebeb;
-  --teal: #147b72;
-  --teal-dark: #0d675f;
-  --pale: #e9f4f2;
+  --primary: #1d63b8;
+  --primary-dark: #174f93;
+  --pale: #edf4ff;
   --orange: #d49353
 }
 
@@ -64,8 +65,8 @@ body {
 .brand-mark {
   width: 38px;
   height: 38px;
-  background: #e8f3f1;
-  color: var(--teal);
+  background: var(--pale);
+  color: var(--primary);
   border-radius: 12px;
   display: grid;
   place-items: center;
@@ -84,7 +85,7 @@ body {
 }
 
 .brand-copy small {
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: .16em;
   color: #93a1a5
 }
@@ -98,7 +99,7 @@ body {
 }
 
 .meta-label {
-  color: #44615e
+  color: #465c77
 }
 
 .header-divider {
@@ -108,7 +109,7 @@ body {
 }
 
 .page-shell {
-  max-width: 1152px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 0 28px
 }
@@ -119,7 +120,7 @@ body {
   align-items: center;
   padding: 25px 0 28px;
   color: #8c9a9e;
-  font-size: 11px
+  font-size: 12px
 }
 
 .breadcrumbs a {
@@ -146,7 +147,7 @@ body {
   align-items: center;
   gap: 9px;
   color: #9aa9a8;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: .18em;
   font-weight: 600
 }
@@ -154,7 +155,7 @@ body {
 .eyebrow-line {
   height: 1px;
   width: 22px;
-  background: #7eb0a8
+  background: var(--primary)
 }
 
 .intro h1 {
@@ -167,7 +168,7 @@ body {
 }
 
 .intro h1 span {
-  color: var(--teal)
+  color: var(--primary)
 }
 
 .intro-copy>p {
@@ -205,7 +206,7 @@ body {
 }
 
 .intro-side strong {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: #3a585b
 }
@@ -233,19 +234,22 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-bottom: 26px
 }
 
 .section-heading>div {
   display: flex;
-  gap: 12px
+  gap: 12px;
+  min-width: 0
 }
 
 .step-number {
   font-size: 12px;
   letter-spacing: .08em;
-  color: #87a9a5;
-  border: 1px solid #dcebe8;
+  color: var(--primary);
+  border: 1px solid #c8d9ee;
   border-radius: 5px;
   padding: 5px 6px;
   height: 25px
@@ -273,6 +277,10 @@ body {
   color: #829294;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
   gap: 6px;
   padding-top: 5px
 }
@@ -281,7 +289,8 @@ body {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #80b5a4
+  background: var(--primary);
+  flex: 0 0 auto
 }
 
 .field-group {
@@ -289,7 +298,7 @@ body {
 }
 
 .field-group label,.materials-heading>div>label {
-  font-size: 11px;
+  font-size: 14px;
   color: #334c51;
   font-weight: 600;
   display: block;
@@ -303,7 +312,7 @@ body {
   background: #fff;
   padding: 10px 12px;
   font: inherit;
-  font-size: 12px;
+  font-size: 14px;
   color: #30474b;
   outline: none;
   transition: border .15s,box-shadow .15s
@@ -321,8 +330,8 @@ body {
 }
 
 .field-group input:focus,.field-group textarea:focus {
-  border-color: #78aaa2;
-  box-shadow: 0 0 0 3px #dff0ec
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px #dbeaff
 }
 
 .field-group textarea:disabled {
@@ -332,7 +341,7 @@ body {
 
 .field-hint {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   color: #99a6a8;
   margin-top: 7px
 }
@@ -344,7 +353,7 @@ body {
 }
 
 .field-footer #character-count {
-  font-size: 11px;
+  font-size: 12px;
   color: #a3adaf;
   margin-top: 7px
 }
@@ -359,6 +368,8 @@ body {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
   margin: 3px 0 11px
 }
 
@@ -367,18 +378,20 @@ body {
 }
 
 .materials-heading p {
-  font-size: 11px;
+  font-size: 12px;
   color: #9aa7a8;
   margin: 0
 }
 
 .materials-count {
-  font-size: 11px;
+  font-size: 12px;
+  min-width: 0;
+  overflow-wrap: anywhere;
   color: #91a0a1
 }
 
 .materials-count strong {
-  color: var(--teal);
+  color: var(--primary);
   font-size: 12px
 }
 
@@ -389,26 +402,26 @@ body {
 }
 
 .material-row {
-  height: 62px;
+  min-height: 64px;
   border: 1px solid #e8eeee;
   border-radius: 5px;
   margin-bottom: 7px;
   display: flex;
   align-items: center;
-  padding: 0 12px;
+  padding: 10px 12px;
   gap: 11px;
   cursor: pointer;
   transition: border .15s,background .15s
 }
 
 .material-row:hover {
-  border-color: #b6d4cf;
+  border-color: #b6cbe5;
   background: #fbfdfd
 }
 
 .material-row:has(input:checked) {
-  border-color: #8dbbb3;
-  background: #f4faf8
+  border-color: #8db4e4;
+  background: #f4f8ff
 }
 
 .material-row:has(input:disabled) {
@@ -433,8 +446,8 @@ body {
 }
 
 .material-row input:checked+.material-check {
-  border-color: var(--teal);
-  background: var(--teal)
+  border-color: var(--primary);
+  background: var(--primary)
 }
 
 .material-row input:checked+.material-check:after {
@@ -445,7 +458,7 @@ body {
 }
 
 .material-row input:focus-visible+.material-check {
-  outline: 3px solid #c8e4df
+  outline: 3px solid #c8dcf5
 }
 
 .material-icon {
@@ -454,7 +467,7 @@ body {
   border-radius: 7px;
   display: grid;
   place-items: center;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   flex: 0 0 auto
 }
@@ -477,17 +490,18 @@ body {
 .material-copy {
   display: grid;
   gap: 4px;
-  flex: 1
+  flex: 1;
+  min-width: 0
 }
 
 .material-copy strong {
-  font-size: 12px;
+  font-size: 14px;
   color: #3c565a;
   font-weight: 600
 }
 
 .material-copy small {
-  font-size: 11px;
+  font-size: 12px;
   color: #9aa6a8
 }
 
@@ -529,9 +543,9 @@ body {
 .button {
   border-radius: 5px;
   font: inherit;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
-  height: 35px;
+  height: 40px;
   padding: 0 15px;
   cursor: pointer;
   transition: background .15s,border .15s,transform .15s
@@ -559,14 +573,14 @@ body {
 }
 
 .button-primary {
-  border: 1px solid var(--teal);
-  background: var(--teal);
+  border: 1px solid var(--primary);
+  background: var(--primary);
   color: white;
   padding: 0 18px
 }
 
 .button-primary:hover:not(:disabled) {
-  background: var(--teal-dark)
+  background: var(--primary-dark)
 }
 
 .button-primary span {
@@ -594,15 +608,15 @@ body {
   width: 25px;
   height: 25px;
   border-radius: 6px;
-  background: #eaf4f2;
-  color: var(--teal);
+  background: var(--pale);
+  color: var(--primary);
   display: grid;
   place-items: center;
   font-size: 14px
 }
 
 .card-title h2 {
-  font-size: 13px;
+  font-size: 14px;
   margin: 0
 }
 
@@ -638,16 +652,16 @@ body {
   display: grid;
   place-items: center;
   color: #9ba8a9;
-  font-size: 11px;
+  font-size: 12px;
   z-index: 1;
   background: white;
   flex: 0 0 auto
 }
 
 .step-current .step-node {
-  border-color: #85b7af;
-  background: #edf7f5;
-  color: #287f74
+  border-color: #8db4e4;
+  background: var(--pale);
+  color: var(--primary)
 }
 
 .steps-list li div {
@@ -657,37 +671,37 @@ body {
 }
 
 .steps-list strong {
-  font-size: 12px;
+  font-size: 14px;
   color: #607377;
   font-weight: 500
 }
 
 .step-current strong {
-  color: #28786f;
+  color: var(--primary);
   font-weight: 600
 }
 
 .steps-list small {
-  font-size: 11px;
+  font-size: 12px;
   color: #a0abad
 }
 
 .flow-note {
   display: flex;
   gap: 8px;
-  background: #f4f8f7;
+  background: #f3f6fb;
   padding: 10px;
   border-radius: 5px
 }
 
 .flow-note>span {
-  color: #77a39c;
+  color: var(--primary);
   font-weight: 700;
   font-size: 12px
 }
 
 .flow-note p {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.6;
   color: #819293;
   margin: 0
@@ -709,17 +723,17 @@ body {
   place-items: center;
   border: 1px solid #e3ebea;
   border-radius: 50%;
-  color: #8ba5a1;
-  font-size: 11px
+  color: #627b98;
+  font-size: 12px
 }
 
 .help-card strong {
-  font-size: 12px;
+  font-size: 14px;
   color: #50696b
 }
 
 .help-card p {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.65;
   color: #96a3a4;
   margin: 5px 0 0
@@ -734,7 +748,7 @@ body {
   padding: 10px 0 0;
   text-align: left;
   font: inherit;
-  font-size: 11px;
+  font-size: 12px;
   cursor: pointer
 }
 
@@ -751,11 +765,11 @@ body {
 
 .privacy-note>span {
   font-size: 13px;
-  color: #9ab7b1
+  color: var(--primary)
 }
 
 .privacy-note p {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.6;
   margin: 0
 }
@@ -765,8 +779,8 @@ body {
   align-items: center;
   gap: 13px;
   margin-top: 17px;
-  border: 1px solid #c9e3da;
-  background: #f3faf6;
+  border: 1px solid #c8d9ee;
+  background: #f4f8ff;
   padding: 14px 18px;
   border-radius: 7px
 }
@@ -777,19 +791,19 @@ body {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: #dff0e8;
-  color: #328267
+  background: #dbeaff;
+  color: var(--primary)
 }
 
 .submitted-panel strong {
-  font-size: 11px;
-  color: #32745e
+  font-size: 14px;
+  color: var(--primary)
 }
 
 .submitted-panel p {
   margin: 4px 0 0;
   font-size: 12px;
-  color: #779187
+  color: #687b90
 }
 
 .page-footer {
@@ -799,7 +813,7 @@ body {
   margin-top: 26px;
   padding: 15px 0 22px;
   color: #a1acab;
-  font-size: 11px
+  font-size: 12px
 }
 
 .visually-hidden {
@@ -886,15 +900,24 @@ body {
   }
 
   .section-heading {
-    gap: 8px
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px
   }
 
   .draft-indicator {
-    white-space: nowrap
+    white-space: normal;
+    padding-top: 0
   }
 
   .materials-heading {
+    align-items: flex-start;
+    flex-direction: column;
     gap: 8px
+  }
+
+  .materials-heading>div {
+    min-width: 0
   }
 
   .materials-row {
@@ -902,7 +925,7 @@ body {
   }
 
   .material-row {
-    padding: 0 8px;
+    padding: 10px 8px;
     gap: 8px
   }
 
@@ -926,7 +949,7 @@ body {
   }
 
   .header-meta {
-    font-size: 11px;
+    font-size: 12px;
     gap: 0
   }
 
@@ -939,7 +962,7 @@ body {
   }
 
   .brand-copy small {
-    font-size: 9px
+    font-size: 12px
   }
 
 }
