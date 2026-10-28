@@ -13,6 +13,10 @@ npm run dev
 
 浏览器打开 Vite 显示的本地地址。页面可热更新，导航和路由集中在 `src/app/page-registry.ts` 与 `src/app/router.ts`。
 
+页面登记的 `path` 只写静态路径，例如 `/material-submission/apply`，不要把 `?id=...` 写入注册表。深链接可以使用 `#/material-submission/apply?id=demo-001`；路由按路径匹配，查询参数可从 `useHashRouter()` 返回的 `query`（`URLSearchParams`）读取。示例不会根据这些参数自动加载业务记录，参数含义仍需由项目确认。空 Hash 使用默认入口；未登记的地址显示明确提示及已有页面链接。
+
+按需在模块 `PAGE_FLOW.md` 中记录导航配置的引用位置、非菜单入口及返回/取消目标，保持登记源唯一。需要前后端协作时，在 `contracts/API_HANDOFF.md` 中确认菜单与路由的来源及其与服务端授权的边界。
+
 ### 快速新增一个页面
 
 这是面向简单页面的操作目标；实际用时取决于页面交互和规则复杂度。“不超过五分钟”仍是目标，尚未经过非开发产品经理计时验收。需要复做时，请使用[新增页面人测卡](docs/ADD_PAGE_TRIAL.md)。

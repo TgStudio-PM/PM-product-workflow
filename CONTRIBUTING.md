@@ -27,3 +27,5 @@ python maintainers/scripts/check_public_content.py --root .
 python maintainers/scripts/check_markdown_links.py .
 git diff --check
 ```
+
+`maintainers/scripts/check_public_content.py` 以及使用 `--base-ref` 的差异风险判断依赖 Git 文件清单、提交历史和 Git 命令，应在正式 Git 工作副本中运行。GitHub 的 Download ZIP 不包含 `.git` 元数据；若要参与仓库维护，请先获取 Git 工作副本。普通产品使用者请从[产品指南](docs/product/README.md)开始；产品模板和打包命令不因此要求 Git。

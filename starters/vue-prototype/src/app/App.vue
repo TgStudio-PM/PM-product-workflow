@@ -2,7 +2,7 @@
 import { pageRegistry } from './page-registry'
 import { useHashRouter } from './router'
 
-const { currentPath, activePage } = useHashRouter()
+const { currentPath, query, activePage } = useHashRouter()
 </script>
 
 <template>
@@ -26,11 +26,12 @@ const { currentPath, activePage } = useHashRouter()
         :key="page.path"
         class="nav-link"
         :class="{ active: currentPath === page.path }"
+        :aria-current="currentPath === page.path ? 'page' : undefined"
         :href="`#${page.path}`"
       >
         <span class="nav-mark" aria-hidden="true"></span>{{ page.menuLabel }}
       </a>
-      <div class="sidebar-note">
+      <div v-if="activePage" class="sidebar-note">
         <span>演示角色</span>
         <strong>{{ activePage.demoRole }}</strong>
         <small>仅用于说明原型页面上下文，不代表真实身份认证。</small>
@@ -38,8 +39,22 @@ const { currentPath, activePage } = useHashRouter()
     </aside>
 
     <main class="main-content">
-      <div class="breadcrumbs"><a href="#/overview">首页</a><span>/</span><strong>{{ activePage.title }}</strong></div>
-      <component :is="activePage.component" />
+      <template v-if="activePage">
+        <div class="breadcrumbs"><a href="#/overview">首页</a><span>/</span><strong>{{ activePage.title }}</strong></div>
+        <component :is="activePage.component" />
+      </template>
+      <template v-else>
+        <div class="breadcrumbs"><a href="#/overview">首页</a><span>/</span><strong>页面未找到</strong></div>
+        <section class="panel template-content not-found-panel" aria-labelledby="not-found-title">
+          <h1 id="not-found-title">页面未找到</h1>
+          <p>当前原型未登记该地址：</p>
+          <code class="not-found-path">{{ currentPath }}<template v-if="query.size">?{{ query.toString() }}</template></code>
+          <p>你可以返回已有页面：</p>
+          <ul class="not-found-links">
+            <li v-for="page in pageRegistry" :key="page.path"><a :href="`#${page.path}`">{{ page.title }}</a></li>
+          </ul>
+        </section>
+      </template>
       <footer class="page-footer">
         <span>Tg Studio · 虚构教学原型</span>
         <span>页面注册表驱动导航 · Hash 路由</span>

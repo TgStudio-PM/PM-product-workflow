@@ -362,6 +362,34 @@ test('rejects dynamic page metadata before building an offline package', async (
   assert.match(result.stderr, /title 必须是静态字符串/)
 })
 
+test('rejects a registered path containing a query during offline verification', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const registryPath = path.join(fixtureRoot, 'src', 'app', 'page-registry.ts')
+  const registry = await readFile(registryPath, 'utf8')
+  const originalPackage = await snapshotPreviewFiles(fixtureRoot)
+  await writeFile(registryPath, registry.replace("path: '/overview'", "path: '/overview?mode=1'"), 'utf8')
+
+  const result = verify(fixtureRoot)
+
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /登记 path 只写静态路径，查询参数放页面链接/)
+  assert.deepEqual(await snapshotPreviewFiles(fixtureRoot), originalPackage, '验包失败不应修改离线包文件或其 SHA 清单')
+})
+
+test('rejects a registered path containing a query before replacing the offline package', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const registryPath = path.join(fixtureRoot, 'src', 'app', 'page-registry.ts')
+  const registry = await readFile(registryPath, 'utf8')
+  const originalPackage = await snapshotPreviewFiles(fixtureRoot)
+  await writeFile(registryPath, registry.replace("path: '/overview'", "path: '/overview?mode=1'"), 'utf8')
+
+  const result = buildPreview(fixtureRoot)
+
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /登记 path 只写静态路径，查询参数放页面链接/)
+  assert.deepEqual(await snapshotPreviewFiles(fixtureRoot), originalPackage, '构建失败不应修改离线包文件或其 SHA 清单')
+})
+
 test('rejects a syntactically invalid registry during offline verification without modifying the package', async (t) => {
   const fixtureRoot = await createFixture(t)
   const registryPath = path.join(fixtureRoot, 'src', 'app', 'page-registry.ts')

@@ -12,7 +12,7 @@
     "test:page-new": "node --test tests/create-page.test.mjs",
     "test:facts-new": "node --test tests/create-facts.test.mjs",
     "typecheck": "vue-tsc --noEmit",
-    "test:preview-verify": "node --test tests/verify-preview.test.mjs tests/preview-pack.test.mjs"
+    "test:preview-verify": "node --test tests/verify-preview.test.mjs tests/preview-pack.test.mjs tests/hash-location.test.mjs"
   },
   "dependencies": {
     "vue": "^3.5.43"
