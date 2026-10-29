@@ -9,6 +9,7 @@
 - 页面：`pages/apply/Page.vue`；页面 mock：`pages/apply/mock.ts`。
 - 页面登记：`src/app/page-registry.ts`。
 - 草稿模型与浏览器存储适配：`data/use-application-draft.ts`、`data/browser-storage.ts`。
+- 说明长度当前执行值为 500，由 `data/limits.ts` 的 `DESCRIPTION_MAX_LENGTH` 供输入控件、计数和草稿读取共用；业务规则以 `BUSINESS_RULES.md` 的 BR-002 为准，调整值前需确认旧记录的读取处理策略。
 - 规则正文：本模块 `BUSINESS_RULES.md`、`DECISIONS.md`、`PAGE_FLOW.md`。
 - 数据只保存在当前浏览器的专用存储键；无文件上传、外部请求或真实办理。
 
