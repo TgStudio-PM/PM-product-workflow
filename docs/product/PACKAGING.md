@@ -20,6 +20,10 @@ ZIP README 还会提供可选的独立验包命令。验包脚本属于 PM-produ
 python <path-to-PM-product-workflow>/.agents/skills/pm-prototype-packager/scripts/package.py --verify <path-to-archive.zip>
 ```
 
+随包的交接材料以解压根目录为路径基准。在交付副本中改写本机定位、补齐被引用的必要事实，保留源项目原件；不要原样附入本机接力日志。源端验证日志未随包交付时，注明其覆盖范围及接收方需重新执行的检查。
+
+包生成后才取得的新验证结论，应绑定原候选的哈希另行记录，不回写或覆盖旧 ZIP。确需更新包内材料时，另用唯一文件名生成新候选，并重新验包、记录新哈希。
+
 ## 使用示例
 
 以下命令在仓库根目录的 Windows PowerShell 中运行。要求本机可调用 Python 3；打包脚本使用 Python 标准库。命令把产物写入本地忽略目录，避免把生成 ZIP 上传到公开仓库。
