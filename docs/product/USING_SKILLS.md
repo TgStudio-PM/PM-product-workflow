@@ -2,6 +2,8 @@
 
 本仓库的产品 Skills 是可复用的工作说明。根据本轮任务选择需要的 Skill，并把 **Skill 文件路径**和**你自己项目中的事实文件路径**明确提供给 Coding Agent。Codex 只是本仓库使用过的参考工具；其他工具是否自动发现或安装 Skill，取决于各自的能力和配置。不要假定所有工具都会自动读取 `.agents/skills/`，也不要把本仓库维护用的根目录 `AGENTS.md` 当作产品 Skill 或安装步骤。
 
+个人原型项目可选用[项目入口模板](../../templates/project/AGENTS_TEMPLATE.md)维护该项目自己的上下文指针；它与本仓库维护入口及下列工作流 Skills 职责不同，也不自动安装 Skills。
+
 完整需求迭代主链见[原型需求迭代与接续指南](PROTOTYPE_ITERATION.md)：先界定需求和影响，再在既有原型中修改、按业务路径验收、同步事实，最后按接收方交接并接收开发反馈。Skills 分别支撑这条链的事实维护、会话接续和按需交付；不是必须每轮全部调用的代理或自动化机制。
 
 `pm-prototype-memory` 和 `pm-prototype-handover` 是工作说明；提供 Skill 内容或可访问路径，并按任务提供自己工作区中的事实文件即可。`pm-prototype-packager` 还依赖其目录下的 `scripts/package.py`、`docs/product/PACKAGING.md` 和对应的 `examples/package-profiles/` 样例。推荐让 Coding Agent 将本仓库作为只读工具来源，同时让它访问使用者自己的项目和项目外输出目录。只提供或粘贴单个 `pm-prototype-packager/SKILL.md` 时，缺少脚本、指南和 Profile 样例，不能据此完成打包；不要假定任意工具会自动安装或发现这些资源。

@@ -20,7 +20,7 @@
 
 | 范围 | 已确认结果与证据 | 尚待验收 |
 | --- | --- | --- |
-| 核心工作流 | `pm-prototype-memory`、`pm-prototype-handover`、`pm-prototype-packager`，中文事实模板、可选 `gov-enterprise-cn` Profile 与完全虚构的四轮材料申报案例已交付；使用入口见[产品工作流指南](../docs/product/README.md)；[需求迭代主指南](../docs/product/PROTOTYPE_ITERATION.md)已提供；另有[R-TRIAL-01 Agent 隔离演练摘要](acceptance/2026-10-29-prototype-iteration-rehearsal.md)。 | 独立非开发产品经理完整主任务试用未完成；Profile 仅完成静态评审，不代表权威平台合规结论。 |
+| 核心工作流 | `pm-prototype-memory`、`pm-prototype-handover`、`pm-prototype-packager`，中文事实模板、可选 `gov-enterprise-cn` Profile 与完全虚构的四轮材料申报案例已交付；使用入口见[产品工作流指南](../docs/product/README.md)；[需求迭代主指南](../docs/product/PROTOTYPE_ITERATION.md)已提供；可选[个人原型项目入口模板](../templates/project/AGENTS_TEMPLATE.md)；另有[R-TRIAL-01 Agent 隔离演练摘要](acceptance/2026-10-29-prototype-iteration-rehearsal.md)。 | 独立非开发产品经理完整主任务试用未完成；Profile 仅完成静态评审，不代表权威平台合规结论。 |
 | 原生案例 | 最新版本 Node VM 7 项状态恢复检查、静态包结构与独立验包通过；Chrome、Edge 本地 HTTP 69 项检查通过，见 [ERR-20261028-004](errors/ERR-20261028-004.md)。 | 第二轮[历史 `file://` 记录](../examples/material-submission/facts/module/ITERATIONS.md)只适用于当时版本；第四轮及 Issue #140 最新版本尚未验 `file://`，HTTP 不能替代离线验收。 |
 | 可选 Vue starter | 蓝色布局、导航及独立源码包构建预览有 Chrome/Edge 本地 HTTP 证据，见[蓝色布局验收](acceptance/2026-10-28-vue-blue-layout.md)、[ERR-20261028-001](errors/ERR-20261028-001.md)和 [ERR-20261028-003](errors/ERR-20261028-003.md)。 | 新样式的 `file://` 与 Windows 真机 2K/125% 缩放尚未验收；Issue #75[旧版绿色包 `file://` 记录](acceptance/2026-10-28-issue75-browser-review.md)不代表新版。先收集实际反馈，不扩充功能面。 |
 | 后端需求材料 | 可定位案例事实、字段、流程和待确认接口。 | 仅为讨论材料；真实前后端契约未经共同确认，不代表生产 API。 |
