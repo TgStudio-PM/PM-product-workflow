@@ -20,15 +20,15 @@
 
 | 范围 | 已确认结果与证据 | 尚待验收 |
 | --- | --- | --- |
-| 核心工作流 | `pm-prototype-memory`、`pm-prototype-handover`、`pm-prototype-packager`，中文事实模板、可选 `gov-enterprise-cn` Profile 与完全虚构的四轮材料申报案例已交付；使用入口见[产品工作流指南](../docs/product/README.md)；[需求迭代主指南](../docs/product/PROTOTYPE_ITERATION.md)已提供；可选[个人原型项目入口模板](../templates/project/AGENTS_TEMPLATE.md)；另有[R-TRIAL-01 Agent 隔离演练摘要](acceptance/2026-10-29-prototype-iteration-rehearsal.md)。 | 独立非开发产品经理完整主任务试用未完成；Profile 仅完成静态评审，不代表权威平台合规结论。 |
-| 原生案例 | 最新版本 Node VM 7 项状态恢复检查、静态包结构与独立验包通过；Chrome、Edge 本地 HTTP 69 项检查通过，见 [ERR-20261028-004](errors/ERR-20261028-004.md)。 | 第二轮[历史 `file://` 记录](../examples/material-submission/facts/module/ITERATIONS.md)只适用于当时版本；第四轮及 Issue #140 最新版本尚未验 `file://`，HTTP 不能替代离线验收。 |
-| 可选 Vue starter | 蓝色布局、导航及独立源码包构建预览有 Chrome/Edge 本地 HTTP 证据，见[蓝色布局验收](acceptance/2026-10-28-vue-blue-layout.md)、[ERR-20261028-001](errors/ERR-20261028-001.md)和 [ERR-20261028-003](errors/ERR-20261028-003.md)。 | 新样式的 `file://` 与 Windows 真机 2K/125% 缩放尚未验收；Issue #75[旧版绿色包 `file://` 记录](acceptance/2026-10-28-issue75-browser-review.md)不代表新版。先收集实际反馈，不扩充功能面。 |
+| 核心工作流 | `pm-prototype-memory`、`pm-prototype-handover`、`pm-prototype-packager`，中文事实模板、可选 `gov-enterprise-cn` Profile 与完全虚构的四轮材料申报案例已交付；使用入口见[产品工作流指南](../docs/product/README.md)；[需求迭代主指南](../docs/product/PROTOTYPE_ITERATION.md)已提供；可选[个人原型项目入口模板](../templates/project/AGENTS_TEMPLATE.md)；另有[R-TRIAL-01 Agent 隔离演练摘要](acceptance/2026-10-29-prototype-iteration-rehearsal.md)和[Issue #156 文件验收与交付复核](acceptance/2026-10-29-workflow-delivery-validation.md)。已补充受影响规则索引与引用的同步要求。 | 独立非开发产品经理完整主任务试用未完成；Profile 仅完成静态评审，不代表权威平台合规结论。 |
+| 原生案例 | 最新版本 Node VM 7 项状态恢复检查、静态包结构与独立验包通过；Chrome、Edge 本地 HTTP 69 项检查通过，见 [ERR-20261028-004](errors/ERR-20261028-004.md)。本次公开源基线的 Chrome/Edge `file://` 自动化结果见[验收摘要](acceptance/2026-10-29-workflow-delivery-validation.md)。 | 自动化结果不证明手工双击关联、独立产品经理人测或 Windows 真机 2K/125% 缩放；HTTP 不能替代 `file://` 验收。 |
+| 可选 Vue starter | 蓝色布局、导航及独立源码包构建预览有 Chrome/Edge 本地 HTTP 证据，见[蓝色布局验收](acceptance/2026-10-28-vue-blue-layout.md)、[ERR-20261028-001](errors/ERR-20261028-001.md)和 [ERR-20261028-003](errors/ERR-20261028-003.md)。本次公开源基线与隔离交付候选的 `file://` 和包核验边界见[验收摘要](acceptance/2026-10-29-workflow-delivery-validation.md)。 | 工程自动化不是目标使用者验收；Windows 真机 2K/125% 缩放仍待实际反馈。Issue #75[旧版绿色包 `file://` 记录](acceptance/2026-10-28-issue75-browser-review.md)不代表新版。 |
 | 后端需求材料 | 可定位案例事实、字段、流程和待确认接口。 | 仅为讨论材料；真实前后端契约未经共同确认，不代表生产 API。 |
 
 ## 下一步
 
 1. R-TRIAL-01 Agent 隔离接续演练已完成（见上方摘要），不替代目标 PM 人测；下一步安排独立非开发 PM 完成一次桌面原型需求迭代与接续，并记录影响、业务路径验收、事实差异及适用交接。
-2. 分别对原生案例和 Vue starter 最新版本补做目标浏览器 `file://` 验收；收集 Windows 真机 2K/125% 的实际使用反馈，自动化密度模拟不能替代真机反馈，HTTP 不能替代 `file://`。
+2. 本次公开源基线和隔离交付候选的目标浏览器 `file://` 自动化验收已记录；收集 Windows 真机 2K/125% 的实际使用反馈，并保留手工打开与目标 PM 人测边界，自动化不能替代这些验收。
 3. 收集外部朋友反馈，并由独立非开发产品经理完成完整 v0.1 主流程人测；小页面计时仅作辅助工程观察，不替代该人测。根据独立人测判断 v0.1 是否达标；正式 Release 仍须另行明确授权。
 
 ## 阻塞与错误
