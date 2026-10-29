@@ -1,4 +1,5 @@
 import type { MaterialId } from '../pages/apply/mock'
+import { DESCRIPTION_MAX_LENGTH } from './limits'
 
 export interface ApplicationDraft {
   description: string
@@ -38,7 +39,7 @@ export function readApplicationDraft(isMaterialId: (value: unknown) => value is 
   return {
     status: 'available',
     draft: {
-      description: typeof saved.description === 'string' ? saved.description.slice(0, 500) : '',
+      description: typeof saved.description === 'string' ? saved.description.slice(0, DESCRIPTION_MAX_LENGTH) : '',
       checkedMaterials: Array.isArray(saved.checkedMaterials) ? saved.checkedMaterials.filter(isMaterialId) : [],
       submitted: saved.submitted === true,
     },

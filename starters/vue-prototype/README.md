@@ -78,3 +78,5 @@ npm run preview:verify
 本模板提供页面结构、注册表、共享 UI 组件和本地 mock 适配示例。它不提供真实 API、身份认证、权限、生产持久化、文件上传或后端处理。更多产品经理操作说明见 `docs/`。
 
 本 Vue 示例与仓库原生案例的页面、状态、规则和静态交付方式对照见[案例实现对照](docs/CASE_COMPARISON.md)。
+
+材料申报说明长度的页面限制与草稿读取上限共用 `src/modules/material-submission/data/limits.ts`；业务规则以模块 `facts/module/BUSINESS_RULES.md` 为准，调整上限前须确认旧记录的处理策略。

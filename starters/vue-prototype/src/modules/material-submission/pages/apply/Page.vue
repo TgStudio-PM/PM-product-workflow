@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import ConfirmDialog from '../../../../shared/components/ConfirmDialog.vue'
 import FormSection from '../../../../shared/components/FormSection.vue'
+import { DESCRIPTION_MAX_LENGTH } from '../../data/limits'
 import { useApplicationDraft } from '../../data/use-application-draft'
 import { applicationMock, type MaterialId } from './mock'
 
@@ -55,13 +56,13 @@ async function confirmReset() {
           id="application-description"
           v-model="draft.description"
           class="text-input description-input"
-          maxlength="500"
+          :maxlength="DESCRIPTION_MAX_LENGTH"
           placeholder="请填写虚构示例说明，不要填写真实个人或机构信息。"
           :disabled="submitted"
           :aria-invalid="showDescriptionError"
           @input="showDescriptionError = false"
         ></textarea>
-        <div class="field-meta"><small>去除首尾空白后必填，最多 500 字。</small><small>{{ descriptionCount }} / 500</small></div>
+        <div class="field-meta"><small>去除首尾空白后必填，最多 {{ DESCRIPTION_MAX_LENGTH }} 字。</small><small>{{ descriptionCount }} / {{ DESCRIPTION_MAX_LENGTH }}</small></div>
         <p v-if="showDescriptionError" class="field-error" role="alert">请填写申请说明后再提交。</p>
 
         <div class="materials-heading">
