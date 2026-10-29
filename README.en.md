@@ -2,21 +2,32 @@
 
 [简体中文](README.md) | [English](README.en.md)
 
-**A Coding Agent workflow for product managers building government and complex enterprise products, covering prototype iteration, context governance, and delivery.**
+**A desktop web prototype iteration and handoff workflow for product managers building government and complex enterprise products with Coding Agents.**
 
-PM-product-workflow keeps requirements, business rules, prototypes, reviews, validation, and handoffs in the project repository, so product managers and developers can maintain one consistent source of truth across multiple Coding Agent sessions.
+PM-product-workflow helps product managers and Coding Agents assess requirement changes, update an existing prototype, review business paths, sync evidence-based facts, and hand off work to the right recipient. Mobile adaptations may be made when a project needs them, but are not the primary target.
 
 > Repository is memory. Conversation is working context.
 
+## Start the product workflow
+
+Start with the [prototype iteration and continuation guide](docs/product/PROTOTYPE_ITERATION.md), then use the [product workflow entry](docs/product/README.md) to choose fact templates, existing Skills, and delivery guidance as needed. The main loop is:
+
+```text
+Requirement change → Clarify impact → Update the existing framework → Review business paths
+                    → Sync confirmed facts and version differences → Handoff → Feed back implementation findings
+```
+
+Navigation is not a complete requirements list. Requirements, prototype observations, and implementation notes are separate evidence. Mark unknown sources or versions as pending; do not infer confirmed requirements or production capability from code. Codex is one reference implementation; the method remains Coding Agent neutral.
+
 ### Try it
 
-You do not need to be a product manager or developer. Read the [external trial guide](docs/product/EXTERNAL_TRIAL.md), choose the no-tool basic trial or an optional AI/engineering track, and record what you actually did in the [feedback template](docs/product/TRIAL_REPORT_TEMPLATE.md). The guide is currently in Chinese.
+The primary trial task is for a product manager to complete one prototype iteration and handoff. AI may help, while the participant judges the result. Read the [external trial guide](docs/product/EXTERNAL_TRIAL.md) and record what was completed, skipped, or blocked in the [feedback template](docs/product/TRIAL_REPORT_TEMPLATE.md). Basic browsing, AI-only review, and engineering trials are supporting observations; they do not replace a target PM trial. The guide is currently in Chinese.
 
 ## Choose your path
 
 ### Use the product workflow
 
-If you want to apply this workflow to your own product project, begin with the [product workflow guide](docs/product/README.md), see [how to use the Skills](docs/product/USING_SKILLS.md), copy the files under `templates/`, and select a design profile from `profiles/`.
+To iterate a desktop web business prototype in your own project, start with the [main guide](docs/product/PROTOTYPE_ITERATION.md) and [product workflow entry](docs/product/README.md). Copy `templates/`, choose existing Skills for the task, and select a design profile from `profiles/` as needed. Keep authorized real materials in your own workspace; do not copy them into this public repository.
 
 Product users do not need to read the root `AGENTS.md` or `maintainers/` directory. Those files govern this public repository itself.
 
@@ -39,19 +50,9 @@ Government and complex enterprise web management systems
 
 This profile focuses on search and ledger pages, complex forms, material submission, batch operations, multi-role collaboration, status transitions, error prevention, and traceability. Codex is the first reference implementation, but the public method is not tied to a specific Coding Agent, frontend framework, or design system.
 
-## Workflow
+## Product scope and status
 
-```text
-Understand evidence → Confirm rules → Implement prototype → Review and revise
-                    → Sync facts → Validate → Deliver → Continue in a new session
-```
-
-At the end of each iteration, the project repository should answer:
-
-1. What changed?
-2. Which pages and business rules were affected?
-3. What has been validated, and what remains pending?
-4. Where should the next Coding Agent session continue?
+The first release focuses on desktop web management prototypes for government and complex enterprise product managers; mobile is not the primary target. Tg Studio is the example identity used in this repository. The Vue starter and fully fictional material-submission case are optional aids and do not represent real delivery quality. Page navigation is not a complete requirements list.
 
 ## Current contents
 
@@ -61,7 +62,7 @@ At the end of each iteration, the project repository should answer:
 | Optional government and complex enterprise web profile | Available and evolving; projects may override it | `profiles/gov-enterprise-cn/`, `templates/project/DESIGN_PROFILE.md` |
 | Page review template | Available; non-compliance findings require authoritative project-provided criteria | `profiles/gov-enterprise-cn/REVIEW_TEMPLATE.md` |
 | Fictional page review example | Available; see the example file | `examples/material-submission/reviews/gov-enterprise-cn.md` |
-| Product method and quick start | Available | `docs/product/` |
+| Product method and iteration guide | Guide provided; full target PM trial pending | `docs/product/PROTOTYPE_ITERATION.md`, `docs/product/README.md` |
 | `pm-prototype-memory` Skill | Delivered | `.agents/skills/pm-prototype-memory/SKILL.md` |
 | Fictional material-submission example | Four iterations documented: the first two revise page rules, the third practices interruption handoff, and the fourth fixes recovery from an invalid local submission state | `examples/material-submission/` |
 | Tg Studio Vue prototype starter | Delivered; optional to use | `starters/vue-prototype/` |
@@ -116,9 +117,12 @@ See the complete [open-source boundary](maintainers/OPEN_SOURCE_BOUNDARY.md). Pr
 - [x] Deliver the optional Tg Studio Vue prototype starter.
 - [x] Deliver `pm-prototype-handover`.
 - [x] Deliver three fictional delivery profiles, the packaging guide, and `pm-prototype-packager`.
+- [x] Provide a product guide centered on prototype iteration, fact sync, and continuation.
 - [ ] Complete the `gov-enterprise-cn` profile and v0.1 acceptance.
 
-The historical Chrome and Edge `file://` browser check is documented in the [October 21, 2026 v0.1 acceptance record](maintainers/acceptance/2026-10-21-v01-product-audit.md) and applies to the static package rebuilt at that time. The fourth iteration's native-case fix passed targeted Node VM tests, static preview package build and independent verification, and CI; `file://` interaction in target browsers has not been rechecked after this latest change. Testing by a non-developer product manager remains pending, and v0.1 has not been formally released.
+The PR141 native-case checks in Chrome 155 and Edge 155 passed for local HTTP recovery, the government-blue styling, and narrow-screen layout. See [ERR-20261028-004](maintainers/errors/ERR-20261028-004.md) for scope and limits. HTTP does not confirm offline `file://` interaction. The historical Chrome and Edge `file://` check applies to the static package rebuilt for the [October 21 acceptance record](maintainers/acceptance/2026-10-21-v01-product-audit.md); the latest native case and blue Vue page still need `file://` checks in their target environments.
+
+An independent non-developer product manager's full requirement-iteration and continuation trial remains pending. The five-minute simple-page target is an optional engineering-efficiency observation, with no target-PM timing acceptance evidence yet. Real interfaces and production behavior are unconfirmed; this repository does not claim production integration. Version 0.1 has not been formally released.
 
 ## Contributing and license
 
