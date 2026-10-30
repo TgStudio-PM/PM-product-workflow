@@ -4,6 +4,7 @@
   "name": "Tg Studio Vue 原型工程前端源码包",
   "output": "artifacts/vue-prototype-frontend-source.zip",
   "include": [
+    "UPSTREAM_LICENSE.txt",
     "package.json",
     "package-lock.json",
     "tsconfig.json",
@@ -21,6 +22,7 @@
     "docs/BACKEND_HANDOFF.md"
   ],
   "required": [
+    "UPSTREAM_LICENSE.txt",
     "package.json",
     "package-lock.json",
     "tsconfig.json",

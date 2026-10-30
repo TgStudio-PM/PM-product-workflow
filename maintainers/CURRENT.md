@@ -22,7 +22,7 @@
 | --- | --- | --- |
 | 核心工作流 | `pm-prototype-memory`、`pm-prototype-handover`、`pm-prototype-packager`，中文事实模板、可选 `gov-enterprise-cn` Profile 与完全虚构的四轮材料申报案例已交付；使用入口见[产品工作流指南](../docs/product/README.md)；[需求迭代主指南](../docs/product/PROTOTYPE_ITERATION.md)已提供；可选[个人原型项目入口模板](../templates/project/AGENTS_TEMPLATE.md)；另有[R-TRIAL-01 Agent 隔离演练摘要](acceptance/2026-10-29-prototype-iteration-rehearsal.md)和[Issue #156 文件验收与交付复核](acceptance/2026-10-29-workflow-delivery-validation.md)。已补充受影响规则索引与引用的同步要求。 | 独立非开发产品经理完整主任务试用未完成；Profile 仅完成静态评审，不代表权威平台合规结论。 |
 | 原生案例 | 最新版本 Node VM 7 项状态恢复检查、静态包结构与独立验包通过；Chrome、Edge 本地 HTTP 69 项检查通过，见 [ERR-20261028-004](errors/ERR-20261028-004.md)。本次公开源基线的 Chrome/Edge `file://` 自动化结果见[验收摘要](acceptance/2026-10-29-workflow-delivery-validation.md)。 | 自动化结果不证明手工双击关联、独立产品经理人测或 Windows 真机 2K/125% 缩放；HTTP 不能替代 `file://` 验收。 |
-| 可选 Vue starter | 蓝色布局、导航及独立源码包构建预览有 Chrome/Edge 本地 HTTP 证据，见[蓝色布局验收](acceptance/2026-10-28-vue-blue-layout.md)、[ERR-20261028-001](errors/ERR-20261028-001.md)和 [ERR-20261028-003](errors/ERR-20261028-003.md)。本次公开源基线与隔离交付候选的 `file://` 和包核验边界见[验收摘要](acceptance/2026-10-29-workflow-delivery-validation.md)。离线预览随包保留 Vue 固定运行组件完整许可说明，旧 7 文件预览需重建，详见[ERR-20261030-002](errors/ERR-20261030-002.md)。 | 工程自动化不是目标使用者验收；Windows 真机 2K/125% 缩放仍待实际反馈。Issue #75[旧版绿色包 `file://` 记录](acceptance/2026-10-28-issue75-browser-review.md)不代表新版。 |
+| 可选 Vue starter | 蓝色布局、导航及独立源码包构建预览有 Chrome/Edge 本地 HTTP 证据，见[蓝色布局验收](acceptance/2026-10-28-vue-blue-layout.md)、[ERR-20261028-001](errors/ERR-20261028-001.md)和 [ERR-20261028-003](errors/ERR-20261028-003.md)。本次公开源基线与隔离交付候选的 `file://` 和包核验边界见[验收摘要](acceptance/2026-10-29-workflow-delivery-validation.md)。离线预览随包保留 Vue 固定运行组件完整许可说明，见[ERR-20261030-002](errors/ERR-20261030-002.md)；示例交付另保留 Tg Studio 原有许可与归属，旧 Vue 预览需重建，见[ERR-20261030-003](errors/ERR-20261030-003.md)。 | 工程自动化不是目标使用者验收；Windows 真机 2K/125% 缩放仍待实际反馈。Issue #75[旧版绿色包 `file://` 记录](acceptance/2026-10-28-issue75-browser-review.md)不代表新版。 |
 | 后端需求材料 | 可定位案例事实、字段、流程和待确认接口。 | 仅为讨论材料；真实前后端契约未经共同确认，不代表生产 API。 |
 
 ## 下一步
@@ -34,7 +34,7 @@
 ## 阻塞与错误
 
 - 尚无独立非开发产品经理完成完整 v0.1 主流程人测；可选新增页面计时也尚无目标使用者记录，但不单独作为主流程阻塞。
-- 当前无未关闭错误，详见[错误记录目录](errors/)。Issue #140 截图复发已闭环；四张被覆盖的初始截图永久撤销验收用途，不能作为原始初始证据或新验收结果，见 [ERR-20261028-002](errors/ERR-20261028-002.md)。错误闭环不代表产品人测完成。
+- 当前无未关闭错误，详见[错误记录目录](errors/)。Issue #140 与 Issue #166 截图证据复发均已补采闭环；被覆盖的初始截图与原始 JSON 永久撤销验收用途，不能作为原始证据或新验收结果，详见 [ERR-20261028-002](errors/ERR-20261028-002.md)。错误闭环不代表产品人测完成。
 
 ## 更新规则
 

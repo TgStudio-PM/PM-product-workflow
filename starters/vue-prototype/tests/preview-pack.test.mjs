@@ -17,6 +17,7 @@ async function createMissingLicenseFixture(t) {
   await Promise.all([
     cp(path.join(starterRoot, 'scripts', 'build-preview.mjs'), path.join(fixtureRoot, 'scripts', 'build-preview.mjs')),
     cp(path.join(starterRoot, 'scripts', 'vue-runtime-notices.mjs'), path.join(fixtureRoot, 'scripts', 'vue-runtime-notices.mjs')),
+    cp(path.join(starterRoot, 'UPSTREAM_LICENSE.txt'), path.join(fixtureRoot, 'UPSTREAM_LICENSE.txt')),
   ])
 
   const runtimePackages = ['vue', '@vue/shared', '@vue/reactivity', '@vue/runtime-core', '@vue/runtime-dom']
@@ -76,4 +77,34 @@ test('preview:pack preserves the existing preview when an installed runtime lice
   assert.match(output, /无法读取 Vue 运行依赖 @vue\/runtime-dom\/LICENSE/)
   assert.equal(createHash('sha256').update(await readFile(existingPreview)).digest('hex'), oldHash)
   assert.deepEqual(await readdir(path.join(fixtureRoot, 'dist', 'preview')), ['previous-output.txt'])
+})
+
+test('preview build preserves the existing preview when the upstream license is missing or empty', async (t) => {
+  for (const input of ['missing', 'empty']) {
+    await t.test(input, async (t) => {
+      const fixtureRoot = await mkdtemp(path.join(os.tmpdir(), 'tg-studio-preview-upstream-missing-'))
+      t.after(() => rm(fixtureRoot, { recursive: true, force: true }))
+      await Promise.all([
+        cp(path.join(starterRoot, 'scripts'), path.join(fixtureRoot, 'scripts'), { recursive: true }),
+        cp(path.join(starterRoot, 'src'), path.join(fixtureRoot, 'src'), { recursive: true }),
+        cp(path.join(starterRoot, 'package.json'), path.join(fixtureRoot, 'package.json')),
+        symlink(path.join(starterRoot, 'node_modules'), path.join(fixtureRoot, 'node_modules'), process.platform === 'win32' ? 'junction' : 'dir'),
+      ])
+      if (input === 'empty') await writeFile(path.join(fixtureRoot, 'UPSTREAM_LICENSE.txt'), '  \n', 'utf8')
+      await mkdir(path.join(fixtureRoot, 'dist', 'preview'), { recursive: true })
+      const existingPreview = path.join(fixtureRoot, 'dist', 'preview', 'previous-output.txt')
+      await writeFile(existingPreview, 'prior preview remains intact', 'utf8')
+      const oldHash = createHash('sha256').update(await readFile(existingPreview)).digest('hex')
+
+      const result = spawnSync(process.execPath, [path.join(fixtureRoot, 'scripts', 'build-preview.mjs')], {
+        cwd: fixtureRoot,
+        encoding: 'utf8',
+      })
+      const output = `${result.stdout ?? ''}\n${result.stderr ?? ''}`
+      assert.notEqual(result.status, 0, output)
+      assert.match(output, /UPSTREAM_LICENSE\.txt 缺失或为空|ENOENT.*UPSTREAM_LICENSE\.txt/)
+      assert.equal(createHash('sha256').update(await readFile(existingPreview)).digest('hex'), oldHash)
+      assert.deepEqual(await readdir(path.join(fixtureRoot, 'dist', 'preview')), ['previous-output.txt'])
+    })
+  }
 })

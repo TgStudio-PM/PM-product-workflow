@@ -9,9 +9,11 @@
 - `src/modules/<模块>/data/`：页面数据源适配；示例中的 `browser-storage.ts` 是本地浏览器存储，不是 API。
 - `src/shared/components/`：可复用的查询、表格、表单、确认和详情 UI 组件。
 
-## 离线预览的依赖许可说明
+## 离线预览的许可说明
 
-`npm run preview:pack` 会从当前安装的 `vue`、`@vue/shared`、`@vue/reactivity`、`@vue/runtime-core` 和 `@vue/runtime-dom` 读取包名、版本、许可字段与完整 `LICENSE` 正文，生成 `dist/preview/THIRD_PARTY_NOTICES.txt`，并在预览清单与完整性摘要中登记。交付静态预览时应保留该文件；旧版七文件 Vue 预览需重新构建。此固定清单只覆盖上述 Vue 运行组件，不会自动审计新增的其他运行依赖；其他依赖应按实际使用内容维护。
+`UPSTREAM_LICENSE.txt` 随 starter 保留本仓库复用内容原有的许可与归属说明。它不会因为使用模板而自动给用户新增或无关代码指定 MIT 许可，也不表示私有资料可以公开。`npm run preview:pack` 会将该文件原文复制到 `dist/preview/UPSTREAM_LICENSE.txt`，并将其登记到清单和完整性摘要；专用验包会与当前 starter 源文件逐字节核对。
+
+同一预览包还包含独立的 `THIRD_PARTY_NOTICES.txt`：构建从当前安装的 `vue`、`@vue/shared`、`@vue/reactivity`、`@vue/runtime-core` 和 `@vue/runtime-dom` 读取包名、版本、许可字段与完整 `LICENSE` 正文。交付静态预览时应保留这两个许可文件；升级前生成的七文件或八文件 Vue 预览需重新构建。固定清单只覆盖上述 Vue 运行组件，不会自动审计新增的其他运行依赖；这些说明不构成完整依赖许可审计或法律结论。
 
 ## 接入后端前
 

@@ -4,12 +4,14 @@
   "name": "Tg Studio 虚构材料申报后端需求讨论包",
   "output": "artifacts/material-submission-backend-requirements.zip",
   "include": [
+    "UPSTREAM_LICENSE.txt",
     "docs/BACKEND_HANDOFF.md",
     "api-template/API_HANDOFF.md",
     "src/modules/material-submission/contracts",
     "src/modules/material-submission/facts/module"
   ],
   "required": [
+    "UPSTREAM_LICENSE.txt",
     "docs/BACKEND_HANDOFF.md",
     "api-template/API_HANDOFF.md",
     "src/modules/material-submission/contracts/README.md",
