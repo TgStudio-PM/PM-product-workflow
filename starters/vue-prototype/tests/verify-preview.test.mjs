@@ -51,6 +51,7 @@ async function createFixture(t) {
   await mkdir(path.join(fixtureRoot, 'scripts'), { recursive: true })
   await Promise.all([
     cp(path.join(starterRoot, 'scripts', 'build-preview.mjs'), path.join(fixtureRoot, 'scripts', 'build-preview.mjs')),
+    cp(path.join(starterRoot, 'scripts', 'vue-runtime-notices.mjs'), path.join(fixtureRoot, 'scripts', 'vue-runtime-notices.mjs')),
     cp(path.join(starterRoot, 'scripts', 'verify-preview.mjs'), path.join(fixtureRoot, 'scripts', 'verify-preview.mjs')),
     cp(path.join(starterRoot, 'scripts', 'page-registry.mjs'), path.join(fixtureRoot, 'scripts', 'page-registry.mjs')),
     cp(path.join(starterRoot, 'src'), path.join(fixtureRoot, 'src'), { recursive: true }),
@@ -131,6 +132,58 @@ test('builds the exact empty favicon declaration and verifies the generated pack
   assert.ok(html.includes('<link rel="icon" href="data:,">'))
   const result = verify(fixtureRoot)
   assert.equal(result.status, 0, result.stderr || result.stdout)
+})
+
+test('builds complete notices from installed Vue runtime package metadata and license files', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const buildResult = buildPreview(fixtureRoot)
+  assert.equal(buildResult.status, 0, buildResult.stderr || buildResult.stdout)
+
+  const previewRoot = path.join(fixtureRoot, 'dist', 'preview')
+  const noticeFile = 'THIRD_PARTY_NOTICES.txt'
+  const noticeText = await readFile(path.join(previewRoot, noticeFile), 'utf8')
+  const runtimePackages = ['vue', '@vue/shared', '@vue/reactivity', '@vue/runtime-core', '@vue/runtime-dom']
+  const licenseTexts = []
+  for (const packageName of runtimePackages) {
+    const packageRoot = path.join(starterRoot, 'node_modules', ...packageName.split('/'))
+    const metadata = JSON.parse(await readFile(path.join(packageRoot, 'package.json'), 'utf8'))
+    const licenseText = await readFile(path.join(packageRoot, 'LICENSE'), 'utf8')
+    assert.ok(noticeText.includes(`${metadata.name}@${metadata.version} (license: ${metadata.license})`))
+    assert.ok(noticeText.includes(licenseText), `${packageName} full LICENSE body should be retained verbatim`)
+    licenseTexts.push(licenseText)
+  }
+  assert.equal((noticeText.match(/----- BEGIN LICENSE TEXT -----/g) ?? []).length, new Set(licenseTexts).size)
+
+  const { manifest } = await readManifest(fixtureRoot)
+  assert.ok(manifest.files.includes(noticeFile))
+  assert.ok((await readFile(path.join(previewRoot, 'README.md'), 'utf8')).includes(noticeFile))
+  const verifyResult = verify(fixtureRoot)
+  assert.equal(verifyResult.status, 0, verifyResult.stderr || verifyResult.stdout)
+})
+
+test('rejects a missing third-party notice file', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  await rm(path.join(fixtureRoot, 'dist', 'preview', 'THIRD_PARTY_NOTICES.txt'), { force: true })
+
+  const result = verify(fixtureRoot)
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /缺少必要产物：THIRD_PARTY_NOTICES\.txt/)
+})
+
+test('rejects a re-signed stale third-party notice body', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const noticePath = path.join(fixtureRoot, 'dist', 'preview', 'THIRD_PARTY_NOTICES.txt')
+  const current = await readFile(noticePath, 'utf8')
+  const vueMetadata = JSON.parse(await readFile(path.join(starterRoot, 'node_modules', 'vue', 'package.json'), 'utf8'))
+  const stale = current.replace(`${vueMetadata.name}@${vueMetadata.version}`, `${vueMetadata.name}@0.0.0`)
+  assert.notEqual(stale, current)
+  await writeFile(noticePath, stale, 'utf8')
+  await updateContentHash(fixtureRoot, 'THIRD_PARTY_NOTICES.txt')
+
+  const result = verify(fixtureRoot)
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /THIRD_PARTY_NOTICES\.txt 与当前安装的 Vue 运行依赖许可说明不一致/)
+  assert.doesNotMatch(result.stderr, /文件校验值不匹配：THIRD_PARTY_NOTICES\.txt/)
 })
 
 test('continues to verify an existing package without a favicon declaration', async (t) => {

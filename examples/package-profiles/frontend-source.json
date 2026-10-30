@@ -41,6 +41,7 @@
     "module-template/facts/module/ERROR_LEDGER.md",
     "api-template/API_HANDOFF.md",
     "scripts/build-preview.mjs",
+    "scripts/vue-runtime-notices.mjs",
     "scripts/page-registry.mjs",
     "scripts/verify-preview.mjs",
     "tests/verify-preview.test.mjs",

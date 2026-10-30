@@ -72,6 +72,8 @@ Pop-Location
 
 依赖安装和命令运行属于源码包的工程验证。`npm run test:preview-verify` 会在隔离临时副本检查正常包及 manifest/摘要异常能否被拒绝。它们不代表产品规则正确，也不替代在接收方目标浏览器和运行环境中的验收。`npm run preview:pack` 产生的静态预览目录可另行按静态预览方式检查。
 
+Vue starter 的 `npm run preview:pack` 会随离线预览生成 `THIRD_PARTY_NOTICES.txt`，内容取自当前安装的 Vue 运行组件包名、版本、许可字段和完整 `LICENSE` 正文；清单与摘要会一并校验。若再将该目录制作为独立静态 ZIP，应确保白名单包含此文件；旧版七文件 Vue 预览需重新构建。该固定清单只覆盖已确认的 Vue 运行组件，其他新增运行依赖需按实际使用单独维护，不构成全依赖许可审计。
+
 <a id="backend-requirements-package"></a>
 ### 后端需求材料包
 
