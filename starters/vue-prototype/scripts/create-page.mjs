@@ -241,7 +241,8 @@ export async function createPage({ root = process.cwd(), module, page, title }) 
       await rename(registryTempPath, registryPath)
       registryTempExists = false
     } catch (error) {
-      throw new Error(`页面文件已创建，但注册表未更新；请保留文件并手动检查 page-registry.ts（${error.message}）。`)
+      const createdDirectory = path.relative(projectRoot, targetDirectory).split(path.sep).join('/')
+      throw new Error(`页面文件已创建：${createdDirectory}；src/app/page-registry.ts 未更新。请按 docs/ADD_PAGE.md「部分完成后的接续」核对并补充注册项；直接重复 page:new 会因目标目录已存在而被拒绝。原始错误：${error.message}`)
     }
   } finally {
     if (stagingExists) await rm(stagingDirectory, { recursive: true, force: true })

@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
+import fsPromises from 'node:fs/promises'
 import { mkdtemp, mkdir, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises'
+import { syncBuiltinESMExports } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
 import { test } from 'node:test'
@@ -148,6 +151,58 @@ test('rejects an import identifier collision without changing files', async (t) 
   await assert.rejects(createPage({ root, module: 'demo-help', page: 'guide', title: '演示帮助' }), /导入名 .* 已存在/)
   assert.equal(await readFile(registryPath, 'utf8'), before)
   assert.equal(await readdir(path.join(root, 'src', 'modules')).catch((error) => error.code), 'ENOENT')
+})
+
+test('explains how to continue when the page is created but registry replacement fails', async (t) => {
+  const root = await createProjectFixture(t)
+  const target = path.join(root, 'src', 'modules', 'demo-help', 'pages', 'guide')
+  const registryPath = path.join(root, 'src', 'app', 'page-registry.ts')
+  const registryBefore = await readFile(registryPath)
+  const originalRename = fsPromises.rename
+  fsPromises.rename = async (source, destination, ...args) => {
+    if (destination === registryPath) {
+      const error = new Error('controlled registry rename failure')
+      error.code = 'EPERM'
+      throw error
+    }
+    return originalRename(source, destination, ...args)
+  }
+  syncBuiltinESMExports()
+
+  try {
+    await assert.rejects(
+      createPage({ root, module: 'demo-help', page: 'guide', title: '演示帮助' }),
+      (error) => {
+        assert.match(error.message, /页面文件已创建：src\/modules\/demo-help\/pages\/guide/)
+        assert.match(error.message, /src\/app\/page-registry\.ts 未更新/)
+        assert.match(error.message, /docs\/ADD_PAGE\.md「部分完成后的接续」/)
+        assert.match(error.message, /直接重复 page:new 会因目标目录已存在而被拒绝/)
+        assert.match(error.message, /controlled registry rename failure/)
+        return true
+      },
+    )
+  } finally {
+    fsPromises.rename = originalRename
+    syncBuiltinESMExports()
+  }
+
+  assert.deepEqual((await readdir(target)).sort(), ['Page.vue', 'RULES.md', 'mock.ts'])
+  assert.deepEqual(await readFile(registryPath), registryBefore)
+  const pageHashes = await Promise.all(
+    ['Page.vue', 'mock.ts', 'RULES.md'].map(async (filename) => [
+      filename,
+      await readFile(path.join(target, filename)).then((content) => createHash('sha256').update(content).digest('hex')),
+    ]),
+  )
+  await assert.rejects(
+    createPage({ root, module: 'demo-help', page: 'guide', title: '演示帮助' }),
+    /目标目录已存在，不会覆盖/,
+  )
+  assert.deepEqual((await readdir(target)).sort(), ['Page.vue', 'RULES.md', 'mock.ts'])
+  assert.deepEqual(await readFile(registryPath), registryBefore)
+  for (const [filename, hash] of pageHashes) {
+    assert.equal(createHash('sha256').update(await readFile(path.join(target, filename))).digest('hex'), hash)
+  }
 })
 
 test('rejects a symlinked module output parent without writing outside the project', async (t) => {
