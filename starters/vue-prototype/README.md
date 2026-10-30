@@ -79,4 +79,4 @@ npm run preview:verify
 
 本 Vue 示例与仓库原生案例的页面、状态、规则和静态交付方式对照见[案例实现对照](docs/CASE_COMPARISON.md)。
 
-材料申报说明长度的页面限制与草稿读取上限共用 `src/modules/material-submission/data/limits.ts`；业务规则以模块 `facts/module/BUSINESS_RULES.md` 为准，调整上限前须确认旧记录的处理策略。
+材料申报说明的输入、计数、提交和恢复有效性检查共用 `src/modules/material-submission/data/limits.ts` 中的上限；读取旧记录时保留全文，不按上限截断。超限正文可编辑和暂存，修正后才可提交；超限的旧“已提交”记录按草稿恢复，详见[模块当前状态](src/modules/material-submission/facts/module/CURRENT.md)。业务规则以模块 `facts/module/BUSINESS_RULES.md` 为准，调整上限前须确认旧记录的处理策略。
