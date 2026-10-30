@@ -51,6 +51,26 @@ class PackageTests(unittest.TestCase):
         package.build(self.source, self.profile_path, self.output)
         package.verify(self.output)
 
+    def write_resigned_archive(self, path: Path, payload: dict[str, bytes]) -> None:
+        payload = {"README.md": b"Fictional fixture", **payload}
+        files = {name: package._sha(content) for name, content in sorted(payload.items())}
+        manifest = {
+            "schema_version": 1,
+            "kind": "backend-requirements",
+            "name": "Fictional fixture",
+            "entry": "contract.md",
+            "required": ["contract.md"],
+            "pages": [],
+            "files": files,
+        }
+        manifest_bytes = (json.dumps(manifest, indent=2) + "\n").encode("utf-8")
+        sums = "".join(f"{digest}  {name}\n" for name, digest in sorted(files.items())).encode("utf-8")
+        with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+            for name, content in payload.items():
+                archive.writestr(name, content)
+            archive.writestr("manifest.json", manifest_bytes)
+            archive.writestr("SHA256SUMS", sums)
+
     def test_builds_all_three_delivery_kinds_with_allowlist(self) -> None:
         scenarios = [
             ("static-preview", {"index.html": '<script src="app.js"></script><link rel="stylesheet" href="app.css">', "app.js": "ok", "app.css": "body{}"}, ["index.html", "app.js", "app.css"], "index.html", {"pages": ["index.html"]}),
@@ -409,6 +429,83 @@ class PackageTests(unittest.TestCase):
         self.profile("frontend-source", ["../secret.txt"], ["../secret.txt"], "../secret.txt")
         with self.assertRaisesRegex(package.PackageError, "PROFILE-01"):
             package.build(self.source, self.profile_path, self.output)
+
+    def test_rejects_ascii_space_or_period_at_end_of_path_components(self) -> None:
+        cases = (
+            "folder./file.txt",
+            "folder /file.txt",
+            "folder/file.",
+            "folder/file ",
+        )
+        self.output.write_bytes(b"previous candidate")
+        for rel in cases:
+            with self.subTest(rel=rel):
+                self.profile("frontend-source", [rel], [rel], rel)
+                with self.assertRaisesRegex(package.PackageError, "PROFILE-01"):
+                    package.build(self.source, self.profile_path, self.output)
+                self.assertEqual(self.output.read_bytes(), b"previous candidate")
+
+    def test_rejects_ascii_trailing_character_in_required_profile_path(self) -> None:
+        self.write("contract.md")
+        self.profile("backend-requirements", ["contract.md"], ["contract.md."], "contract.md")
+        with self.assertRaisesRegex(package.PackageError, "PROFILE-01"):
+            package.build(self.source, self.profile_path, self.output)
+
+    def test_accepts_normal_unicode_dotfiles_internal_spaces_and_nested_paths(self) -> None:
+        self.write("contract.md")
+        self.write("docs/README.md", "fictional nested readme")
+        self.write("docs/.private/中文 文件/guide.v1.md", "fictional nested guide")
+        self.profile(
+            "backend-requirements",
+            ["contract.md", "docs"],
+            ["contract.md"],
+            "contract.md",
+        )
+        self.build_and_verify()
+
+    def test_build_rejects_file_parent_conflicts_without_overwriting_output(self) -> None:
+        self.profile("backend-requirements", ["contract.md"], ["contract.md"], "contract.md")
+        collisions = (
+            {"contract.md": b"fictional", "slot": b"file", "slot/child.txt": b"child"},
+            {"contract.md": b"fictional", "slot/child.txt": b"child", "slot": b"file"},
+            {"contract.md": b"fictional", "Slot": b"file", "slot/child.txt": b"child"},
+            {"contract.md": b"fictional", "README.md/child.txt": b"metadata conflict"},
+        )
+        for files in collisions:
+            with self.subTest(paths=tuple(files)):
+                self.output.write_bytes(b"previous candidate")
+                with patch.object(package, "_collect_files", return_value=files):
+                    with self.assertRaisesRegex(package.PackageError, "SOURCE-03"):
+                        package.build(self.source, self.profile_path, self.output)
+                self.assertEqual(self.output.read_bytes(), b"previous candidate")
+
+    def test_verify_rejects_signed_file_parent_conflicts_in_any_order(self) -> None:
+        cases = (
+            {"contract.md": b"fictional", "slot": b"file", "slot/child.txt": b"child"},
+            {"contract.md": b"fictional", "slot/child.txt": b"child", "slot": b"file"},
+            {"contract.md": b"fictional", "Slot": b"file", "slot/child.txt": b"child"},
+            {"contract.md": b"fictional", "README.md/child.txt": b"metadata conflict"},
+        )
+        for index, payload in enumerate(cases):
+            with self.subTest(paths=tuple(payload)):
+                forged = self.root / f"file-parent-conflict-{index}.zip"
+                self.write_resigned_archive(forged, payload)
+                with self.assertRaisesRegex(package.PackageError, "VERIFY-01"):
+                    package.verify(forged)
+
+    def test_verify_rejects_signed_paths_with_trailing_ascii_space_or_period(self) -> None:
+        cases = (
+            {"contract.md": b"fictional", "notes/readme": b"base", "notes/readme.": b"dot alias"},
+            {"contract.md": b"fictional", "notes/readme": b"base", "notes/readme ": b"space alias"},
+            {"contract.md": b"fictional", "folder./child.txt": b"dot parent"},
+            {"contract.md": b"fictional", "folder /child.txt": b"space parent"},
+        )
+        for index, payload in enumerate(cases):
+            with self.subTest(paths=tuple(payload)):
+                forged = self.root / f"trailing-path-component-{index}.zip"
+                self.write_resigned_archive(forged, payload)
+                with self.assertRaisesRegex(package.PackageError, "PROFILE-01"):
+                    package.verify(forged)
 
     def test_rejects_non_string_profile_kind(self) -> None:
         for kind in ({"unexpected": "object"}, ["static-preview"]):

@@ -50,6 +50,8 @@ def _safe_relative(value: object, label: str) -> PurePosixPath:
     path = PurePosixPath(value)
     if not path.parts or path.is_absolute() or any(part in {"", ".", ".."} for part in path.parts):
         raise PackageError(f"PROFILE-01 {label}: unsafe relative path")
+    if any(part.endswith((" ", ".")) for part in path.parts):
+        raise PackageError(f"PROFILE-01 {label}: path components cannot end in an ASCII space or period")
     if path.parts and re.match(r"^[A-Za-z]:", path.parts[0]):
         raise PackageError(f"PROFILE-01 {label}: drive-qualified path is not allowed")
     if any(part.casefold() in FORBIDDEN_SEGMENTS for part in path.parts):
@@ -112,6 +114,15 @@ def _check_sensitive_filename(path: PurePosixPath) -> None:
     if (name == ".env" or name.startswith(".env.") or name in SENSITIVE_EXACT_NAMES
             or PurePosixPath(name).suffix in SENSITIVE_SUFFIXES):
         raise PackageError("SOURCE-06 sensitive filename or credential file type is not allowed")
+
+
+def _check_file_tree(paths: Iterable[str], error: str) -> None:
+    """Reject file paths whose case-insensitive parent is also a file path."""
+    folded_paths = {path.casefold() for path in paths}
+    for path in folded_paths:
+        parts = path.split("/")
+        if any("/".join(parts[:index]) in folded_paths for index in range(1, len(parts))):
+            raise PackageError(error)
 
 
 def _collect_files(root: Path, profile: dict) -> dict[str, bytes]:
@@ -515,6 +526,10 @@ def build(source: Path, profile_path: Path, output: Path | None = None) -> None:
     }
     manifest_bytes = (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
     sums = "".join(f"{digest}  {name}\n" for name, digest in sorted(manifest["files"].items())).encode("utf-8")
+    _check_file_tree(
+        [*files, "manifest.json", "SHA256SUMS"],
+        "SOURCE-03 source files conflict with an archive parent path",
+    )
     destination.parent.mkdir(parents=True, exist_ok=True)
     temporary_path: Path | None = None
     try:
@@ -549,6 +564,7 @@ def verify(archive_path: Path) -> None:
             names = [info.filename for info in infos]
             if len(names) != len(set(name.casefold() for name in names)):
                 raise PackageError("VERIFY-01 archive has duplicate or case-colliding paths")
+            _check_file_tree(names, "VERIFY-01 archive has a file/parent path conflict")
             if any(_is_directory_or_special_entry(info) for info in infos):
                 raise PackageError("VERIFY-02 archive contains directory or non-regular file entries")
             for name in names:
