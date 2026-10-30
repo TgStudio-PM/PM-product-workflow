@@ -60,10 +60,12 @@ async function confirmReset() {
           placeholder="请填写虚构示例说明，不要填写真实个人或机构信息。"
           :disabled="submitted"
           :aria-invalid="showDescriptionError"
-          @input="showDescriptionError = false"
+          @input="showDescriptionError = descriptionCount > DESCRIPTION_MAX_LENGTH"
         ></textarea>
         <div class="field-meta"><small>去除首尾空白后必填，最多 {{ DESCRIPTION_MAX_LENGTH }} 字。</small><small>{{ descriptionCount }} / {{ DESCRIPTION_MAX_LENGTH }}</small></div>
-        <p v-if="showDescriptionError" class="field-error" role="alert">请填写申请说明后再提交。</p>
+        <p v-if="showDescriptionError" class="field-error" role="alert">
+          {{ descriptionCount > DESCRIPTION_MAX_LENGTH ? `申请说明最多填写 ${DESCRIPTION_MAX_LENGTH} 字。原内容已保留，请修改后提交。` : '请填写申请说明后再提交。' }}
+        </p>
 
         <div class="materials-heading">
           <div><strong>申报材料</strong><small>勾选表示已备齐，不会上传文件。</small></div>

@@ -46,6 +46,7 @@
     "scripts/vue-runtime-notices.mjs",
     "scripts/page-registry.mjs",
     "scripts/verify-preview.mjs",
+    "tests/application-draft.test.mjs",
     "tests/verify-preview.test.mjs",
     "tests/create-page.test.mjs",
     "tests/create-facts.test.mjs",

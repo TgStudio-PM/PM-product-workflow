@@ -78,3 +78,11 @@
 - 修复：提交 `0f4653d2c0873a1f7b2e37c4bfd30aba1d77cbcd` 仅修改 CSS/HTML。手机长提示完整换行，标题/提示与材料计数改为上下排；移除固定材料卡高度以避免字体放大时裁切。主色为 `#1d63b8`、hover 为 `#174f93`；辅助文字至少 12px、常用文字 14px、按钮高 40px、宽屏容器最大 1600px。HTML 增加空 favicon。JS、业务文案、BR 与材料规则未变。
 - 机器验证：Node 状态恢复回归 7 项、`node --check examples/material-submission/app.js` 和差异检查通过。此前原生 HTTP 预览的 `/favicon.ico` 404 是伴随请求问题，空 favicon 声明沿用 [ERR-20261028-003](../../../../maintainers/errors/ERR-20261028-003.md) 所述入口防护经验，不代表 Vue 回归。
 - 浏览器验收：修复后的 `static-preview` 包独立验包通过；Chrome、Edge HTTP 恢复矩阵及 1280×800、390×844、2048×1050/DSF 1.25 视口检查通过，390px 长提示完整换行。验收摘要与包哈希见 [ERR-20261028-004](../../../../maintainers/errors/ERR-20261028-004.md)；截图证据复采与旧证据保护结果见 [ERR-20261028-002](../../../../maintainers/errors/ERR-20261028-002.md)。HTTP 不等同 `file://` 离线验收；2048px/DSF 1.25 不等同 Windows 真机 125% 缩放；AI/非 PM 结果不替代独立非开发 PM 人测，也不代表正式 Release。
+
+### 2026-10-30 补充：Issue #168 超长本地说明恢复
+
+- 输入：[Issue #168](https://github.com/TgStudio-PM/PM-product-workflow/issues/168)。修复前的 Chrome `file://` 四例复现见 [ERR-20261026-007](../../../../maintainers/errors/ERR-20261026-007.md)；其基线是旧源码，不能当作修复后验收。
+- 修复边界：本地读取保留完整说明；超过既有 500 字上限的草稿可编辑和暂存，但提交受阻并提示修正。超过上限的“已提交”记录恢复为草稿，尝试更正存储并提示成功或失败。字数上限、材料规则及存储结构不变。
+- 机器验证：修复后的原生 Node VM 状态恢复回归 12 项通过，`node --check` 通过。该结果不等同于 Chrome/Edge `file://` 产品验收。
+- 浏览器定向验证：Chrome 155 与 Edge 156 `file://` 原生案例共 8 个流程 case 通过；和 Vue 的 8 个 case 合计 16 个，0 case fail、0 unrun。覆盖修正后 native 行为，不等于旧源 108-case 矩阵或独立 PM 人测。采集结束有 fatal 1，完整性收尾另行 exit 0；分层结果见 [ERR-20261026-007](../../../../maintainers/errors/ERR-20261026-007.md)。
+- 后续验收：最终 warning 修复后的干净源码验证已完成；CI 以关联 PR 最终提交对应结果为准。Windows 真机 2K/125% 缩放、手工双击和独立非开发产品经理人测仍待验。
