@@ -32,6 +32,15 @@ npm run facts:new -- demo-help
 2. 在页面目录维护 `mock.ts`、`Page.vue` 和 `RULES.md`。
 3. 在 `src/app/page-registry.ts` 增加组件导入和静态注册项。注册表同时驱动页面切换与导航；通常无需修改 `src/app/router.ts`。每个路由应唯一。
 
+## 部分完成后的接续
+
+如果 `page:new` 提示页面目录已创建、但 `src/app/page-registry.ts` 未更新，不要直接重跑命令；目标目录已存在，重试会被拒绝。按当前文件现场继续：
+
+1. 在项目根目录检查目标目录中的 `Page.vue`、`mock.ts` 和 `RULES.md`；若项目使用 Git，同时核对 `git status --short`，保留已有修改。
+2. 检查 `src/app/page-registry.ts` 当前是否已有目标页面的组件导入和静态路由。已存在时不要重复添加。
+3. 若缺失，按上文“手动新增方式”只补相应导入和注册项；保留注册表中的其他现有变更，不用旧快照覆盖整个文件。
+4. 运行 `npm run typecheck` 和 `npm run preview:pack`，并从入口核对新页面及相关旧页面；在已有模块 `CURRENT.md` 或接续记录中简记失败现场和下一步，不必为此新建文件。
+
 离线预览打包会逐项读取注册表的 `path` 和 `title`。两者需使用确定的字符串，字段先后顺序不限；动态计算的标题或路径会在打包时被明确拒绝。
 
 ## 验收与离线预览
