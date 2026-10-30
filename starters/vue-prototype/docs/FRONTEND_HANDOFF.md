@@ -9,6 +9,10 @@
 - `src/modules/<模块>/data/`：页面数据源适配；示例中的 `browser-storage.ts` 是本地浏览器存储，不是 API。
 - `src/shared/components/`：可复用的查询、表格、表单、确认和详情 UI 组件。
 
+## 离线预览的依赖许可说明
+
+`npm run preview:pack` 会从当前安装的 `vue`、`@vue/shared`、`@vue/reactivity`、`@vue/runtime-core` 和 `@vue/runtime-dom` 读取包名、版本、许可字段与完整 `LICENSE` 正文，生成 `dist/preview/THIRD_PARTY_NOTICES.txt`，并在预览清单与完整性摘要中登记。交付静态预览时应保留该文件；旧版七文件 Vue 预览需重新构建。此固定清单只覆盖上述 Vue 运行组件，不会自动审计新增的其他运行依赖；其他依赖应按实际使用内容维护。
+
 ## 接入后端前
 
 1. 与后端确认接口 URL、方法、请求/响应、认证、错误结构和持久化行为，并更新合同文件。

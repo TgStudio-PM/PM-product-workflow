@@ -3,11 +3,12 @@ import { readdir, readFile, stat } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { formatPagesMarkdown, readRegisteredPages } from './page-registry.mjs'
+import { generateVueRuntimeNotices, THIRD_PARTY_NOTICES_FILE } from './vue-runtime-notices.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const output = path.join(root, 'dist', 'preview')
-const allowedFiles = new Set(['index.html', 'app.js', 'styles.css', 'README.md', 'PAGES.md', 'manifest.json', 'SHA256SUMS'])
-const contentFiles = ['index.html', 'app.js', 'styles.css', 'README.md', 'PAGES.md']
+const allowedFiles = new Set(['index.html', 'app.js', 'styles.css', 'README.md', 'PAGES.md', THIRD_PARTY_NOTICES_FILE, 'manifest.json', 'SHA256SUMS'])
+const contentFiles = ['index.html', 'app.js', 'styles.css', 'README.md', 'PAGES.md', THIRD_PARTY_NOTICES_FILE]
 const hashFiles = [...contentFiles, 'manifest.json']
 const errors = []
 
@@ -30,7 +31,7 @@ try {
   }
   for (const file of allowedFiles) if (!names.has(file)) issue(`缺少必要产物：${file}`)
 
-  for (const required of ['index.html', 'app.js', 'styles.css', 'README.md', 'PAGES.md', 'manifest.json', 'SHA256SUMS']) {
+  for (const required of [...contentFiles, 'manifest.json', 'SHA256SUMS']) {
     if (names.has(required) && !(await stat(path.join(output, required))).isFile()) issue(`产物不是普通文件：${required}`)
   }
 
@@ -39,6 +40,13 @@ try {
   const css = await readFile(path.join(output, 'styles.css'), 'utf8')
   const manifest = JSON.parse(await readFile(path.join(output, 'manifest.json'), 'utf8'))
   const sumsText = await readFile(path.join(output, 'SHA256SUMS'), 'utf8')
+  const expectedRuntimeNotices = await generateVueRuntimeNotices(root)
+  if (names.has(THIRD_PARTY_NOTICES_FILE)) {
+    const actualRuntimeNotices = await readFile(path.join(output, THIRD_PARTY_NOTICES_FILE), 'utf8')
+    if (actualRuntimeNotices !== expectedRuntimeNotices) issue(`${THIRD_PARTY_NOTICES_FILE} 与当前安装的 Vue 运行依赖许可说明不一致。`)
+  }
+  const readme = await readFile(path.join(output, 'README.md'), 'utf8')
+  if (!readme.includes(THIRD_PARTY_NOTICES_FILE)) issue(`README.md 未说明随包提供 ${THIRD_PARTY_NOTICES_FILE}。`)
 
   const htmlForResourceScan = html.replace('<link rel="icon" href="data:,">', '')
   const references = [...htmlForResourceScan.matchAll(/(?:src|href)=["']([^"']+)["']/gi)].map((match) => match[1])
