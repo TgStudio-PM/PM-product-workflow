@@ -6,12 +6,14 @@
   "include": [
     "index.html",
     "app.js",
-    "styles.css"
+    "styles.css",
+    "UPSTREAM_LICENSE.txt"
   ],
   "required": [
     "index.html",
     "app.js",
-    "styles.css"
+    "styles.css",
+    "UPSTREAM_LICENSE.txt"
   ],
   "entry": "index.html",
   "pages": [

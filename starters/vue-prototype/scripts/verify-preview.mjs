@@ -7,8 +7,8 @@ import { generateVueRuntimeNotices, THIRD_PARTY_NOTICES_FILE } from './vue-runti
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const output = path.join(root, 'dist', 'preview')
-const allowedFiles = new Set(['index.html', 'app.js', 'styles.css', 'README.md', 'PAGES.md', THIRD_PARTY_NOTICES_FILE, 'manifest.json', 'SHA256SUMS'])
-const contentFiles = ['index.html', 'app.js', 'styles.css', 'README.md', 'PAGES.md', THIRD_PARTY_NOTICES_FILE]
+const allowedFiles = new Set(['index.html', 'app.js', 'styles.css', 'README.md', 'PAGES.md', THIRD_PARTY_NOTICES_FILE, 'UPSTREAM_LICENSE.txt', 'manifest.json', 'SHA256SUMS'])
+const contentFiles = ['index.html', 'app.js', 'styles.css', 'README.md', 'PAGES.md', THIRD_PARTY_NOTICES_FILE, 'UPSTREAM_LICENSE.txt']
 const hashFiles = [...contentFiles, 'manifest.json']
 const errors = []
 
@@ -40,6 +40,14 @@ try {
   const css = await readFile(path.join(output, 'styles.css'), 'utf8')
   const manifest = JSON.parse(await readFile(path.join(output, 'manifest.json'), 'utf8'))
   const sumsText = await readFile(path.join(output, 'SHA256SUMS'), 'utf8')
+  if (names.has('UPSTREAM_LICENSE.txt')) {
+    const [actualUpstreamLicense, expectedUpstreamLicense] = await Promise.all([
+      readFile(path.join(output, 'UPSTREAM_LICENSE.txt')),
+      readFile(path.join(root, 'UPSTREAM_LICENSE.txt')),
+    ])
+    if (!expectedUpstreamLicense.toString('utf8').trim()) issue('UPSTREAM_LICENSE.txt 源文件为空或仅含空白。')
+    if (!actualUpstreamLicense.equals(expectedUpstreamLicense)) issue('UPSTREAM_LICENSE.txt 与 starter 源文件不一致。')
+  }
   const expectedRuntimeNotices = await generateVueRuntimeNotices(root)
   if (names.has(THIRD_PARTY_NOTICES_FILE)) {
     const actualRuntimeNotices = await readFile(path.join(output, THIRD_PARTY_NOTICES_FILE), 'utf8')
@@ -47,6 +55,7 @@ try {
   }
   const readme = await readFile(path.join(output, 'README.md'), 'utf8')
   if (!readme.includes(THIRD_PARTY_NOTICES_FILE)) issue(`README.md 未说明随包提供 ${THIRD_PARTY_NOTICES_FILE}。`)
+  if (!readme.includes('UPSTREAM_LICENSE.txt')) issue('README.md 未说明随包提供 UPSTREAM_LICENSE.txt。')
 
   const htmlForResourceScan = html.replace('<link rel="icon" href="data:,">', '')
   const references = [...htmlForResourceScan.matchAll(/(?:src|href)=["']([^"']+)["']/gi)].map((match) => match[1])

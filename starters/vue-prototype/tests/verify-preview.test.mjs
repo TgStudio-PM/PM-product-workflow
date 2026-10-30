@@ -54,6 +54,7 @@ async function createFixture(t) {
     cp(path.join(starterRoot, 'scripts', 'vue-runtime-notices.mjs'), path.join(fixtureRoot, 'scripts', 'vue-runtime-notices.mjs')),
     cp(path.join(starterRoot, 'scripts', 'verify-preview.mjs'), path.join(fixtureRoot, 'scripts', 'verify-preview.mjs')),
     cp(path.join(starterRoot, 'scripts', 'page-registry.mjs'), path.join(fixtureRoot, 'scripts', 'page-registry.mjs')),
+    cp(path.join(starterRoot, 'UPSTREAM_LICENSE.txt'), path.join(fixtureRoot, 'UPSTREAM_LICENSE.txt')),
     cp(path.join(starterRoot, 'src'), path.join(fixtureRoot, 'src'), { recursive: true }),
     cp(path.join(starterRoot, 'package.json'), path.join(fixtureRoot, 'package.json')),
     cp(path.join(starterRoot, 'dist', 'preview'), path.join(fixtureRoot, 'dist', 'preview'), { recursive: true }),
@@ -159,6 +160,58 @@ test('builds complete notices from installed Vue runtime package metadata and li
   assert.ok((await readFile(path.join(previewRoot, 'README.md'), 'utf8')).includes(noticeFile))
   const verifyResult = verify(fixtureRoot)
   assert.equal(verifyResult.status, 0, verifyResult.stderr || verifyResult.stdout)
+})
+
+test('builds and verifies the complete upstream license body', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const buildResult = buildPreview(fixtureRoot)
+  assert.equal(buildResult.status, 0, buildResult.stderr || buildResult.stdout)
+
+  const previewRoot = path.join(fixtureRoot, 'dist', 'preview')
+  const sourceLicense = await readFile(path.join(fixtureRoot, 'UPSTREAM_LICENSE.txt'))
+  assert.deepEqual(await readFile(path.join(previewRoot, 'UPSTREAM_LICENSE.txt')), sourceLicense)
+  const { manifest } = await readManifest(fixtureRoot)
+  assert.ok(manifest.files.includes('UPSTREAM_LICENSE.txt'))
+  assert.ok((await readFile(path.join(previewRoot, 'README.md'), 'utf8')).includes('UPSTREAM_LICENSE.txt'))
+  const verifyResult = verify(fixtureRoot)
+  assert.equal(verifyResult.status, 0, verifyResult.stderr || verifyResult.stdout)
+})
+
+test('rejects a missing upstream license artifact', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  await rm(path.join(fixtureRoot, 'dist', 'preview', 'UPSTREAM_LICENSE.txt'), { force: true })
+
+  const result = verify(fixtureRoot)
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /缺少必要产物：UPSTREAM_LICENSE\.txt/)
+})
+
+test('rejects a re-signed stale upstream license body', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const licensePath = path.join(fixtureRoot, 'dist', 'preview', 'UPSTREAM_LICENSE.txt')
+  const current = await readFile(licensePath, 'utf8')
+  const stale = current.replace('Copyright (c) 2026 TG_Studio', 'Copyright (c) 2025 TG_Studio')
+  assert.notEqual(stale, current)
+  await writeFile(licensePath, stale, 'utf8')
+  await updateContentHash(fixtureRoot, 'UPSTREAM_LICENSE.txt')
+
+  const result = verify(fixtureRoot)
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /UPSTREAM_LICENSE\.txt 与 starter 源文件不一致/)
+  assert.doesNotMatch(result.stderr, /文件校验值不匹配：UPSTREAM_LICENSE\.txt/)
+})
+
+test('rejects matching whitespace-only upstream license source and artifact after re-signing', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const whitespaceLicense = Buffer.from(' \t\r\n   ')
+  await writeFile(path.join(fixtureRoot, 'UPSTREAM_LICENSE.txt'), whitespaceLicense)
+  await writeFile(path.join(fixtureRoot, 'dist', 'preview', 'UPSTREAM_LICENSE.txt'), whitespaceLicense)
+  await updateContentHash(fixtureRoot, 'UPSTREAM_LICENSE.txt')
+
+  const result = verify(fixtureRoot)
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /UPSTREAM_LICENSE\.txt 源文件为空或仅含空白/)
+  assert.doesNotMatch(result.stderr, /文件校验值不匹配：UPSTREAM_LICENSE\.txt/)
 })
 
 test('rejects a missing third-party notice file', async (t) => {

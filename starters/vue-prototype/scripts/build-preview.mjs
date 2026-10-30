@@ -6,12 +6,14 @@ import { generateVueRuntimeNotices, THIRD_PARTY_NOTICES_FILE } from './vue-runti
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const output = path.join(root, 'dist', 'preview')
+const upstreamLicense = await readFile(path.join(root, 'UPSTREAM_LICENSE.txt'))
+if (!upstreamLicense.toString('utf8').trim()) throw new Error('UPSTREAM_LICENSE.txt 缺失或为空。')
 const runtimeNotices = await generateVueRuntimeNotices(root)
 const { default: vue } = await import('@vitejs/plugin-vue')
 const { build } = await import('vite')
 const { formatPagesMarkdown, readRegisteredPages } = await import('./page-registry.mjs')
 const registry = await readFile(path.join(root, 'src', 'app', 'page-registry.ts'), 'utf8')
-const contentFiles = ['index.html', 'app.js', 'styles.css', 'README.md', 'PAGES.md', THIRD_PARTY_NOTICES_FILE]
+const contentFiles = ['index.html', 'app.js', 'styles.css', 'README.md', 'PAGES.md', THIRD_PARTY_NOTICES_FILE, 'UPSTREAM_LICENSE.txt']
 const pages = readRegisteredPages(registry)
 
 await build({
@@ -69,6 +71,7 @@ const previewReadme = [
   '- app.js、styles.css：本地运行资源。',
   '- PAGES.md：本包路由清单。',
   `- ${THIRD_PARTY_NOTICES_FILE}：本预览包含的 Vue 运行依赖许可正文。`,
+  '- UPSTREAM_LICENSE.txt：本仓库复用内容原有许可与归属说明。',
   '- manifest.json、SHA256SUMS：包文件和完整性校验信息。',
   '',
   '## 已知限制',
@@ -84,6 +87,7 @@ if (/\bimport\s*(?:\(|\{)|\bexport\s|<script[^>]+type=["']module|\bprocess\.env\
   throw new Error('离线包脚本包含模块语法或未替换的 Node 环境变量，不能作为经典脚本交付。')
 }
 await writeFile(path.join(output, THIRD_PARTY_NOTICES_FILE), runtimeNotices, 'utf8')
+await writeFile(path.join(output, 'UPSTREAM_LICENSE.txt'), upstreamLicense)
 const manifestPath = path.join(output, 'manifest.json')
 const manifest = { name: 'tg-studio-vue-prototype-preview', pages, files: contentFiles }
 await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8')
