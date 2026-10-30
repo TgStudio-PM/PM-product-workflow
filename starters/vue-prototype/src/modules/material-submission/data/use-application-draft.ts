@@ -1,6 +1,7 @@
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import type { MaterialId } from '../pages/apply/mock'
 import { readApplicationDraft, removeApplicationDraft, writeApplicationDraft, type ApplicationDraft } from './browser-storage'
+import { DESCRIPTION_MAX_LENGTH } from './limits'
 
 export function useApplicationDraft(isMaterialId: (value: unknown) => value is MaterialId, requiredIds: MaterialId[]) {
   const draft = reactive<ApplicationDraft>({ description: '', checkedMaterials: [], submitted: false })
@@ -41,7 +42,7 @@ export function useApplicationDraft(isMaterialId: (value: unknown) => value is M
   }
 
   function submitDraft(): boolean {
-    showDescriptionError.value = !draft.description.trim()
+    showDescriptionError.value = !draft.description.trim() || draft.description.length > DESCRIPTION_MAX_LENGTH
     showMaterialsError.value = requiredCheckedCount.value !== requiredIds.length
     if (showDescriptionError.value || showMaterialsError.value) return false
     draft.submitted = true
@@ -62,8 +63,10 @@ export function useApplicationDraft(isMaterialId: (value: unknown) => value is M
     const loaded = readApplicationDraft(isMaterialId)
     if (loaded.draft) {
       Object.assign(draft, loaded.draft)
+      showDescriptionError.value = draft.description.length > DESCRIPTION_MAX_LENGTH
       const restoredSubmissionIsInvalid = draft.submitted && (
-        !draft.description.trim() || requiredIds.some((id) => !draft.checkedMaterials.includes(id))
+        !draft.description.trim() || draft.description.length > DESCRIPTION_MAX_LENGTH ||
+        requiredIds.some((id) => !draft.checkedMaterials.includes(id))
       )
       if (restoredSubmissionIsInvalid) {
         draft.submitted = false

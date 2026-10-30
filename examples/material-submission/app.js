@@ -7,6 +7,7 @@
   const statusLabel = document.querySelector("#status-label");
   const indicator = document.querySelector("#draft-indicator");
   const descriptionError = document.querySelector("#description-error");
+  const defaultDescriptionError = descriptionError.textContent;
   const materialsError = document.querySelector("#materials-error");
   const characterCount = document.querySelector("#character-count");
   const checkedCount = document.querySelector("#checked-count");
@@ -23,7 +24,7 @@
       const value = JSON.parse(raw);
       if (!value || typeof value !== "object") return null;
       return {
-        description: typeof value.description === "string" ? value.description.slice(0, 500) : "",
+        description: typeof value.description === "string" ? value.description : "",
         materials: Array.isArray(value.materials) ? value.materials.filter(item => checkboxes.some(box => box.value === item)) : [],
         status: value.status === "已提交" ? "已提交" : "草稿"
       };
@@ -37,6 +38,14 @@
     const count = requiredCheckboxes.filter(box => box.checked).length;
     checkedCount.textContent = String(count);
     return count;
+  }
+
+  function updateDescriptionError() {
+    const overLimit = description.value.length > 500;
+    descriptionError.textContent = overLimit
+      ? "超过500字，原内容已保留，请修改后提交。"
+      : defaultDescriptionError;
+    return overLimit;
   }
 
   function setStatus(status) {
@@ -77,8 +86,13 @@
       description.value = state.description;
       checkboxes.forEach(box => { box.checked = state.materials.includes(box.value); });
       const invalidSubmittedState = state.status === "已提交" && (
-        !state.description.trim() || requiredCheckboxes.some(box => !state.materials.includes(box.value))
+        !state.description.trim() || state.description.length > 500 ||
+        requiredCheckboxes.some(box => !state.materials.includes(box.value))
       );
+      if (state.description.length > 500) {
+        updateDescriptionError();
+        descriptionError.hidden = false;
+      }
       if (invalidSubmittedState) {
         const correctedState = { ...state, status: "草稿" };
         setStatus("草稿");
@@ -99,7 +113,8 @@
   }
 
   description.addEventListener("input", () => {
-    descriptionError.hidden = true;
+    const overLimit = updateDescriptionError();
+    descriptionError.hidden = !overLimit;
     updateCounters();
     saveDraft();
   });
@@ -113,7 +128,8 @@
   form.addEventListener("submit", event => {
     event.preventDefault();
     if (form.dataset.status === "submitted") return;
-    const descriptionValid = description.value.trim().length > 0;
+    const overLimit = updateDescriptionError();
+    const descriptionValid = description.value.trim().length > 0 && !overLimit;
     updateCounters();
     const materialsValid = requiredCheckboxes.every(box => box.checked);
     descriptionError.hidden = descriptionValid;
