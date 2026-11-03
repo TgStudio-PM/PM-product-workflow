@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import tempfile
 import unittest
 import zipfile
@@ -82,8 +83,10 @@ class PackageTests(unittest.TestCase):
                 for name, content in files.items():
                     self.write(name, content)
                 self.profile(kind, required, required, entry, **extra)
-                self.build_and_verify()
-                with zipfile.ZipFile(self.output) as archive:
+                output = self.root / f"{kind}.zip"
+                package.build(self.source, self.profile_path, output)
+                package.verify(output)
+                with zipfile.ZipFile(output) as archive:
                     readme = archive.read("README.md").decode("utf-8")
                     self.assertIn("README.md", archive.namelist())
                     self.assertIn("manifest.json", archive.namelist())
@@ -463,7 +466,7 @@ class PackageTests(unittest.TestCase):
         )
         self.build_and_verify()
 
-    def test_build_rejects_file_parent_conflicts_without_overwriting_output(self) -> None:
+    def test_build_rejects_file_parent_conflicts_without_publishing_output(self) -> None:
         self.profile("backend-requirements", ["contract.md"], ["contract.md"], "contract.md")
         collisions = (
             {"contract.md": b"fictional", "slot": b"file", "slot/child.txt": b"child"},
@@ -471,13 +474,14 @@ class PackageTests(unittest.TestCase):
             {"contract.md": b"fictional", "Slot": b"file", "slot/child.txt": b"child"},
             {"contract.md": b"fictional", "README.md/child.txt": b"metadata conflict"},
         )
-        for files in collisions:
+        for index, files in enumerate(collisions):
             with self.subTest(paths=tuple(files)):
-                self.output.write_bytes(b"previous candidate")
+                output = self.root / f"conflict-{index}.zip"
                 with patch.object(package, "_collect_files", return_value=files):
                     with self.assertRaisesRegex(package.PackageError, "SOURCE-03"):
-                        package.build(self.source, self.profile_path, self.output)
-                self.assertEqual(self.output.read_bytes(), b"previous candidate")
+                        package.build(self.source, self.profile_path, output)
+                self.assertFalse(os.path.lexists(output))
+                self.assertEqual(list(self.root.glob(f".{output.name}.*.tmp")), [])
 
     def test_verify_rejects_signed_file_parent_conflicts_in_any_order(self) -> None:
         cases = (
@@ -694,14 +698,84 @@ class PackageTests(unittest.TestCase):
                     package.build(self.source, self.profile_path, self.output)
                 (self.source / rel).unlink()
 
-    def test_failed_build_preserves_existing_output_and_removes_temp(self) -> None:
+    def test_existing_output_is_preserved_and_new_name_can_be_built(self) -> None:
+        self.write("contract.md", "version one")
+        self.profile("backend-requirements", ["contract.md"], ["contract.md"], "contract.md")
+        package.build(self.source, self.profile_path, self.output)
+        version_one = self.output.read_bytes()
+
+        self.write("contract.md", "version two")
+        with self.assertRaisesRegex(package.PackageError, "OUTPUT-02.*new output name"):
+            package.build(self.source, self.profile_path, self.output)
+        self.assertEqual(self.output.read_bytes(), version_one)
+        package.verify(self.output)
+
+        new_output = self.root / "bundle-v2.zip"
+        package.build(self.source, self.profile_path, new_output)
+        package.verify(new_output)
+        self.assertNotEqual(new_output.read_bytes(), version_one)
+
+    def test_existing_output_directory_is_rejected_unchanged(self) -> None:
         self.write("contract.md", "fictional")
         self.profile("backend-requirements", ["contract.md"], ["contract.md"], "contract.md")
-        self.output.write_bytes(b"previous valid artifact")
+        self.output.mkdir()
+        marker = self.output / "keep.txt"
+        marker.write_bytes(b"existing directory content")
+        with self.assertRaisesRegex(package.PackageError, "OUTPUT-02.*new output name"):
+            package.build(self.source, self.profile_path, self.output)
+        self.assertEqual(marker.read_bytes(), b"existing directory content")
+        self.assertEqual(list(self.root.glob(f".{self.output.name}.*.tmp")), [])
+
+    def test_existing_output_symlinks_are_rejected_without_following_them(self) -> None:
+        self.write("contract.md", "fictional")
+        self.profile("backend-requirements", ["contract.md"], ["contract.md"], "contract.md")
+        for name, dangling in (("valid-link.zip", False), ("dangling-link.zip", True)):
+            with self.subTest(name=name):
+                link = self.root / name
+                target = self.root / f"{name}.target"
+                if not dangling:
+                    target.write_bytes(b"symlink target bytes")
+                try:
+                    link.symlink_to(target.name)
+                except OSError as exc:
+                    self.skipTest(
+                        f"output symlink creation is unavailable ({type(exc).__name__}); "
+                        "Linux CI exercises this case"
+                    )
+                link_text = os.readlink(link)
+                with self.assertRaisesRegex(package.PackageError, "OUTPUT-02.*new output name"):
+                    package.build(self.source, self.profile_path, link)
+                self.assertTrue(link.is_symlink())
+                self.assertEqual(os.readlink(link), link_text)
+                if dangling:
+                    self.assertFalse(target.exists())
+                else:
+                    self.assertEqual(target.read_bytes(), b"symlink target bytes")
+                self.assertEqual(list(self.root.glob(f".{link.name}.*.tmp")), [])
+
+    def test_target_created_after_verify_is_preserved_and_temp_is_removed(self) -> None:
+        self.write("contract.md", "fictional")
+        self.profile("backend-requirements", ["contract.md"], ["contract.md"], "contract.md")
+        real_verify = package.verify
+        competing_bytes = b"concurrent output owner"
+
+        def verify_then_create_target(archive_path: Path) -> None:
+            real_verify(archive_path)
+            self.output.write_bytes(competing_bytes)
+
+        with patch.object(package, "verify", side_effect=verify_then_create_target):
+            with self.assertRaisesRegex(package.PackageError, "OUTPUT-02.*new output name"):
+                package.build(self.source, self.profile_path, self.output)
+        self.assertEqual(self.output.read_bytes(), competing_bytes)
+        self.assertEqual(list(self.root.glob(f".{self.output.name}.*.tmp")), [])
+
+    def test_failed_verify_does_not_publish_or_leave_temp(self) -> None:
+        self.write("contract.md", "fictional")
+        self.profile("backend-requirements", ["contract.md"], ["contract.md"], "contract.md")
         with patch.object(package, "verify", side_effect=package.PackageError("VERIFY-TEST expected failure")):
             with self.assertRaisesRegex(package.PackageError, "VERIFY-TEST"):
                 package.build(self.source, self.profile_path, self.output)
-        self.assertEqual(self.output.read_bytes(), b"previous valid artifact")
+        self.assertFalse(os.path.lexists(self.output))
         self.assertEqual(list(self.root.glob(f".{self.output.name}.*.tmp")), [])
 
     def test_cli_build_and_standalone_verify(self) -> None:
@@ -715,8 +789,13 @@ class PackageTests(unittest.TestCase):
     def test_profile_output_is_used_when_cli_override_is_omitted(self) -> None:
         self.write("contract.md", "fictional")
         self.profile("backend-requirements", ["contract.md"], ["contract.md"], "contract.md")
-        self.assertEqual(package.main(["--source", str(self.source), "--profile", str(self.profile_path)]), 0)
-        self.assertTrue((self.root / "deliveries" / "fixture.zip").is_file())
+        args = ["--source", str(self.source), "--profile", str(self.profile_path)]
+        self.assertEqual(package.main(args), 0)
+        output = self.root / "deliveries" / "fixture.zip"
+        self.assertTrue(output.is_file())
+        original_bytes = output.read_bytes()
+        self.assertEqual(package.main(args), 2)
+        self.assertEqual(output.read_bytes(), original_bytes)
 
     def test_rejects_profile_paths_not_covered_by_include(self) -> None:
         self.write("index.html")

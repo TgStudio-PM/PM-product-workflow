@@ -22,7 +22,7 @@ python <path-to-PM-product-workflow>/.agents/skills/pm-prototype-packager/script
 
 随包的交接材料以解压根目录为路径基准。在交付副本中改写本机定位、补齐被引用的必要事实，保留源项目原件；不要原样附入本机接力日志。源端验证日志未随包交付时，注明其覆盖范围及接收方需重新执行的检查。
 
-包生成后才取得的新验证结论，应绑定原候选的哈希另行记录，不回写或覆盖旧 ZIP。确需更新包内材料时，另用唯一文件名生成新候选，并重新验包、记录新哈希。
+包生成后才取得的新验证结论，应绑定原候选的哈希另行记录，不回写或覆盖旧 ZIP。确需更新包内材料时，另用唯一文件名生成新候选，并重新验包、记录新哈希。每轮打包都选尚未占用的输出路径；已存在时脚本报 `OUTPUT-02` 并拒绝生成。遇到该错误后改用新轮次名称（例如 `-r02`），不要继续验包或解压；旧路径仍对应旧包。只检查已有包时，直接运行 `--verify`。
 
 ## 使用示例
 
@@ -30,21 +30,25 @@ python <path-to-PM-product-workflow>/.agents/skills/pm-prototype-packager/script
 
 ```powershell
 New-Item -ItemType Directory -Force .codex-local/packages | Out-Null
-
+$previewZip = '.codex-local/packages/material-submission-preview-r01.zip'
+$previewDir = '.codex-local/packages/material-submission-preview-r01'
+if (Test-Path -LiteralPath $previewZip) { throw 'Choose a new preview ZIP name.' }
 python .agents/skills/pm-prototype-packager/scripts/package.py `
   --source examples/material-submission `
   --profile examples/package-profiles/static-preview.json `
-  --output .codex-local/packages/material-submission-preview.zip
+  --output $previewZip
+if ($LASTEXITCODE -ne 0) { throw 'Preview packaging failed; stop before verify or extraction.' }
 
-python .agents/skills/pm-prototype-packager/scripts/package.py `
-  --verify .codex-local/packages/material-submission-preview.zip
+python .agents/skills/pm-prototype-packager/scripts/package.py --verify $previewZip
+if ($LASTEXITCODE -ne 0) { throw 'Preview verification failed; stop before extraction.' }
 ```
 
-静态预览成功生成后，解压到本地临时目录，在目标浏览器打开解压目录中的 `index.html`，检查主要交互并确认离线资源可用：
+静态预览成功生成后，解压到本地临时目录，在目标浏览器打开解压目录中的 `index.html`，检查主要交互并确认离线资源可用。解压目录已存在时先选新目录；不要合并到旧解压内容。开启下一轮时，将 ZIP 和目录中的 `-r01` 一并改为新的轮次名：
 
 ```powershell
-Expand-Archive -Force .codex-local/packages/material-submission-preview.zip .codex-local/packages/material-submission-preview
-Start-Process (Resolve-Path .codex-local/packages/material-submission-preview/index.html)
+if (Test-Path -LiteralPath $previewDir) { throw 'Choose a new preview extraction directory.' }
+Expand-Archive -LiteralPath $previewZip -DestinationPath $previewDir -ErrorAction Stop
+Start-Process (Resolve-Path (Join-Path $previewDir 'index.html'))
 ```
 
 浏览器验收应至少覆盖说明必填校验、必备材料确认、暂存后刷新恢复、提交后只读和清除演示数据。此处是本仓库虚构案例的建议检查点；其他项目应依据其已确认规则制定自己的产品验收。
@@ -52,16 +56,20 @@ Start-Process (Resolve-Path .codex-local/packages/material-submission-preview/in
 ### 前端源码包
 
 ```powershell
+$frontendZip = '.codex-local/packages/vue-prototype-frontend-r01.zip'
+$frontendDir = '.codex-local/packages/vue-prototype-frontend-r01'
+if (Test-Path -LiteralPath $frontendZip) { throw 'Choose a new frontend ZIP name.' }
 python .agents/skills/pm-prototype-packager/scripts/package.py `
   --source starters/vue-prototype `
   --profile examples/package-profiles/frontend-source.json `
-  --output .codex-local/packages/vue-prototype-frontend.zip
+  --output $frontendZip
+if ($LASTEXITCODE -ne 0) { throw 'Frontend packaging failed; stop before verify or extraction.' }
 
-python .agents/skills/pm-prototype-packager/scripts/package.py `
-  --verify .codex-local/packages/vue-prototype-frontend.zip
-
-Expand-Archive -Force .codex-local/packages/vue-prototype-frontend.zip .codex-local/packages/vue-prototype-frontend
-Push-Location .codex-local/packages/vue-prototype-frontend
+python .agents/skills/pm-prototype-packager/scripts/package.py --verify $frontendZip
+if ($LASTEXITCODE -ne 0) { throw 'Frontend archive verification failed; stop before extraction.' }
+if (Test-Path -LiteralPath $frontendDir) { throw 'Choose a new frontend extraction directory.' }
+Expand-Archive -LiteralPath $frontendZip -DestinationPath $frontendDir -ErrorAction Stop
+Push-Location $frontendDir -ErrorAction Stop
 npm ci
 npm run typecheck
 npm run preview:pack
@@ -82,13 +90,16 @@ Vue starter 的 `npm run preview:pack` 会将同名文件原文带入离线预�
 > **下面的原始示例命令只打包材料申报模块。** 要打包新模块，请先完成下方的 [新模块定制步骤](#customize-backend-requirements)，不要直接运行这组示例命令。
 
 ```powershell
+$backendZip = '.codex-local/packages/material-submission-backend-requirements-r01.zip'
+if (Test-Path -LiteralPath $backendZip) { throw 'Choose a new backend ZIP name.' }
 python .agents/skills/pm-prototype-packager/scripts/package.py `
   --source starters/vue-prototype `
   --profile examples/package-profiles/backend-requirements.json `
-  --output .codex-local/packages/material-submission-backend-requirements.zip
+  --output $backendZip
+if ($LASTEXITCODE -ne 0) { throw 'Backend packaging failed; stop before verification.' }
 
-python .agents/skills/pm-prototype-packager/scripts/package.py `
-  --verify .codex-local/packages/material-submission-backend-requirements.zip
+python .agents/skills/pm-prototype-packager/scripts/package.py --verify $backendZip
+if ($LASTEXITCODE -ne 0) { throw 'Backend archive verification failed; stop before review.' }
 ```
 
 将解压后的 `docs/BACKEND_HANDOFF.md`、合同说明和材料申报模块事实交给相关人员逐项评审。确认 API 地址、HTTP 方法、身份权限、字段可空性、错误结构、持久化和审计要求等事项前，保持为待确认。页面上的按钮名称或 mock 结构不能单独证明后端行为。
@@ -111,16 +122,18 @@ Copy-Item examples/package-profiles/backend-requirements.json .codex-local/profi
 
 ```powershell
 New-Item -ItemType Directory -Force .codex-local/packages | Out-Null
-
+$moduleZip = '.codex-local/packages/demo-help-backend-requirements-r01.zip'
+if (Test-Path -LiteralPath $moduleZip) { throw 'Choose a new module ZIP name.' }
 python .agents/skills/pm-prototype-packager/scripts/package.py `
   --source starters/vue-prototype `
   --profile .codex-local/profiles/demo-help-backend-requirements.json `
-  --output .codex-local/packages/demo-help-backend-requirements.zip
+  --output $moduleZip
+if ($LASTEXITCODE -ne 0) { throw 'Module packaging failed; stop before verification or listing.' }
 
-python .agents/skills/pm-prototype-packager/scripts/package.py `
-  --verify .codex-local/packages/demo-help-backend-requirements.zip
-
-python -m zipfile -l .codex-local/packages/demo-help-backend-requirements.zip
+python .agents/skills/pm-prototype-packager/scripts/package.py --verify $moduleZip
+if ($LASTEXITCODE -ne 0) { throw 'Module archive verification failed; stop before listing.' }
+python -m zipfile -l $moduleZip
+if ($LASTEXITCODE -ne 0) { throw 'Module archive listing failed.' }
 ```
 
 5. 查看 ZIP 清单，确认 `docs/BACKEND_HANDOFF.md`、通用模板及目标模块事实均在包内；同时确认没有误带入 `material-submission`、页面源码或 mock。实际 API 和业务语义仍需产品及前后端责任人确认。

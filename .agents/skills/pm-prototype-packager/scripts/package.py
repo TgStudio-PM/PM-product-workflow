@@ -499,7 +499,10 @@ def build(source: Path, profile_path: Path, output: Path | None = None) -> None:
     profile = _load_profile(profile_path)
     try:
         profile_root = profile_path.resolve(strict=True).parent
-        destination = (output if output is not None else profile_root / profile["output"]).resolve(strict=False)
+        requested_output = output if output is not None else profile_root / profile["output"]
+        # Resolve parent aliases while preserving the final name so an existing
+        # (including dangling) symlink is treated as the destination itself.
+        destination = requested_output.parent.resolve(strict=False) / requested_output.name
     except OSError:
         raise PackageError("PATH-01 profile or output path is invalid") from None
     try:
@@ -509,6 +512,8 @@ def build(source: Path, profile_path: Path, output: Path | None = None) -> None:
         pass
     if profile_path.resolve(strict=False) == destination:
         raise PackageError("PATH-04 profile and output paths must differ")
+    if os.path.lexists(destination):
+        raise PackageError("OUTPUT-02 output already exists; choose a new output name")
     files = _collect_files(root, profile)
     if profile["kind"] == "static-preview":
         _audit_static(files, profile)
@@ -544,9 +549,14 @@ def build(source: Path, profile_path: Path, output: Path | None = None) -> None:
             archive.writestr("manifest.json", manifest_bytes)
             archive.writestr("SHA256SUMS", sums)
         verify(temporary_path)
-        os.replace(temporary_path, destination)
+        if os.name == "nt":
+            os.rename(temporary_path, destination)
+        else:
+            os.link(temporary_path, destination)
     except PackageError:
         raise
+    except FileExistsError:
+        raise PackageError("OUTPUT-02 output already exists; choose a new output name") from None
     except OSError:
         raise PackageError("OUTPUT-01 unable to write archive") from None
     finally:
