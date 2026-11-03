@@ -15,7 +15,7 @@ npm run dev
 
 浏览器打开 Vite 显示的本地地址。页面可热更新，导航和路由集中在 `src/app/page-registry.ts` 与 `src/app/router.ts`。
 
-页面登记的 `path` 只写静态路径，例如 `/material-submission/apply`，不要把 `?id=...` 写入注册表。深链接可以使用 `#/material-submission/apply?id=demo-001`；路由按路径匹配，查询参数可从 `useHashRouter()` 返回的 `query`（`URLSearchParams`）读取。已登记的中文和空格路径会按浏览器地址形式匹配；未登记地址不会通用解码。若两条登记路径经浏览器序列化后指向同一地址，打包前会拒绝，需先改为唯一路径。示例不会根据参数自动加载业务记录，参数含义仍需由项目确认。空 Hash 使用默认入口；未登记的地址显示明确提示及已有页面链接。
+页面登记的 `path` 只写静态路径，例如 `/material-submission/apply`，不要把 `?id=...` 写入注册表。深链接可以使用 `#/material-submission/apply?id=demo-001`；路由按路径匹配，查询参数可从 `useHashRouter()` 返回的 `query`（`URLSearchParams`）读取。已登记的中文和空格路径会按浏览器地址形式匹配；未登记地址不会通用解码。若两条登记路径经浏览器序列化后指向同一地址，打包前会拒绝，需先改为唯一路径。示例不会根据参数自动加载业务记录，参数含义仍需由项目确认。空 Hash、品牌和首页链接使用登记表第一项作为默认入口；未登记的地址显示明确提示及已有页面链接。
 
 按需在模块 `PAGE_FLOW.md` 中记录导航配置的引用位置、非菜单入口及返回/取消目标，保持登记源唯一。需要前后端协作时，在 `contracts/API_HANDOFF.md` 中确认菜单与路由的来源及其与服务端授权的边界。
 
