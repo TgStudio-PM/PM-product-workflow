@@ -29,6 +29,12 @@ export function formatPagesMarkdown(pages) {
   return `# 页面清单\n\n| 路由 | 页面 |\n| --- | --- |\n${pages.map(({ route, title }) => `| ${formatMarkdownTableCell(route)} | ${formatMarkdownTableCell(title)} |`).join('\n')}\n`
 }
 
+function browserSerializedPath(path) {
+  const url = new URL('file:///')
+  url.hash = `#${path}`
+  return url.hash.slice(1)
+}
+
 export function readRegisteredPages(registrySource) {
   const sourceFile = ts.createSourceFile('page-registry.ts', registrySource, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS)
   if (sourceFile.parseDiagnostics.length > 0) {
@@ -103,6 +109,16 @@ export function readRegisteredPages(registrySource) {
   const duplicateRoutes = [...routeCounts].filter(([, count]) => count > 1).map(([route]) => route)
   if (duplicateRoutes.length > 0) {
     throw new Error(`页面注册表包含重复路由，无法生成离线包：${duplicateRoutes.join('、')}`)
+  }
+
+  const serializedRoutes = new Map()
+  for (const { route } of pages) {
+    const serializedRoute = browserSerializedPath(route)
+    const conflictingRoute = serializedRoutes.get(serializedRoute)
+    if (conflictingRoute !== undefined) {
+      throw new Error(`页面注册表包含浏览器地址冲突，不同登记 path 经浏览器序列化后指向同一地址：${conflictingRoute}、${route}`)
+    }
+    serializedRoutes.set(serializedRoute, route)
   }
 
   return pages

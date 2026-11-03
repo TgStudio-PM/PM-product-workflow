@@ -14,6 +14,7 @@ const moduleUrl = `data:text/javascript;base64,${Buffer.from(outputText).toStrin
 const { resolveHashLocation } = await import(moduleUrl)
 
 const registeredPaths = ['/overview', '/material-submission/apply']
+const encodedRoutePaths = ['/帮助中心', '/help center', '/100% complete']
 
 test('empty hash selects the first registered route', () => {
   assert.equal(resolveHashLocation('', registeredPaths).path, '/overview')
@@ -34,6 +35,36 @@ test('registered route separates the query at the first question mark', () => {
   assert.equal(result.isRegistered, true)
   assert.equal(result.query.get('id'), 'demo-001')
   assert.equal(result.query.get('step'), '2')
+})
+
+test('registered Chinese and space routes match their browser-serialized paths and retain registration values', () => {
+  const chinese = resolveHashLocation('#/%E5%B8%AE%E5%8A%A9%E4%B8%AD%E5%BF%83', encodedRoutePaths)
+  assert.equal(chinese.path, '/帮助中心')
+  assert.equal(chinese.isRegistered, true)
+
+  const spaced = resolveHashLocation('#/help%20center', encodedRoutePaths)
+  assert.equal(spaced.path, '/help center')
+  assert.equal(spaced.isRegistered, true)
+})
+
+test('empty hash selects a Chinese first route and a registered literal percent route matches', () => {
+  const chineseFirst = resolveHashLocation('#', ['/首页', '/overview'])
+  assert.equal(chineseFirst.path, '/首页')
+  assert.equal(chineseFirst.isRegistered, true)
+
+  const percent = resolveHashLocation('#/100% complete', encodedRoutePaths)
+  assert.equal(percent.path, '/100% complete')
+  assert.equal(percent.isRegistered, true)
+  const serializedPercent = resolveHashLocation('#/100%%20complete', encodedRoutePaths)
+  assert.equal(serializedPercent.path, '/100% complete')
+  assert.equal(serializedPercent.isRegistered, true)
+})
+
+test('browser-serialized registered route keeps query handling unchanged', () => {
+  const result = resolveHashLocation('#/help%20center?id=demo-001', encodedRoutePaths)
+  assert.equal(result.path, '/help center')
+  assert.equal(result.isRegistered, true)
+  assert.equal(result.query.get('id'), 'demo-001')
 })
 
 test('query parameters preserve duplicates and decode values for reading', () => {
@@ -61,4 +92,5 @@ test('unknown path and its query remain separate', () => {
 test('encoded and differently cased paths are not decoded or normalized into registered routes', () => {
   assert.equal(resolveHashLocation('#/%6Fverview', registeredPaths).isRegistered, false)
   assert.equal(resolveHashLocation('#/Overview', registeredPaths).isRegistered, false)
+  assert.equal(resolveHashLocation('#/%E5%B8%AE%E5%8A%A9%E4%B8%AD%E5%BF%83', ['/帮助中心X']).isRegistered, false)
 })
