@@ -3,6 +3,7 @@ import { pageRegistry } from './page-registry'
 import { useHashRouter } from './router'
 
 const { currentPath, query, activePage } = useHashRouter()
+const homePath = pageRegistry[0].path
 </script>
 
 <template>
@@ -11,7 +12,7 @@ const { currentPath, query, activePage } = useHashRouter()
     Tg Studio 虚构教学原型 · 不对应真实政务服务，不上传文件、不发起网络请求
   </div>
   <header class="site-header">
-    <a class="brand" href="#/overview" aria-label="Tg Studio 原型概览">
+    <a class="brand" :href="`#${homePath}`" aria-label="Tg Studio 首页">
       <span class="brand-mark" aria-hidden="true">Tg</span>
       <span><strong>Tg Studio</strong><small>PROTOTYPE STARTER</small></span>
     </a>
@@ -40,11 +41,11 @@ const { currentPath, query, activePage } = useHashRouter()
 
     <main class="main-content">
       <template v-if="activePage">
-        <div class="breadcrumbs"><a href="#/overview">首页</a><span>/</span><strong>{{ activePage.title }}</strong></div>
+        <div class="breadcrumbs"><a :href="`#${homePath}`">首页</a><span>/</span><strong>{{ activePage.title }}</strong></div>
         <component :is="activePage.component" />
       </template>
       <template v-else>
-        <div class="breadcrumbs"><a href="#/overview">首页</a><span>/</span><strong>页面未找到</strong></div>
+        <div class="breadcrumbs"><a :href="`#${homePath}`">首页</a><span>/</span><strong>页面未找到</strong></div>
         <section class="panel template-content not-found-panel" aria-labelledby="not-found-title">
           <h1 id="not-found-title">页面未找到</h1>
           <p>当前原型未登记该地址：</p>
