@@ -491,6 +491,106 @@ test('builds and verifies an additional page without colliding with existing rou
   )
 })
 
+test('builds and verifies registered Chinese and space routes while preserving their raw values', async (t) => {
+  const fixtureRoot = await createFixture(t)
+  const { manifest: baselineManifest } = await readManifest(fixtureRoot)
+  const baselinePages = await readFile(path.join(fixtureRoot, 'dist', 'preview', 'PAGES.md'), 'utf8')
+  const targetRoutes = ['/overview', '/material-submission/apply']
+  const baselineTargetPages = baselineManifest.pages.filter(({ route }) => targetRoutes.includes(route))
+  assert.equal(baselineTargetPages.length, targetRoutes.length, '测试夹具应包含两个待替换页面')
+  for (const route of targetRoutes) {
+    assert.ok(baselineTargetPages.some((page) => page.route === route), `测试夹具应包含 ${route}`)
+  }
+
+  const occupiedRoutes = baselineManifest.pages
+    .filter(({ route }) => !targetRoutes.includes(route))
+    .map(({ route }) => route)
+  function browserSerializedPath(route) {
+    const url = new URL('file:///')
+    url.hash = `#${route}`
+    return url.hash.slice(1)
+  }
+  function selectUnusedRoute(base) {
+    let route = base
+    let suffix = 1
+    const conflicts = (candidate) => occupiedRoutes.some((existing) => (
+      browserSerializedPath(existing) === browserSerializedPath(candidate)
+    ))
+    while (conflicts(route)) route = `${base}-${suffix++}`
+    occupiedRoutes.push(route)
+    return route
+  }
+  const chineseRoute = selectUnusedRoute('/帮助中心')
+  const spaceRoute = selectUnusedRoute('/help center')
+
+  const registryPath = path.join(fixtureRoot, 'src', 'app', 'page-registry.ts')
+  const registry = await readFile(registryPath, 'utf8')
+  const updatedRegistry = registry
+    .replace("path: '/overview'", `path: ${JSON.stringify(chineseRoute)}`)
+    .replace("path: '/material-submission/apply'", `path: ${JSON.stringify(spaceRoute)}`)
+  assert.notEqual(updatedRegistry, registry, '测试夹具应替换两条已登记路由')
+  await writeFile(registryPath, updatedRegistry, 'utf8')
+
+  const buildResult = buildPreview(fixtureRoot)
+  assert.equal(buildResult.status, 0, buildResult.stderr || buildResult.stdout)
+  const verifyResult = verify(fixtureRoot)
+  assert.equal(verifyResult.status, 0, verifyResult.stderr || verifyResult.stdout)
+
+  const { manifest } = await readManifest(fixtureRoot)
+  const routeReplacements = new Map([
+    ['/overview', chineseRoute],
+    ['/material-submission/apply', spaceRoute],
+  ])
+  assert.deepEqual(
+    manifest.pages,
+    baselineManifest.pages.map((page) => ({ ...page, route: routeReplacements.get(page.route) ?? page.route })),
+  )
+
+  function replaceRouteCell(pages, originalRoute, replacementRoute) {
+    const marker = `| ${originalRoute} |`
+    const index = pages.indexOf(marker)
+    assert.notEqual(index, -1, `基线页面清单应包含 ${originalRoute} 路由单元格`)
+    return `${pages.slice(0, index)}| ${replacementRoute} |${pages.slice(index + marker.length)}`
+  }
+  const expectedPages = replaceRouteCell(
+    replaceRouteCell(baselinePages, '/overview', chineseRoute),
+    '/material-submission/apply',
+    spaceRoute,
+  )
+  assert.equal(await readFile(path.join(fixtureRoot, 'dist', 'preview', 'PAGES.md'), 'utf8'), expectedPages)
+})
+
+test('rejects browser-equivalent routes during build and independent verification without changing package files', async (t) => {
+  const collisions = [
+    ['/帮助中心', '/%E5%B8%AE%E5%8A%A9%E4%B8%AD%E5%BF%83'],
+    ['/help center', '/help%20center'],
+  ]
+
+  for (const [firstRoute, secondRoute] of collisions) {
+    await t.test(`${firstRoute} and ${secondRoute}`, async (t) => {
+      for (const operation of ['build', 'verify']) {
+        await t.test(operation, async (t) => {
+          const fixtureRoot = await createFixture(t)
+          const registryPath = path.join(fixtureRoot, 'src', 'app', 'page-registry.ts')
+          const registry = await readFile(registryPath, 'utf8')
+          const updatedRegistry = registry
+            .replace("path: '/overview'", `path: ${JSON.stringify(firstRoute)}`)
+            .replace("path: '/material-submission/apply'", `path: ${JSON.stringify(secondRoute)}`)
+          assert.notEqual(updatedRegistry, registry, '测试夹具应替换两条唯一原始路由')
+          await writeFile(registryPath, updatedRegistry, 'utf8')
+          const originalPackage = await snapshotPreviewFiles(fixtureRoot)
+
+          const result = operation === 'build' ? buildPreview(fixtureRoot) : verify(fixtureRoot)
+
+          assert.equal(result.status, 1)
+          assert.match(result.stderr, /不同登记 path 经浏览器序列化后指向同一地址/)
+          assert.deepEqual(await snapshotPreviewFiles(fixtureRoot), originalPackage, `${operation} 失败不应修改离线包文件或其 SHA 清单`)
+        })
+      }
+    })
+  }
+})
+
 test('rejects a modified PAGES.md even when its checksum is updated', async (t) => {
   const fixtureRoot = await createFixture(t)
   const pagesPath = path.join(fixtureRoot, 'dist', 'preview', 'PAGES.md')
