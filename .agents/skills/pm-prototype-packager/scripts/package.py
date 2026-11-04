@@ -59,6 +59,17 @@ def _safe_relative(value: object, label: str) -> PurePosixPath:
     return path
 
 
+def _format_path_list(paths: list[str], label: str) -> str:
+    shown = paths[:20]
+    detail = (
+        f" ({label}_count={len(paths)}; "
+        f"{label}_paths={json.dumps(shown, ensure_ascii=True)}"
+    )
+    if len(paths) > len(shown):
+        detail += f"; omitted_count={len(paths) - len(shown)}"
+    return detail + ")"
+
+
 def _load_profile(path: Path) -> dict:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
@@ -73,18 +84,28 @@ def _load_profile(path: Path) -> dict:
         raise PackageError("PROFILE-12 output must name a .zip file")
     if not isinstance(data.get("name"), str) or not data["name"].strip():
         raise PackageError("PROFILE-06 name is required")
+    parsed_paths: dict[str, list[PurePosixPath]] = {}
     for key in ("include", "required"):
         if not isinstance(data.get(key), list) or not data[key]:
             raise PackageError(f"PROFILE-07 {key} must be a non-empty list")
         parsed = [_safe_relative(item, f"{key}[{index}]") for index, item in enumerate(data[key])]
+        parsed_paths[key] = parsed
         folded = [str(item).casefold() for item in parsed]
         if len(set(folded)) != len(folded):
             raise PackageError(f"PROFILE-08 {key} contains duplicate paths")
     entry = _safe_relative(data.get("entry"), "entry")
-    for required in data["required"] + [data["entry"]]:
-        required_path = _safe_relative(required, "required/entry")
-        if not any(required_path == inc or inc in required_path.parents for inc in map(PurePosixPath, data["include"])):
-            raise PackageError("PROFILE-09 required files and entry must be covered by include")
+    required_paths = parsed_paths["required"] + [entry]
+    include_paths = parsed_paths["include"]
+    uncovered = sorted({
+        required.as_posix()
+        for required in required_paths
+        if not any(required == inc or inc in required.parents for inc in include_paths)
+    })
+    if uncovered:
+        raise PackageError(
+            "PROFILE-09 required files and entry must be covered by include"
+            + _format_path_list(uncovered, "uncovered")
+        )
     if data["kind"] == "static-preview":
         pages = data.get("pages", [])
         if not isinstance(pages, list):
@@ -145,7 +166,11 @@ def _collect_files(root: Path, profile: dict) -> dict[str, bytes]:
             archive_name = relative.as_posix()
             case_key = archive_name.casefold()
             if case_key in folded or case_key in METADATA_NAMES:
-                raise PackageError("SOURCE-03 duplicate or reserved archive path")
+                reason = "duplicate" if case_key in folded else "reserved"
+                raise PackageError(
+                    "SOURCE-03 duplicate or reserved archive path "
+                    f"(archive_name={json.dumps(archive_name, ensure_ascii=True)}; reason={reason})"
+                )
             folded.add(case_key)
             try:
                 files[archive_name] = candidate.read_bytes()
@@ -158,15 +183,9 @@ def _collect_files(root: Path, profile: dict) -> dict[str, bytes]:
         if rel.as_posix() not in files
     })
     if missing:
-        shown = missing[:20]
-        detail = (
-            f" (missing_count={len(missing)}; "
-            f"missing_paths={json.dumps(shown, ensure_ascii=True)}"
-        )
-        if len(missing) > len(shown):
-            detail += f"; omitted_count={len(missing) - len(shown)}"
         raise PackageError(
-            "SOURCE-05 required file, entry, or page is missing from allowlisted files" + detail + ")"
+            "SOURCE-05 required file, entry, or page is missing from allowlisted files"
+            + _format_path_list(missing, "missing")
         )
     return files
 
