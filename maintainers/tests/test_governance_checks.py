@@ -96,13 +96,13 @@ class RiskClassificationTests(unittest.TestCase):
         self.commit_changes(root)
         self.assertEqual(classify_risk(root, "base")[0], "high")
 
-    def test_product_starter_is_medium_risk_case_insensitively(self) -> None:
+    def test_template_path_is_medium_risk_case_insensitively(self) -> None:
         root = self.make_repo({"README.md": "Project overview\n"})
-        self.write_files(root, {"Starters/Vue-Prototype/package.json": "{}\n"})
+        self.write_files(root, {"Templates/Package-Profiles/FRONTEND-SOURCE.JSON": "{}\n"})
         self.commit_changes(root)
         self.assertEqual(
             classify_risk(root, "base"),
-            ("medium", ["Starters/Vue-Prototype/package.json"]),
+            ("medium", ["Templates/Package-Profiles/FRONTEND-SOURCE.JSON"]),
         )
 
     def test_existing_high_risk_path_stays_high_case_insensitively(self) -> None:
@@ -164,56 +164,34 @@ class MarkdownLinkTests(unittest.TestCase):
             self.assertEqual(check_file(source, root), [(1, "docs/Rules.md")])
 
 
-class VueStarterDistributionTests(unittest.TestCase):
-    PROFILE_SOURCES = {
-        "static-preview.json": "examples/material-submission",
-        "frontend-source.json": "starters/vue-prototype",
-        "backend-requirements.json": "starters/vue-prototype",
-    }
-
-    def test_distributed_templates_match_canonical_templates(self) -> None:
-        pairs = {
-            ROOT / "templates/module/CURRENT.md": ROOT / "starters/vue-prototype/module-template/facts/module/CURRENT.md",
-            ROOT / "templates/module/BUSINESS_RULES.md": ROOT / "starters/vue-prototype/module-template/facts/module/BUSINESS_RULES.md",
-            ROOT / "templates/module/PAGE_FLOW.md": ROOT / "starters/vue-prototype/module-template/facts/module/PAGE_FLOW.md",
-            ROOT / "templates/module/DECISIONS.md": ROOT / "starters/vue-prototype/module-template/facts/module/DECISIONS.md",
-            ROOT / "templates/module/ERROR_LEDGER.md": ROOT / "starters/vue-prototype/module-template/facts/module/ERROR_LEDGER.md",
-            ROOT / "templates/optional/API_HANDOFF.md": ROOT / "starters/vue-prototype/api-template/API_HANDOFF.md",
-        }
-        for canonical, distributed in pairs.items():
-            with self.subTest(template=canonical.name):
-                self.assertEqual(canonical.read_bytes(), distributed.read_bytes())
-
-    def test_frontend_profile_includes_required_distributed_templates(self) -> None:
-        profile = json.loads((ROOT / "examples/package-profiles/frontend-source.json").read_text(encoding="utf-8"))
-        included = set(profile["include"])
-        required = set(profile["required"])
-        for path in (
-            "module-template/facts/module/CURRENT.md",
-            "module-template/facts/module/BUSINESS_RULES.md",
-            "module-template/facts/module/PAGE_FLOW.md",
-            "module-template/facts/module/DECISIONS.md",
-            "module-template/facts/module/ERROR_LEDGER.md",
-            "api-template/API_HANDOFF.md",
-        ):
-            with self.subTest(path=path):
-                self.assertIn(path.split("/")[0], included)
-                self.assertIn(path, required)
-
-    def test_all_delivery_profiles_build_and_independently_verify_zip(self) -> None:
+class DeliveryProfileTemplateTests(unittest.TestCase):
+    def test_profile_templates_build_and_independently_verify_with_minimal_inputs(self) -> None:
+        profile_dir = ROOT / "templates/package-profiles"
         packager = ROOT / ".agents/skills/pm-prototype-packager/scripts/package.py"
-        profile_dir = ROOT / "examples/package-profiles"
-        actual_profiles = {path.name for path in profile_dir.glob("*.json")}
-        self.assertEqual(actual_profiles, set(self.PROFILE_SOURCES))
+        scenarios = (
+            ("static-preview.json", "static-preview", "index.html", "<!doctype html><html><body>fixture</body></html>"),
+            ("frontend-source.json", "frontend-source", "source-entry.txt", "fictional source fixture"),
+            ("backend-requirements.json", "backend-requirements", "requirements.md", "# Fictional requirements\n待项目证据确认。"),
+        )
 
-        for profile_name, source_relative in self.PROFILE_SOURCES.items():
-            with self.subTest(profile=profile_name), tempfile.TemporaryDirectory() as directory:
-                profile = profile_dir / profile_name
-                source = ROOT / source_relative
-                config = json.loads(profile.read_text(encoding="utf-8"))
-                self.assertTrue(source.is_dir())
+        for template_name, expected_kind, entry, content in scenarios:
+            with self.subTest(template=template_name), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                profile_path = root / "profile.json"
+                profile_path.write_bytes((profile_dir / template_name).read_bytes())
+                config = json.loads(profile_path.read_text(encoding="utf-8"))
+                self.assertEqual(config["kind"], expected_kind)
+                config["include"] = [entry]
+                config["required"] = [entry]
+                config["entry"] = entry
+                if expected_kind == "static-preview":
+                    config["pages"] = [entry]
+                profile_path.write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-                archive = Path(directory) / f"{profile.stem}.zip"
+                source = root / "source"
+                source.mkdir()
+                (source / entry).write_text(content, encoding="utf-8")
+                archive = root / "candidate.zip"
                 build = subprocess.run(
                     [
                         sys.executable,
@@ -221,7 +199,7 @@ class VueStarterDistributionTests(unittest.TestCase):
                         "--source",
                         str(source),
                         "--profile",
-                        str(profile),
+                        str(profile_path),
                         "--output",
                         str(archive),
                     ],
@@ -242,16 +220,14 @@ class VueStarterDistributionTests(unittest.TestCase):
 
                 with zipfile.ZipFile(archive) as package:
                     names = set(package.namelist())
-                self.assertIn(config["entry"], names)
-                for required in config["required"]:
-                    with self.subTest(profile=profile_name, required=required):
-                        self.assertIn(required, names)
-
-                if config["kind"] == "backend-requirements":
-                    self.assertIn("api-template/API_HANDOFF.md", names)
-                    self.assertFalse(
-                        any("pages" in name.split("/") or name.endswith((".vue", "mock.ts")) for name in names)
-                    )
+                    manifest = json.loads(package.read("manifest.json").decode("utf-8"))
+                self.assertEqual(manifest["kind"], expected_kind)
+                self.assertIn(entry, names)
+                self.assertIn(entry, manifest["required"])
+                self.assertEqual(
+                    names,
+                    set(manifest["files"]) | {"manifest.json", "SHA256SUMS"},
+                )
 
 
 class MaintenanceScriptFailureTests(unittest.TestCase):

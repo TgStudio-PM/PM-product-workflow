@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "kind": "backend-requirements",
+  "name": "后端需求评审材料包",
+  "output": "deliveries/backend-requirements.zip",
+  "include": [
+    "path/to/requirements.md"
+  ],
+  "required": [
+    "path/to/requirements.md"
+  ],
+  "entry": "path/to/requirements.md",
+  "limitations": "仅按项目证据列明评审材料；未确认的接口和业务语义应标记待确认。"
+}
