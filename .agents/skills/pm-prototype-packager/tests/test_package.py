@@ -248,6 +248,45 @@ class PackageTests(unittest.TestCase):
         self.assertNotIn(str(self.source), message)
         self.assertNotIn("fictional payload", message)
 
+    def test_cli_reports_uncovered_profile_paths_and_does_not_create_output_parent(self) -> None:
+        output = self.root / "not-created" / "nested" / "bundle.zip"
+        self.profile(
+            "frontend-source",
+            ["src"],
+            ["z-missing.md", "a-missing.md"],
+            "z-missing.md",
+        )
+        stderr = io.StringIO()
+        with patch.object(package, "_collect_files", wraps=package._collect_files) as collect_files:
+            with redirect_stderr(stderr):
+                exit_code = package.main([
+                    "--source", str(self.source),
+                    "--profile", str(self.profile_path),
+                    "--output", str(output),
+                ])
+        message = stderr.getvalue().strip()
+        self.assertEqual(exit_code, 2)
+        collect_files.assert_not_called()
+        self.assertIn(
+            'PROFILE-09 required files and entry must be covered by include '
+            '(uncovered_count=2; uncovered_paths=["a-missing.md", "z-missing.md"])',
+            message,
+        )
+        self.assertNotIn(str(self.source), message)
+        self.assertFalse(output.parent.exists())
+        self.assertFalse(os.path.lexists(output))
+
+    def test_profile_uncovered_paths_are_limited_and_json_escaped(self) -> None:
+        uncovered = [f"path-{index:02}.md" for index in range(21)] + ["line\nbreak.md"]
+        self.profile("frontend-source", ["src"], uncovered, "path-20.md")
+        with self.assertRaises(package.PackageError) as caught:
+            package._load_profile(self.profile_path)
+        message = str(caught.exception)
+        self.assertIn("uncovered_count=22; uncovered_paths=", message)
+        self.assertIn(r'"line\nbreak.md"', message)
+        self.assertIn("omitted_count=2", message)
+        self.assertNotIn(str(self.source), message)
+
     def test_markdown_relative_links_resolve_inside_package(self) -> None:
         self.write("docs/guide.md", """[trial](./ADD%5FTRIAL.md#step)\n\n[external](https://example.invalid/missing.md)\n\n[section](#local)\n\n```md\n[example](missing.md)\n```\n""")
         self.write("docs/ADD_TRIAL.md", "fictional trial")
@@ -596,6 +635,49 @@ class PackageTests(unittest.TestCase):
                         package.build(self.source, self.profile_path, output)
                 self.assertFalse(os.path.lexists(output))
                 self.assertEqual(list(self.root.glob(f".{output.name}.*.tmp")), [])
+
+    def test_collect_reports_duplicate_and_reserved_paths_before_reading_conflict_payload(self) -> None:
+        self.write("contract.md", "fictional contract")
+        self.write("slot/child.txt", "fictional child payload")
+        self.profile(
+            "backend-requirements",
+            ["slot", "slot/child.txt", "contract.md"],
+            ["contract.md"],
+            "contract.md",
+        )
+        original_read_bytes = Path.read_bytes
+        read_paths: list[str] = []
+
+        def counted_read_bytes(path: Path) -> bytes:
+            read_paths.append(str(path))
+            return original_read_bytes(path)
+
+        with patch.object(Path, "read_bytes", new=counted_read_bytes):
+            with self.assertRaises(package.PackageError) as caught:
+                package.build(self.source, self.profile_path, self.output)
+        self.assertIn(
+            'SOURCE-03 duplicate or reserved archive path (archive_name="slot/child.txt"; reason=duplicate)',
+            str(caught.exception),
+        )
+        self.assertNotIn(str(self.source), str(caught.exception))
+        self.assertNotIn("fictional child payload", str(caught.exception))
+        self.assertEqual(read_paths.count(str(self.source / "slot/child.txt")), 1)
+        self.assertFalse(os.path.lexists(self.output))
+
+        self.write("README.md", "fictional reserved metadata")
+        self.profile("backend-requirements", ["README.md", "contract.md"], ["contract.md"], "contract.md")
+        read_paths.clear()
+        with patch.object(Path, "read_bytes", new=counted_read_bytes):
+            with self.assertRaises(package.PackageError) as caught:
+                package.build(self.source, self.profile_path, self.output)
+        self.assertIn(
+            'SOURCE-03 duplicate or reserved archive path (archive_name="README.md"; reason=reserved)',
+            str(caught.exception),
+        )
+        self.assertNotIn(str(self.source), str(caught.exception))
+        self.assertNotIn("fictional reserved metadata", str(caught.exception))
+        self.assertNotIn(str(self.source / "README.md"), read_paths)
+        self.assertFalse(os.path.lexists(self.output))
 
     def test_verify_rejects_signed_file_parent_conflicts_in_any_order(self) -> None:
         cases = (
