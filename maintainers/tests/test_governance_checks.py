@@ -6,14 +6,17 @@ import sys
 import tempfile
 import unittest
 import zipfile
+from contextlib import redirect_stderr, redirect_stdout
+from io import StringIO
 from pathlib import Path
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "maintainers" / "scripts"))
 
-from check_markdown_links import check_file  # noqa: E402
-from check_public_content import classify_risk, scan_text  # noqa: E402
+from check_markdown_links import check_file, main as markdown_links_main  # noqa: E402
+from check_public_content import classify_risk, main as public_content_main, scan_text  # noqa: E402
 
 
 def git(root: Path, *args: str) -> None:
@@ -249,6 +252,65 @@ class VueStarterDistributionTests(unittest.TestCase):
                     self.assertFalse(
                         any("pages" in name.split("/") or name.endswith((".vue", "mock.ts")) for name in names)
                     )
+
+
+class MaintenanceScriptFailureTests(unittest.TestCase):
+    HINT = "Run repository maintenance checks in a Git clone/checkout; check the root path and any base ref."
+
+    def test_non_git_cli_failures_give_checkout_guidance(self) -> None:
+        cases = (
+            (ROOT / "maintainers/scripts/check_markdown_links.py", lambda root: [str(root)]),
+            (ROOT / "maintainers/scripts/check_public_content.py", lambda root: ["--root", str(root)]),
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for script, arguments in cases:
+                with self.subTest(script=script.name):
+                    result = subprocess.run(
+                        [sys.executable, str(script), *arguments(root)],
+                        cwd=ROOT,
+                        capture_output=True,
+                        text=True,
+                        encoding="utf-8",
+                    )
+                    output = result.stdout + result.stderr
+                    self.assertEqual(result.returncode, 2)
+                    self.assertIn("[CHECK_ERROR] CalledProcessError", result.stderr)
+                    self.assertIn(self.HINT, result.stderr)
+                    self.assertNotIn("passed", output.casefold())
+                    self.assertNotIn(str(root), output)
+
+    def test_called_process_error_does_not_echo_command_or_stderr(self) -> None:
+        sentinel = "ISSUE180_SENSITIVE_GIT_COMMAND_AND_STDERR"
+        cases = (
+            (markdown_links_main, "check_markdown_links.subprocess.run", lambda root: ["check_markdown_links.py", str(root)]),
+            (public_content_main, "check_public_content.subprocess.run", lambda root: ["check_public_content.py", "--root", str(root)]),
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for main, target, arguments in cases:
+                with self.subTest(main=main.__module__):
+                    error = subprocess.CalledProcessError(
+                        128,
+                        ["git", sentinel],
+                        stderr=sentinel,
+                    )
+                    stderr = StringIO()
+                    stdout = StringIO()
+                    with (
+                        patch(target, side_effect=error),
+                        patch.object(sys, "argv", arguments(root)),
+                        redirect_stdout(stdout),
+                        redirect_stderr(stderr),
+                    ):
+                        exit_code = main()
+                    output = stdout.getvalue() + stderr.getvalue()
+                    self.assertEqual(exit_code, 2)
+                    self.assertIn("[CHECK_ERROR] CalledProcessError", stderr.getvalue())
+                    self.assertIn(self.HINT, stderr.getvalue())
+                    self.assertNotIn(sentinel, output)
+                    self.assertNotIn(str(root), output)
+                    self.assertNotIn("passed", output.casefold())
 
 
 if __name__ == "__main__":

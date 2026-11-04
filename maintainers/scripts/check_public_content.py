@@ -267,6 +267,8 @@ def main() -> int:
         risk, reasons = classify_risk(root, args.base_ref)
     except (OSError, subprocess.CalledProcessError) as error:
         print(f"[CHECK_ERROR] {type(error).__name__}", file=sys.stderr)
+        if isinstance(error, subprocess.CalledProcessError):
+            print("Run repository maintenance checks in a Git clone/checkout; check the root path and any base ref.", file=sys.stderr)
         return 2
 
     publish_risk(risk, reasons)
