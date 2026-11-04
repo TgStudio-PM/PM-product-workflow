@@ -120,9 +120,9 @@ See the complete [open-source boundary](maintainers/OPEN_SOURCE_BOUNDARY.md). Pr
 - [x] Provide a product guide centered on prototype iteration, fact sync, and continuation.
 - [ ] Complete the `gov-enterprise-cn` profile and v0.1 acceptance.
 
-The PR141 native-case checks in Chrome 155 and Edge 155 passed for local HTTP recovery, the government-blue styling, and narrow-screen layout. See [ERR-20261028-004](maintainers/errors/ERR-20261028-004.md) for scope and limits. HTTP does not confirm offline `file://` interaction. The historical Chrome and Edge `file://` check applies to the static package rebuilt for the [October 21 acceptance record](maintainers/acceptance/2026-10-21-v01-product-audit.md); the latest native case and blue Vue page still need `file://` checks in their target environments.
+Targeted `file://` checks for the native case and Vue apply only to the versions and scopes in their records; see [ERR-20261026-007](maintainers/errors/ERR-20261026-007.md) and the [module status](examples/material-submission/facts/module/CURRENT.md). Later route and home-entry checks are scoped in [their records](maintainers/errors/ERR-20261028-001.md) and [the home-entry record](maintainers/errors/ERR-20261103-002.md); the latest home-entry candidate has HTTP review only, and `file://` remains unverified. Historical or targeted checks do not mean the latest target environment has passed a full check.
 
-An independent non-developer product manager's full requirement-iteration and continuation trial remains pending. The five-minute simple-page target is an optional engineering-efficiency observation, with no target-PM timing acceptance evidence yet. Real interfaces and production behavior are unconfirmed; this repository does not claim production integration. Version 0.1 has not been formally released.
+The full requirement-iteration and continuation trial by an independent non-developer product manager, manual double-click acceptance, and Windows hardware checks at 2K/125% remain pending. The five-minute simple-page target is only an optional engineering-efficiency observation, with no target-PM timing acceptance. Real interfaces and production behavior remain unconfirmed; this repository does not claim production integration and has not formally released v0.1.
 
 ## Contributing and license
 
