@@ -151,10 +151,23 @@ def _collect_files(root: Path, profile: dict) -> dict[str, bytes]:
                 files[archive_name] = candidate.read_bytes()
             except OSError:
                 raise PackageError("SOURCE-04 unable to read allowlisted file") from None
-    for raw in profile["required"] + [profile["entry"]] + profile.get("pages", []):
-        rel = _safe_relative(raw, "required")
-        if rel.as_posix() not in files:
-            raise PackageError("SOURCE-05 required file, entry, or page is missing from allowlisted files")
+    missing = sorted({
+        rel.as_posix()
+        for raw in profile["required"] + [profile["entry"]] + profile.get("pages", [])
+        for rel in [_safe_relative(raw, "required")]
+        if rel.as_posix() not in files
+    })
+    if missing:
+        shown = missing[:20]
+        detail = (
+            f" (missing_count={len(missing)}; "
+            f"missing_paths={json.dumps(shown, ensure_ascii=True)}"
+        )
+        if len(missing) > len(shown):
+            detail += f"; omitted_count={len(missing) - len(shown)}"
+        raise PackageError(
+            "SOURCE-05 required file, entry, or page is missing from allowlisted files" + detail + ")"
+        )
     return files
 
 

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import io
 import json
 import os
 import tempfile
 import unittest
 import zipfile
+from contextlib import redirect_stderr
 from pathlib import Path
 from unittest.mock import patch
 
@@ -185,6 +187,66 @@ class PackageTests(unittest.TestCase):
         self.profile("frontend-source", ["index.html", "missing.json"], ["missing.json"], "index.html")
         with self.assertRaisesRegex(package.PackageError, "SOURCE-05"):
             package.build(self.source, self.profile_path, self.output)
+
+    def test_cli_reports_multiple_missing_required_paths_and_does_not_create_zip(self) -> None:
+        self.write("index.html", "fictional source content")
+        self.profile(
+            "frontend-source",
+            ["index.html", "missing-a.json", "missing-b.json"],
+            ["missing-a.json", "missing-b.json"],
+            "index.html",
+        )
+        stderr = io.StringIO()
+        with redirect_stderr(stderr):
+            exit_code = package.main([
+                "--source", str(self.source),
+                "--profile", str(self.profile_path),
+                "--output", str(self.output),
+            ])
+        message = stderr.getvalue().strip()
+        self.assertEqual(exit_code, 2)
+        self.assertTrue(
+            message.startswith(
+                "SOURCE-05 required file, entry, or page is missing from allowlisted files"
+            )
+        )
+        self.assertIn('missing_count=2; missing_paths=["missing-a.json", "missing-b.json"]', message)
+        self.assertFalse(self.output.exists())
+
+    def test_missing_required_entry_and_pages_are_deduplicated_and_sorted(self) -> None:
+        self.write("index.html", "ok")
+        profile = {
+            "include": ["index.html"],
+            "required": ["z-missing.md", "a-missing.md"],
+            "entry": "z-missing.md",
+            "pages": ["a-missing.md", "b-missing.md", "z-missing.md"],
+        }
+        with self.assertRaises(package.PackageError) as caught:
+            package._collect_files(self.source, profile)
+        self.assertEqual(
+            str(caught.exception),
+            "SOURCE-05 required file, entry, or page is missing from allowlisted files "
+            '(missing_count=3; missing_paths=["a-missing.md", "b-missing.md", "z-missing.md"])',
+        )
+
+    def test_missing_paths_are_limited_and_control_characters_are_json_escaped(self) -> None:
+        self.write("index.html", "fictional payload that must not be printed")
+        missing_paths = [f"path-{index:02}.md" for index in range(21)] + ["line\nbreak.md"]
+        profile = {
+            "include": ["index.html"],
+            "required": missing_paths,
+            "entry": "index.html",
+            "pages": [],
+        }
+        with self.assertRaises(package.PackageError) as caught:
+            package._collect_files(self.source, profile)
+        message = str(caught.exception)
+        self.assertIn("missing_count=22; missing_paths=", message)
+        self.assertIn(r'"line\nbreak.md"', message)
+        self.assertIn("omitted_count=2", message)
+        self.assertEqual(message.count('", "'), 19)
+        self.assertNotIn(str(self.source), message)
+        self.assertNotIn("fictional payload", message)
 
     def test_markdown_relative_links_resolve_inside_package(self) -> None:
         self.write("docs/guide.md", """[trial](./ADD%5FTRIAL.md#step)\n\n[external](https://example.invalid/missing.md)\n\n[section](#local)\n\n```md\n[example](missing.md)\n```\n""")
