@@ -16,7 +16,7 @@
 | 线索 | 处理 |
 | --- | --- |
 | 项目与 README 状态滞后 | 已由 [Issue #179](https://github.com/TgStudio-PM/PM-product-workflow/issues/179) 修正；详见[错误记录](../errors/ERR-20261104-001.md)。 |
-| `test:preview-verify` 缺 `dist` 前置 | 已复现：缺件 exit 1、级联失败；先 `preview:pack` 后 73/73（级联计数非独立缺陷）。后续见 [Issue #181](https://github.com/TgStudio-PM/PM-product-workflow/issues/181)；明示前置/友好失败，不隐式重建。 |
+| `test:preview-verify` 缺 `dist` 前置 | 已复现并补前置提示与 README，缺件明确非零；详见 [ERR-20261104-002](../errors/ERR-20261104-002.md) 与 [Issue #181](https://github.com/TgStudio-PM/PM-product-workflow/issues/181)。 |
 | 非 Git 目录中的维护脚本报错 | CLI 已独立复现；[Issue #180](https://github.com/TgStudio-PM/PM-product-workflow/issues/180) 待修。保留 exit 2，不回显 Git 原始 stderr。 |
 | 模板主任务后移建议 | 与当前模板顺序不符；单行 Markdown 不构成长度限制，不增字段。 |
 | 暂存后材料仍缺 | 证据不足以确认是缺陷；不改提交规则。 |
