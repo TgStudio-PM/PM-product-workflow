@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { spawnSync } from 'node:child_process'
-import { cp, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises'
+import { access, cp, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises'
 import { test } from 'node:test'
 import { deflateSync } from 'node:zlib'
 import os from 'node:os'
@@ -9,6 +9,13 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const starterRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+
+try {
+  await access(path.join(starterRoot, 'dist', 'preview'))
+} catch (error) {
+  if (error?.code !== 'ENOENT') throw error
+  throw new Error('Preview fixtures missing. Run npm run preview:pack before npm run test:preview-verify.')
+}
 
 function createOnePixelPng() {
   function crc32(bytes) {

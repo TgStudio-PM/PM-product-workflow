@@ -9,6 +9,29 @@ import { fileURLToPath } from 'node:url'
 
 const starterRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
+test('test:preview-verify explains the preview:pack prerequisite in a fresh copy', async (t) => {
+  const fixtureRoot = await mkdtemp(path.join(os.tmpdir(), 'tg-studio-preview-prerequisite-'))
+  t.after(() => rm(fixtureRoot, { recursive: true, force: true }))
+
+  const testsDirectory = path.join(fixtureRoot, 'tests')
+  await mkdir(testsDirectory, { recursive: true })
+  const isolatedTest = path.join(testsDirectory, 'verify-preview.test.mjs')
+  await cp(path.join(starterRoot, 'tests', 'verify-preview.test.mjs'), isolatedTest)
+  await assert.rejects(access(path.join(fixtureRoot, 'dist', 'preview')), { code: 'ENOENT' })
+
+  const childEnv = { ...process.env }
+  delete childEnv.NODE_TEST_CONTEXT
+  const result = spawnSync(process.execPath, ['--test', isolatedTest], {
+    cwd: fixtureRoot,
+    encoding: 'utf8',
+    env: childEnv,
+  })
+  const output = `${result.stdout ?? ''}\n${result.stderr ?? ''}`
+
+  assert.notEqual(result.status, 0, output)
+  assert.match(output, /Run npm run preview:pack before npm run test:preview-verify/)
+})
+
 async function createMissingLicenseFixture(t) {
   const fixtureRoot = await mkdtemp(path.join(os.tmpdir(), 'tg-studio-preview-notices-missing-'))
   t.after(() => rm(fixtureRoot, { recursive: true, force: true }))
