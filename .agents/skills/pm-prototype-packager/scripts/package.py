@@ -595,18 +595,20 @@ def verify(archive_path: Path) -> None:
             if set(names) != set(expected) | {"manifest.json", "SHA256SUMS"}:
                 raise PackageError("VERIFY-05 archive entries do not match manifest")
             normalized: dict[str, str] = {}
+            payload: dict[str, bytes] = {}
             for name, digest in expected.items():
                 safe = _safe_relative(name, "manifest")
                 if safe.as_posix() != name or not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
                     raise PackageError("VERIFY-06 manifest contains an unsafe path or invalid digest")
-                actual = _sha(archive.read(name))
+                payload[name] = archive.read(name)
+                actual = _sha(payload[name])
                 if actual != digest:
                     raise PackageError("VERIFY-07 file hash does not match manifest")
                 normalized[name] = digest
             expected_sums = "".join(f"{digest}  {name}\n" for name, digest in sorted(normalized.items())).encode("utf-8")
             if archive.read("SHA256SUMS") != expected_sums:
                 raise PackageError("VERIFY-08 SHA256SUMS does not match manifest")
-            _audit_markdown({name: archive.read(name) for name in expected})
+            _audit_markdown(payload)
             entry = _safe_relative(manifest["entry"], "manifest entry").as_posix()
             required_paths = [_safe_relative(path, "manifest required").as_posix() for path in manifest["required"]]
             if entry not in normalized or entry not in required_paths:
@@ -620,7 +622,6 @@ def verify(archive_path: Path) -> None:
                     page_path = _safe_relative(page, "manifest page").as_posix()
                     if page_path not in normalized:
                         raise PackageError("VERIFY-13 manifest page is missing from archive")
-                payload = {name: archive.read(name) for name in expected}
                 _audit_static(payload, {"entry": manifest["entry"], "pages": manifest.get("pages", [])})
     except PackageError:
         raise

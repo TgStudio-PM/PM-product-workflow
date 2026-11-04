@@ -107,6 +107,58 @@ class PackageTests(unittest.TestCase):
                 for name in files:
                     (self.source / name).unlink()
 
+    def test_verify_reads_each_archive_member_once_for_all_delivery_kinds(self) -> None:
+        scenarios = [
+            (
+                "static-preview",
+                {
+                    "index.html": '<script src="app.js"></script><link rel="stylesheet" href="app.css">',
+                    "app.js": "window.fixture = true;",
+                    "app.css": "body { color: black; }",
+                },
+                "index.html",
+                {"pages": ["index.html"]},
+            ),
+            (
+                "frontend-source",
+                {"package.json": '{"scripts":{}}', "src/main.js": "window.fixture = true;"},
+                "src/main.js",
+                {},
+            ),
+            (
+                "backend-requirements",
+                {"contract.md": "# Fictional requirements\n"},
+                "contract.md",
+                {},
+            ),
+        ]
+        for kind, files, entry, extra in scenarios:
+            with self.subTest(kind=kind):
+                for name, content in files.items():
+                    self.write(name, content)
+                self.profile(kind, list(files), list(files), entry, **extra)
+                output = self.root / f"{kind}-read-count.zip"
+                package.build(self.source, self.profile_path, output)
+
+                read_counts: dict[str, int] = {}
+                original_read = zipfile.ZipFile.read
+
+                def counted_read(
+                    archive: zipfile.ZipFile,
+                    name: str | zipfile.ZipInfo,
+                    *args: object,
+                    **kwargs: object,
+                ) -> bytes:
+                    member = name.filename if isinstance(name, zipfile.ZipInfo) else str(name)
+                    read_counts[member] = read_counts.get(member, 0) + 1
+                    return original_read(archive, name, *args, **kwargs)
+
+                with patch.object(zipfile.ZipFile, "read", new=counted_read):
+                    package.verify(output)
+                with zipfile.ZipFile(output) as archive:
+                    expected_counts = {name: 1 for name in archive.namelist()}
+                self.assertEqual(read_counts, expected_counts)
+
     def test_frontend_readme_mentions_optional_page_guide_only_when_included(self) -> None:
         self.write("package.json", '{"scripts":{}}')
         self.write("docs/ADD_PAGE.md", "Fictional page guide")
