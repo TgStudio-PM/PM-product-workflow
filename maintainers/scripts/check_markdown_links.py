@@ -78,6 +78,8 @@ def main() -> int:
                 missing.append((path.relative_to(root).as_posix(), line, target))
     except (OSError, UnicodeDecodeError, subprocess.CalledProcessError) as error:
         print(f"[CHECK_ERROR] {type(error).__name__}", file=sys.stderr)
+        if isinstance(error, subprocess.CalledProcessError):
+            print("Run repository maintenance checks in a Git clone/checkout; check the root path and any base ref.", file=sys.stderr)
         return 2
     for path, line, target in missing:
         print(f"[MISSING_LINK] {path}:{line} -> {target}", file=sys.stderr)
