@@ -22,7 +22,7 @@
 ## 提供的工作流资源
 
 - **方法**：[需求迭代与接续主指南](docs/product/PROTOTYPE_ITERATION.md)、[Skills 使用说明](docs/product/USING_SKILLS.md)、[按需交付说明](docs/product/PACKAGING.md)。
-- **三个现有 Skills**：`pm-prototype-memory` 管事实与变化，`pm-prototype-handover` 管会话接续，`pm-prototype-packager` 按实际用途准备白名单交付。
+- **四个 Skills**：`pm-prototype-memory` 管事实与变化，`gov-requirements-doc-writer` 按需写作/更新/评审开发需求文档，`pm-prototype-handover` 管会话接续，`pm-prototype-packager` 按实际用途准备白名单交付。
 - **项目与模块模板**：`templates/project/`、`templates/module/`，按需复制并沿用项目现有结构。
 - **可选设计预设**：[`gov-enterprise-cn`](profiles/gov-enterprise-cn/PROFILE.md)，需结合项目确认的规范与规则使用。
 - **三类交付配置模板**：`templates/package-profiles/`，须先复制到自己的项目，按实际文件和证据定制后再用于打包。

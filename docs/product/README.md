@@ -6,7 +6,7 @@
 
 阅读[原型需求迭代与接续指南](PROTOTYPE_ITERATION.md)，把本轮目标、需求来源和可访问的项目路径提供给 Agent。沿用项目现有入口、技术栈、设计约束和组件，先查影响，再实现本轮原型改动并按业务路径验收。
 
-如从需求开始建立初版原型，先确认目标用户、角色与流程、设计约束及技术栈。对缺失的关键规则、字段、接口和运行条件提出待确认项，不在此工作流中承诺开箱可运行的应用脚手架。
+如从需求开始建立初版原型，先确认目标用户、角色与流程、设计约束及技术栈。对缺失的关键规则、字段、接口和运行条件提出待确认项，不在此工作流中承诺开箱可运行的应用脚手架。需要面向前端、后端或 QA 整理开发需求时，可按需使用 [`gov-requirements-doc-writer`](../../.agents/skills/gov-requirements-doc-writer/SKILL.md)；它只写作、更新或评审文档，不代替原型开发或业务验收。
 
 ## 在已有项目中接入
 
@@ -20,7 +20,7 @@
 
 ## 工作流资源
 
-- 三个现有 Skills：[`pm-prototype-memory`](../../.agents/skills/pm-prototype-memory/SKILL.md)、[`pm-prototype-handover`](../../.agents/skills/pm-prototype-handover/SKILL.md)、[`pm-prototype-packager`](../../.agents/skills/pm-prototype-packager/SKILL.md)。按任务选用，见[Skills 使用说明](USING_SKILLS.md)。
+- 四个 Skills：[`pm-prototype-memory`](../../.agents/skills/pm-prototype-memory/SKILL.md)、[`gov-requirements-doc-writer`](../../.agents/skills/gov-requirements-doc-writer/SKILL.md)、[`pm-prototype-handover`](../../.agents/skills/pm-prototype-handover/SKILL.md)、[`pm-prototype-packager`](../../.agents/skills/pm-prototype-packager/SKILL.md)。按任务选用，见[Skills 使用说明](USING_SKILLS.md)。
 - 项目/模块事实模板：`templates/project/`、`templates/module/`。
 - 可选政务与复杂 B 端预设：[gov-enterprise-cn](../../profiles/gov-enterprise-cn/PROFILE.md)。
 - 需要向接收方交付时，按[打包说明](PACKAGING.md)复制并定制交付配置模板。
