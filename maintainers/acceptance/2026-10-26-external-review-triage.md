@@ -13,14 +13,14 @@
 
 ## 已核对的取舍
 
-1. **优先修复公开边界和工程外写入。** 带引号凭据键漏扫已在本仓库用完全虚构输入独立复现，经 [Issue #117](https://github.com/TgStudio-PM/PM-product-workflow/issues/117)、[PR #119](https://github.com/TgStudio-PM/PM-product-workflow/pull/119) 修复；定向测试与 GitHub CI 通过，详见[错误记录](../errors/ERR-20261026-003.md)。`page:new` 的父路径链接问题可由[当前源码](../../starters/vue-prototype/scripts/create-page.mjs)定位，外部反例提供了工程外写入线索；[Issue #118](https://github.com/TgStudio-PM/PM-product-workflow/issues/118) 要求先在隔离环境复现，再做有限修复。不得在真实项目或原型目录运行反例。
-2. **交付边界按独立反例继续核对。** 外部报告指出 Vue 预览 CSS 缺失资源、通用打包器的 `object.data`/`video.poster` 引用、原生案例无效已提交状态恢复，以及畸形 Profile 类型的异常提示。公开[预览审计器](../../starters/vue-prototype/scripts/verify-preview.mjs)、[通用打包器](../../.agents/skills/pm-prototype-packager/scripts/package.py)与[原生案例](../../examples/material-submission/app.js)存在对应静态检查范围；这些结论仍需逐项独立复现，不提前标为本仓库已解决或正式发布阻断的已确认事故。
+1. **优先修复公开边界和工程外写入。** 带引号凭据键漏扫已在本仓库用完全虚构输入独立复现，经 [Issue #117](https://github.com/TgStudio-PM/PM-product-workflow/issues/117)、[PR #119](https://github.com/TgStudio-PM/PM-product-workflow/pull/119) 修复；定向测试与 GitHub CI 通过，详见[错误记录](../errors/ERR-20261026-003.md)。`page:new` 的父路径链接问题可由[当前源码](https://github.com/TgStudio-PM/PM-product-workflow/blob/a66a8599d22b10d8511aa5f74e7317d7ce92aa10/starters/vue-prototype/scripts/create-page.mjs)定位，外部反例提供了工程外写入线索；[Issue #118](https://github.com/TgStudio-PM/PM-product-workflow/issues/118) 要求先在隔离环境复现，再做有限修复。不得在真实项目或原型目录运行反例。
+2. **交付边界按独立反例继续核对。** 外部报告指出 Vue 预览 CSS 缺失资源、通用打包器的 `object.data`/`video.poster` 引用、原生案例无效已提交状态恢复，以及畸形 Profile 类型的异常提示。公开[预览审计器](https://github.com/TgStudio-PM/PM-product-workflow/blob/a66a8599d22b10d8511aa5f74e7317d7ce92aa10/starters/vue-prototype/scripts/verify-preview.mjs)、[通用打包器](../../.agents/skills/pm-prototype-packager/scripts/package.py)与[原生案例](https://github.com/TgStudio-PM/PM-product-workflow/blob/a66a8599d22b10d8511aa5f74e7317d7ce92aa10/examples/material-submission/app.js)存在对应静态检查范围；这些结论仍需逐项独立复现，不提前标为本仓库已解决或正式发布阻断的已确认事故。
 3. **外部试用体验采用最小修正。** ZIP 副本运行仓库维护脚本时缺少 Git 元数据的报错，可先明确脚本适用环境；不因这条反馈为普通产品使用者新增一套文件系统扫描模式。案例的 `ITERATIONS.md` 是教学叙事；暂不把它强制加入每个使用者模块和 `facts:new`，待目标用户试用证明需要再决定。中英 README 同步、状态文案和状态页更新可随对应小改动处理。
 4. **维护体系按实际风险增长。** 浏览器 CI 和主分支保护建议可在已有流程反复出现缺口时以最小配置评估，不因此扩充 v0.1 的产品入口、Skill 或 Vue starter 功能。高风险 PR 的合并授权仍以[现行规则](../MAINTENANCE_POLICY.md)为准；正式 Release 仍需另行授权，外部评审不自动修改已确认政策。
 
 ## 产品主线与后续顺序
 
-本项目继续从作者的真实需求变化、原型迭代、Skill/Agent 协作与前后端交付实践中**提炼方法**；真实项目的源码、规则、截图、数据和对话留在私有工作区。公开产品只保留重新创作的虚构案例、通用模板和可验证的工作流。核心路径仍是“需求与证据 → 事实源 → 原型迭代 → 评审和验证 → 交接 → 按接收者交付”；[Vue starter](../../starters/vue-prototype/README.md)为可选工程示范。
+本项目继续从作者的真实需求变化、原型迭代、Skill/Agent 协作与前后端交付实践中**提炼方法**；真实项目的源码、规则、截图、数据和对话留在私有工作区。公开产品只保留重新创作的虚构案例、通用模板和可验证的工作流。核心路径仍是“需求与证据 → 事实源 → 原型迭代 → 评审和验证 → 交接 → 按接收者交付”；[Vue starter](https://github.com/TgStudio-PM/PM-product-workflow/blob/a66a8599d22b10d8511aa5f74e7317d7ce92aa10/starters/vue-prototype/README.md)为可选工程示范。
 
 后续按序处理：复验第四轮原生案例在目标浏览器的异常状态恢复 → 收集外部试用反馈 → 补独立非开发产品经理试用与计时。每次只让新增检查或文件服务于一个已证实的使用障碍。四项 v0.1 成功标准以[项目宪章](../PROJECT_CHARTER.md)为准；正式发布另行判断。
 

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "kind": "static-preview",
+  "name": "静态预览交付包",
+  "output": "deliveries/static-preview.zip",
+  "include": [
+    "path/to/entry.html"
+  ],
+  "required": [
+    "path/to/entry.html"
+  ],
+  "entry": "path/to/entry.html",
+  "pages": [
+    "path/to/entry.html"
+  ],
+  "limitations": "按实际项目证据填写适用说明；结构检查不等于目标环境验收。"
+}

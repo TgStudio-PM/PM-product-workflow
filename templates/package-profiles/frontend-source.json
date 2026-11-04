@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "kind": "frontend-source",
+  "name": "前端源码交付包",
+  "output": "deliveries/frontend-source.zip",
+  "include": [
+    "path/to/source-entry"
+  ],
+  "required": [
+    "path/to/source-entry"
+  ],
+  "entry": "path/to/source-entry",
+  "limitations": "按项目已有说明核对源码及所需构建步骤；工程检查不代表产品行为验收。"
+}
