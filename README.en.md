@@ -22,7 +22,7 @@ For an existing prototype, reuse its stack, design constraints, components, and 
 ## Workflow resources
 
 - **Methods**: [iteration and continuation guide](docs/product/PROTOTYPE_ITERATION.md), [Skills guide](docs/product/USING_SKILLS.md), and [on-demand packaging guide](docs/product/PACKAGING.md).
-- **Three existing Skills**: `pm-prototype-memory` maintains facts and changes; `pm-prototype-handover` supports session continuation; `pm-prototype-packager` prepares allowlisted delivery packages for an actual need.
+- **Four Skills**: `pm-prototype-memory` maintains facts and changes; `gov-requirements-doc-writer` writes, updates, or reviews development requirement documents on demand; `pm-prototype-handover` supports session continuation; `pm-prototype-packager` prepares allowlisted delivery packages for an actual need.
 - **Project and module templates**: `templates/project/` and `templates/module/`; copy only what is needed and follow the project's existing structure.
 - **Optional design profile**: [`gov-enterprise-cn`](profiles/gov-enterprise-cn/PROFILE.md), to be used with project-confirmed standards and rules.
 - **Three delivery-profile templates**: `templates/package-profiles/`; copy them into your project and customize them from actual files and evidence before packaging.

@@ -12,7 +12,7 @@
 
 ## 已交付能力与待验收
 
-- 三个工作流 Skills：`pm-prototype-memory`、`pm-prototype-handover`、`pm-prototype-packager`。
+- 四个工作流 Skills：`pm-prototype-memory`、`gov-requirements-doc-writer`（按需准备开发需求文档）、`pm-prototype-handover`、`pm-prototype-packager`。新增文档能力不代表独立非开发产品经理实际验收完成。
 - 项目与模块事实模板、可选 `gov-enterprise-cn` Profile、原型迭代与接续指南、按需交付指南。
 - 三类交付配置模板作为待定制起点；具体文件白名单必须依据使用者项目证据生成，不可直接套用。
 - 独立非开发产品经理在其有权访问的原型项目上完成四项主链的实际试用仍待进行。既有 demo、AI 或工程演练不计作该验收。
