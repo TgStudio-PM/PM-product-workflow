@@ -147,6 +147,22 @@ def _check_file_tree(paths: Iterable[str], error: str) -> None:
 
 
 def _collect_files(root: Path, profile: dict) -> dict[str, bytes]:
+    included = [_safe_relative(raw, "include") for raw in profile["include"]]
+    declared = {
+        rel.as_posix(): rel
+        for raw in profile["required"] + [profile["entry"]] + profile.get("pages", [])
+        for rel in [_safe_relative(raw, "required")]
+    }
+    missing = sorted(
+        name for name, rel in declared.items()
+        if not any(rel == inc or inc in rel.parents for inc in included)
+        or not _walk_entry(root, rel).is_file()
+    )
+    if missing:
+        raise PackageError(
+            "SOURCE-05 required file, entry, or page is missing from allowlisted files"
+            + _format_path_list(missing, "missing")
+        )
     files: dict[str, bytes] = {}
     folded: set[str] = set()
     for raw in profile["include"]:
