@@ -2,7 +2,7 @@
 
 本文件记录 PM-product-workflow 仓库状态；产品使用者从[产品工作流指南](../docs/product/README.md)开始，无需读取维护状态。使用者项目的模块状态仍使用[模块 CURRENT 模板](../templates/module/CURRENT.md)。
 
-最后更新：2026-11-04
+最后更新：2026-11-12
 
 ## 稳定基线与定位
 
@@ -12,7 +12,8 @@
 
 ## 已交付能力与待验收
 
-- 四个工作流 Skills：`pm-prototype-memory`、`gov-requirements-doc-writer`（按需准备开发需求文档）、`pm-prototype-handover`、`pm-prototype-packager`。新增文档能力不代表独立非开发产品经理实际验收完成。
+- 六个工作流 Skills：`pm-prototype-memory`、`gov-requirements-doc-writer`、`pm-prototype-handover`、`pm-prototype-packager`、`gov-ui-reviewer`、`gov-ui-refactor`。UI 入口共用现有 Profile；协作可选用 Tg Studio 执行角色与已有任务包。见 [ADR 0007](decisions/0007-ui-skills-and-lifecycle-feedback.md)。
+- 需求到代码落地的负责人实践已用于方法提炼：迭代指南补充开发对照、评审处置和交付版本反馈。这是负责人自用实践，不是独立非开发产品经理验收。
 - 项目与模块事实模板、可选 `gov-enterprise-cn` Profile、原型迭代与接续指南、按需交付指南。
 - 三类交付配置模板作为待定制起点；具体文件白名单必须依据使用者项目证据生成，不可直接套用。
 - 独立非开发产品经理在其有权访问的原型项目上完成四项主链的实际试用仍待进行。既有 demo、AI 或工程演练不计作该验收。
@@ -22,7 +23,7 @@
 
 ## 下一步
 
-1. 继续根据可复现问题改进工作流、模板、Skills、Profile 和打包工具，保留已确认范围并分别记录产品验收与工程验证。
+1. 优先跟踪原型到开发实现的一致性、评审处置和交付反馈中的实际阻力；复用现有 Skills、Profile 与模板，避免重复记录或扩建演示。
 2. 安排独立非开发产品经理在自己的授权原型项目中完成一次需求迭代、业务路径验收、事实同步和接续；记录实际障碍，不以旧演示代替。
 3. 依据使用者真实交付要求检验相应交付材料；若要求离线使用，再在目标环境执行对应验收。
 
