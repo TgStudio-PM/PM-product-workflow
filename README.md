@@ -22,8 +22,9 @@
 ## 提供的工作流资源
 
 - **方法**：[需求迭代与接续主指南](docs/product/PROTOTYPE_ITERATION.md)、[Skills 使用说明](docs/product/USING_SKILLS.md)、[按需交付说明](docs/product/PACKAGING.md)。
-- **四个 Skills**：`pm-prototype-memory` 管事实与变化，`gov-requirements-doc-writer` 按需写作/更新/评审开发需求文档，`pm-prototype-handover` 管会话接续，`pm-prototype-packager` 按实际用途准备白名单交付。
+- **六个 Skills**：`pm-prototype-memory` 管事实与变化，`gov-requirements-doc-writer` 按需写作/更新/评审开发需求文档，`pm-prototype-handover` 管会话接续，`pm-prototype-packager` 按实际用途准备白名单交付；`gov-ui-reviewer` 只读评审界面，`gov-ui-refactor` 落实明确的界面调整。
 - **项目与模块模板**：`templates/project/`、`templates/module/`，按需复制并沿用项目现有结构。
+- **协作角色**：[Tg Studio 执行型 Agent](templates/optional/EXECUTOR_ROLE.md)，搭配现有任务包按需使用，不绑定模型。
 - **可选设计预设**：[`gov-enterprise-cn`](profiles/gov-enterprise-cn/PROFILE.md)，需结合项目确认的规范与规则使用。
 - **三类交付配置模板**：`templates/package-profiles/`，须先复制到自己的项目，按实际文件和证据定制后再用于打包。
 
@@ -31,15 +32,13 @@
 
 个人项目从[产品工作流指南](docs/product/README.md)开始，无需读取仓库维护文件。维护本项目请先读[仓库维护入口](AGENTS.md)和[贡献指南](CONTRIBUTING.md)。
 
-使用者授权的私有资料留在自己的工作区；公开内容红线见[开源边界](maintainers/OPEN_SOURCE_BOUNDARY.md)。
-
 原创内容采用 [MIT License](LICENSE)；第三方依赖和资产遵循各自许可证。
 
 ## About
 
-我是产品经理。这个项目来自我对实际工作和项目中反复遇到的问题、验证过的方法与可复用成果的持续总结，公开内容不包含任何真实项目材料。
+我是产品经理。这个项目来自我对实际工作和项目中反复遇到的问题、验证过的方法与可复用成果的持续总结。
 
-Tg Studio is a product manager's open-source project. It distills recurring problems, validated practices, and reusable outcomes from day-to-day product work into a public workflow, without exposing real project materials.
+Tg Studio is a product manager's open-source project. It distills recurring problems, validated practices, and reusable outcomes from day-to-day product work into a public workflow.
 
 从大学学习、参加工作，到持续学习和使用 AI 的这段时间，我从开源社区获得了许多工具、知识和启发。如今我很高兴能把自己的实践整理成一个开源项目，为社区贡献一份力量。
 

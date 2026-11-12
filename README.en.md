@@ -22,8 +22,9 @@ For an existing prototype, reuse its stack, design constraints, components, and 
 ## Workflow resources
 
 - **Methods**: [iteration and continuation guide](docs/product/PROTOTYPE_ITERATION.md), [Skills guide](docs/product/USING_SKILLS.md), and [on-demand packaging guide](docs/product/PACKAGING.md).
-- **Four Skills**: `pm-prototype-memory` maintains facts and changes; `gov-requirements-doc-writer` writes, updates, or reviews development requirement documents on demand; `pm-prototype-handover` supports session continuation; `pm-prototype-packager` prepares allowlisted delivery packages for an actual need.
+- **Six Skills**: `pm-prototype-memory` maintains facts and changes; `gov-requirements-doc-writer` writes, updates, or reviews development requirement documents on demand; `pm-prototype-handover` supports session continuation; `pm-prototype-packager` prepares scoped delivery packages; `gov-ui-reviewer` reviews screens without changing them; `gov-ui-refactor` implements scoped UI adjustments.
 - **Project and module templates**: `templates/project/` and `templates/module/`; copy only what is needed and follow the project's existing structure.
+- **Collaboration role**: the optional [Tg Studio executor](templates/optional/EXECUTOR_ROLE.md) works with the existing task packet and does not require a particular model.
 - **Optional design profile**: [`gov-enterprise-cn`](profiles/gov-enterprise-cn/PROFILE.md), to be used with project-confirmed standards and rules.
 - **Three delivery-profile templates**: `templates/package-profiles/`; copy them into your project and customize them from actual files and evidence before packaging.
 
@@ -31,13 +32,11 @@ For an existing prototype, reuse its stack, design constraints, components, and 
 
 For your own project, start with the [product workflow guide](docs/product/README.md); you do not need the repository maintenance files. To contribute here, read the [repository maintenance entry](AGENTS.md) and [contribution guide](CONTRIBUTING.md).
 
-Keep authorized private materials in your own workspace. See the [open-source boundary](maintainers/OPEN_SOURCE_BOUNDARY.md).
-
 Original content is licensed under the [MIT License](LICENSE). Third-party dependencies and assets remain subject to their respective licenses.
 
 ## About
 
-Tg Studio is a product manager's open-source project. It distills recurring problems, validated practices, and reusable outcomes from day-to-day product work into a public workflow, without exposing real project materials.
+Tg Studio is a product manager's open-source project. It distills recurring problems, validated practices, and reusable outcomes from day-to-day product work into a public workflow.
 
 From university through my professional career and continued AI learning, I have benefited greatly from open-source tools, knowledge, and communities. I am happy to organize my own practice into an open-source project and give something back.
 

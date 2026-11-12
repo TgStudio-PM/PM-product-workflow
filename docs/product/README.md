@@ -22,7 +22,8 @@
 
 ## 工作流资源
 
-- 四个 Skills：[`pm-prototype-memory`](../../.agents/skills/pm-prototype-memory/SKILL.md)、[`gov-requirements-doc-writer`](../../.agents/skills/gov-requirements-doc-writer/SKILL.md)、[`pm-prototype-handover`](../../.agents/skills/pm-prototype-handover/SKILL.md)、[`pm-prototype-packager`](../../.agents/skills/pm-prototype-packager/SKILL.md)。按任务选用，见[Skills 使用说明](USING_SKILLS.md)。
+- 六个 Skills：[`pm-prototype-memory`](../../.agents/skills/pm-prototype-memory/SKILL.md)、[`gov-requirements-doc-writer`](../../.agents/skills/gov-requirements-doc-writer/SKILL.md)、[`pm-prototype-handover`](../../.agents/skills/pm-prototype-handover/SKILL.md)、[`pm-prototype-packager`](../../.agents/skills/pm-prototype-packager/SKILL.md)、[`gov-ui-reviewer`](../../.agents/skills/gov-ui-reviewer/SKILL.md)、[`gov-ui-refactor`](../../.agents/skills/gov-ui-refactor/SKILL.md)。按任务选用，见[Skills 使用说明](USING_SKILLS.md)。
+- 可选协作角色：[Tg Studio 执行型 Agent](../../templates/optional/EXECUTOR_ROLE.md)，与既有任务包配合使用。
 - 项目/模块事实模板：`templates/project/`、`templates/module/`。
 - 可选政务与复杂 B 端预设：[gov-enterprise-cn](../../profiles/gov-enterprise-cn/PROFILE.md)。
 - 需要向接收方交付时，按[打包说明](PACKAGING.md)复制并定制交付配置模板。
