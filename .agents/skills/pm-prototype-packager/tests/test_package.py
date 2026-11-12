@@ -188,6 +188,57 @@ class PackageTests(unittest.TestCase):
         with self.assertRaisesRegex(package.PackageError, "SOURCE-05"):
             package.build(self.source, self.profile_path, self.output)
 
+    def test_missing_paths_fail_before_reading_payload_or_creating_output(self) -> None:
+        self.write("assets/payload.bin", "payload must not be read")
+        self.write("index.html", "<h1>Tg Studio</h1>")
+        self.write("omitted.html", "existing but not allowlisted")
+        scenarios = (
+            (["index.html", "missing.md"], "index.html", []),
+            (["index.html"], "missing.md", []),
+            (["index.html"], "index.html", ["missing.md"]),
+            (["index.html"], "index.html", ["omitted.html"]),
+        )
+        for required, entry, pages in scenarios:
+            with self.subTest(required=required, entry=entry, pages=pages):
+                self.profile(
+                    "static-preview", ["assets", "index.html", "missing.md"],
+                    required, entry, pages=pages,
+                )
+                output = self.root / "not-created" / "bundle.zip"
+                with patch.object(Path, "read_bytes") as read_payload:
+                    with self.assertRaises(package.PackageError) as caught:
+                        package.build(self.source, self.profile_path, output)
+                self.assertTrue(str(caught.exception).startswith("SOURCE-05"))
+                self.assertIn(pages[0] if pages else "missing.md", str(caught.exception))
+                read_payload.assert_not_called()
+                self.assertFalse(output.parent.exists())
+
+    def test_complete_sources_are_read_once_and_read_failure_keeps_diagnostic(self) -> None:
+        self.write("contract.md", "# Tg Studio")
+        self.write("assets/note.txt", "supporting note")
+        self.profile(
+            "backend-requirements", ["assets", "contract.md"],
+            ["contract.md"], "contract.md",
+        )
+        profile = package._load_profile(self.profile_path)
+        original_read_bytes = Path.read_bytes
+        read_paths: list[Path] = []
+
+        def counted_read_bytes(path: Path) -> bytes:
+            read_paths.append(path)
+            return original_read_bytes(path)
+
+        with patch.object(Path, "read_bytes", new=counted_read_bytes):
+            files = package._collect_files(self.source, profile)
+        self.assertEqual(files, {"assets/note.txt": b"supporting note", "contract.md": b"# Tg Studio"})
+        self.assertCountEqual(read_paths, [self.source / name for name in files])
+
+        with patch.object(Path, "read_bytes", side_effect=PermissionError("private detail")):
+            with self.assertRaises(package.PackageError) as caught:
+                package.build(self.source, self.profile_path, self.output)
+        self.assertEqual(str(caught.exception), "SOURCE-04 unable to read allowlisted file")
+        self.assertFalse(self.output.exists())
+
     def test_cli_reports_multiple_missing_required_paths_and_does_not_create_zip(self) -> None:
         self.write("index.html", "fictional source content")
         self.profile(
