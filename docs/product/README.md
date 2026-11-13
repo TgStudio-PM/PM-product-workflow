@@ -8,13 +8,13 @@
 
 如从需求开始建立初版原型，先确认目标用户、角色与流程、设计约束及技术栈。对缺失的关键规则、字段、接口和运行条件提出待确认项，不在此工作流中承诺开箱可运行的应用脚手架。需要面向前端、后端或 QA 整理开发需求时，可按需使用 [`gov-requirements-doc-writer`](../../.agents/skills/gov-requirements-doc-writer/SKILL.md)；它只写作、更新或评审文档，不代替原型开发或业务验收。
 
-## 在已有项目中接入
+## 本轮准备哪些输入
 
-1. 读取项目已有的 Agent 入口、事实记录和当前原型；只盘点本轮相关页面、数据、组件和约束，优先复用现有材料。
-2. 给出本轮需求、来源或确认责任人、目标版本，以及相关原型和事实文件路径。
-3. 分析影响范围并列出冲突、未知项；明确部分可直接实施，关键缺口先请负责人确认。
-4. 在现有项目中完成代码改动，由产品负责人按受影响业务路径检查。
-5. 在相关事实记录中最小同步已确认变化、原型表现、版本差异和下一步；按需准备接续或交付。
+1. **要改什么**：本轮目标、范围、期望结果和禁止事项。
+2. **从哪里接手**：项目已有入口、当前版本、本轮相关页面和事实记录路径；保留未提交工作。
+3. **依据是什么**：需求来源或确认责任人、已有设计约束，以及还需确认的缺口。
+
+未知信息标为待确认。将这些输入填入[主指南的提示词](PROTOTYPE_ITERATION.md#coding-agent-提示词)，即可围绕明确部分开始工作；不以安装 Skills 或创建整套模板为前提。具体阶段和业务验收按主指南执行。
 
 确定性改动需要交给开发者或执行型 Coding Agent 时，可按需使用[可选执行任务包模板](../../templates/optional/AGENT_TASK.md)锁定输入、文件边界和验收；它不替代需求决策与产品验收，也不是必填流程。
 
@@ -22,7 +22,7 @@
 
 ## 工作流资源
 
-- 六个 Skills：[`pm-prototype-memory`](../../.agents/skills/pm-prototype-memory/SKILL.md)、[`gov-requirements-doc-writer`](../../.agents/skills/gov-requirements-doc-writer/SKILL.md)、[`pm-prototype-handover`](../../.agents/skills/pm-prototype-handover/SKILL.md)、[`pm-prototype-packager`](../../.agents/skills/pm-prototype-packager/SKILL.md)、[`gov-ui-reviewer`](../../.agents/skills/gov-ui-reviewer/SKILL.md)、[`gov-ui-refactor`](../../.agents/skills/gov-ui-refactor/SKILL.md)。按任务选用，见[Skills 使用说明](USING_SKILLS.md)。
+- 根据本轮是否需要事实同步、界面评审/调整、会话接续、开发文档或交付，按 [Skills 使用说明](USING_SKILLS.md)选用对应工具；不要求逐一调用。
 - 可选协作角色：[Tg Studio 执行型 Agent](../../templates/optional/EXECUTOR_ROLE.md)，与既有任务包配合使用。
 - 项目/模块事实模板：`templates/project/`、`templates/module/`。
 - 可选政务与复杂 B 端预设：[gov-enterprise-cn](../../profiles/gov-enterprise-cn/PROFILE.md)。

@@ -10,7 +10,7 @@
 
 ## 开始一次迭代
 
-先看[原型需求迭代与接续指南](docs/product/PROTOTYPE_ITERATION.md)和[产品工作流入口](docs/product/README.md)。在自己的原型项目中提供本轮需求，按项目现有入口读取上下文，再完成：
+从[原型需求迭代与接续指南](docs/product/PROTOTYPE_ITERATION.md)开始。把本轮要改什么、项目入口与相关路径、需求来源和当前版本提供给 Coding Agent；未知信息列为待确认。在自己的原型项目中完成：
 
 ```text
 需求与影响 → 原型代码开发/迭代 → 业务路径验收
@@ -19,10 +19,22 @@
 
 已有原型优先复用项目的技术栈、设计约束、组件和目录。若从明确需求开始建立首版原型，先确认目标用户、角色流程、设计约束和技术栈；缺少关键信息时列为待确认。本项目提供工作流，不交付通用应用脚手架。
 
-## 提供的工作流资源
+可以直接按指南开展本轮工作，无需先安装 Skills 或补齐整套模板。改完由产品负责人核对受影响业务路径，再最小同步事实；接续、开发文档和打包按实际需要选择。
 
-- **方法**：[需求迭代与接续主指南](docs/product/PROTOTYPE_ITERATION.md)、[Skills 使用说明](docs/product/USING_SKILLS.md)、[按需交付说明](docs/product/PACKAGING.md)。
-- **六个 Skills**：`pm-prototype-memory` 管事实与变化，`gov-requirements-doc-writer` 按需写作/更新/评审开发需求文档，`pm-prototype-handover` 管会话接续，`pm-prototype-packager` 按实际用途准备白名单交付；`gov-ui-reviewer` 只读评审界面，`gov-ui-refactor` 落实明确的界面调整。
+## 需要时再选工具
+
+| 本轮需要 | 按需使用 |
+| --- | --- |
+| 评审现有界面，或落实明确的界面调整 | `gov-ui-reviewer` / `gov-ui-refactor` |
+| 核对事实、同步已确认变化或记录重要错误 | `pm-prototype-memory` |
+| 换会话继续未完成工作 | `pm-prototype-handover` |
+| 向前端、后端或 QA 写作、更新或评审开发需求 | `gov-requirements-doc-writer` |
+| 接收方确实需要 ZIP 或独立交付包 | `pm-prototype-packager` |
+
+调用方式和可复制提示词见 [Skills 使用说明](docs/product/USING_SKILLS.md)，交付配置见[按需交付说明](docs/product/PACKAGING.md)。
+
+## 可选资源
+
 - **项目与模块模板**：`templates/project/`、`templates/module/`，按需复制并沿用项目现有结构。
 - **协作角色**：[Tg Studio 执行型 Agent](templates/optional/EXECUTOR_ROLE.md)，搭配现有任务包按需使用，不绑定模型。
 - **可选设计预设**：[`gov-enterprise-cn`](profiles/gov-enterprise-cn/PROFILE.md)，需结合项目确认的规范与规则使用。
