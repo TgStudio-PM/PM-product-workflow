@@ -28,11 +28,13 @@
 
 ## 构建与独立验包
 
-从可访问该脚本的 PM-product-workflow 工作副本运行。为每次新候选使用尚未存在的输出文件名；脚本拒绝覆盖已有 ZIP。验证已有包时只运行 `--verify`，不要通过重建覆盖原件。
+可以使用仓库中的 `.agents/skills/pm-prototype-packager/`，也可以完整复制该 Skill 目录（含 `scripts/`）后独立使用。下方 `<打包 Skill 目录>` 指向本轮选择的实际目录；已有有效 Profile 时无需取得整个工作流仓库或重新复制公共模板。
+
+为每次新候选使用尚未存在的输出文件名；脚本拒绝覆盖已有 ZIP。验证已有包时只运行 `--verify`，不要通过重建覆盖原件。
 
 ```text
-python "<PM-product-workflow 根目录>/.agents/skills/pm-prototype-packager/scripts/package.py" --source "<项目根目录>/<实际源码根目录>" --profile "<项目根目录>/<已定制Profile.json>" --output "<项目外输出目录>/<唯一文件名.zip>"
-python "<PM-product-workflow 根目录>/.agents/skills/pm-prototype-packager/scripts/package.py" --verify "<项目外输出目录>/<唯一文件名.zip>"
+python "<打包 Skill 目录>/scripts/package.py" --source "<项目根目录>/<实际源码根目录>" --profile "<项目根目录>/<已定制Profile.json>" --output "<项目外输出目录>/<唯一文件名.zip>"
+python "<打包 Skill 目录>/scripts/package.py" --verify "<项目外输出目录>/<唯一文件名.zip>"
 ```
 
 完成后核对 ZIP 清单、manifest、哈希和独立验包结果。它们说明包结构及配置范围，不证明业务正确或目标环境运行通过。若交付确实要求离线预览，再在接收方目标环境打开声明的 `file://` 入口并检查核心业务路径；其他场景不把离线包或浏览器检查设为统一门槛。
