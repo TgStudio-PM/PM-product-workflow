@@ -945,6 +945,58 @@ class PackageTests(unittest.TestCase):
                     package.build(self.source, self.profile_path, self.output)
                 (self.source / rel).unlink()
 
+    def test_output_parent_file_fails_before_reading_payload(self) -> None:
+        self.write("contract.md", "Tg Studio packaging input")
+        self.profile("backend-requirements", ["contract.md"], ["contract.md"], "contract.md")
+        parent = self.root / "output-location"
+        parent.write_bytes(b"keep-existing-file")
+        read_bytes = Path.read_bytes
+        for output in (parent / "bundle.zip", parent / "missing" / "bundle.zip"):
+            with self.subTest(output=output):
+                stderr = io.StringIO()
+                with patch.object(Path, "read_bytes", autospec=True, side_effect=read_bytes) as reads:
+                    with redirect_stderr(stderr):
+                        result = package.main([
+                            "--source", str(self.source), "--profile", str(self.profile_path),
+                            "--output", str(output),
+                        ])
+                self.assertEqual(result, 2)
+                self.assertIn("OUTPUT-01 output parent is not a directory", stderr.getvalue())
+                reads.assert_not_called()
+                self.assertEqual(parent.read_bytes(), b"keep-existing-file")
+                self.assertFalse(output.exists())
+
+    def test_output_directory_creation_error_is_reported(self) -> None:
+        self.write("contract.md", "Tg Studio packaging input")
+        self.profile("backend-requirements", ["contract.md"], ["contract.md"], "contract.md")
+        output = self.root / "new-output" / "bundle.zip"
+        mkdir = Path.mkdir
+
+        def deny_output_directory(path: Path, *args: object, **kwargs: object) -> None:
+            if path == output.parent:
+                raise PermissionError("controlled output directory denial")
+            mkdir(path, *args, **kwargs)
+
+        stderr = io.StringIO()
+        with patch.object(Path, "mkdir", autospec=True, side_effect=deny_output_directory):
+            with redirect_stderr(stderr):
+                result = package.main([
+                    "--source", str(self.source), "--profile", str(self.profile_path),
+                    "--output", str(output),
+                ])
+        self.assertEqual(result, 2)
+        self.assertIn("OUTPUT-01 unable to create output directory", stderr.getvalue())
+        self.assertFalse(output.parent.exists())
+        self.assertEqual(list(self.root.rglob("*.tmp")), [])
+
+    def test_build_creates_missing_output_directories(self) -> None:
+        self.write("contract.md", "Tg Studio packaging input")
+        self.profile("backend-requirements", ["contract.md"], ["contract.md"], "contract.md")
+        output = self.root / "new-output" / "nested" / "bundle.zip"
+        package.build(self.source, self.profile_path, output)
+        package.verify(output)
+        self.assertTrue(output.is_file())
+
     def test_existing_output_is_preserved_and_new_name_can_be_built(self) -> None:
         self.write("contract.md", "version one")
         self.profile("backend-requirements", ["contract.md"], ["contract.md"], "contract.md")

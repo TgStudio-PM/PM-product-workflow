@@ -562,6 +562,14 @@ def build(source: Path, profile_path: Path, output: Path | None = None) -> None:
         raise PackageError("PATH-04 profile and output paths must differ")
     if os.path.lexists(destination):
         raise PackageError("OUTPUT-02 output already exists; choose a new output name")
+    try:
+        for parent in (destination.parent, *destination.parent.parents):
+            if parent.exists():
+                if not parent.is_dir():
+                    raise PackageError("OUTPUT-01 output parent is not a directory")
+                break
+    except OSError:
+        raise PackageError("OUTPUT-01 unable to inspect output directory") from None
     files = _collect_files(root, profile)
     if profile["kind"] == "static-preview":
         _audit_static(files, profile)
@@ -583,7 +591,10 @@ def build(source: Path, profile_path: Path, output: Path | None = None) -> None:
         [*files, "manifest.json", "SHA256SUMS"],
         "SOURCE-03 source files conflict with an archive parent path",
     )
-    destination.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        destination.parent.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        raise PackageError("OUTPUT-01 unable to create output directory") from None
     temporary_path: Path | None = None
     try:
         file_descriptor, temporary_name = tempfile.mkstemp(
