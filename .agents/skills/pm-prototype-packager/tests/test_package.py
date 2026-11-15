@@ -236,8 +236,47 @@ class PackageTests(unittest.TestCase):
         with patch.object(Path, "read_bytes", side_effect=PermissionError("private detail")):
             with self.assertRaises(package.PackageError) as caught:
                 package.build(self.source, self.profile_path, self.output)
-        self.assertEqual(str(caught.exception), "SOURCE-04 unable to read allowlisted file")
+        self.assertTrue(str(caught.exception).startswith("SOURCE-04 unable to read allowlisted file"))
+        self.assertIn('archive_name="assets/note.txt"', str(caught.exception))
+        self.assertIn("error_type=PermissionError", str(caught.exception))
+        self.assertNotIn("private detail", str(caught.exception))
         self.assertFalse(self.output.exists())
+
+    def test_cli_identifies_unreadable_file_without_disclosing_os_error_detail(self) -> None:
+        self.write("contract.md", "# Tg Studio")
+        relative = "notes/迭代 草稿.md"
+        self.write(relative, "Review note")
+        self.profile("backend-requirements", ["contract.md", "notes"], ["contract.md"], "contract.md")
+        unreadable = self.source / relative
+        output = self.root / "delivery" / "bundle.zip"
+        read_bytes = Path.read_bytes
+        for exception in (PermissionError, OSError):
+            with self.subTest(exception=exception.__name__):
+                reads: list[Path] = []
+
+                def fail_selected_file(path: Path) -> bytes:
+                    reads.append(path)
+                    if path == unreadable:
+                        raise exception(f"internal-only-error-detail: {unreadable}")
+                    return read_bytes(path)
+
+                stderr = io.StringIO()
+                with patch.object(Path, "read_bytes", new=fail_selected_file):
+                    with redirect_stderr(stderr):
+                        result = package.main([
+                            "--source", str(self.source), "--profile", str(self.profile_path),
+                            "--output", str(output),
+                        ])
+                diagnostic = stderr.getvalue()
+                self.assertEqual(result, 2)
+                self.assertTrue(diagnostic.startswith("SOURCE-04 unable to read allowlisted file"))
+                self.assertIn(f"archive_name={json.dumps(relative, ensure_ascii=True)}", diagnostic)
+                self.assertIn(f"error_type={exception.__name__}", diagnostic)
+                self.assertNotIn(str(self.root), diagnostic)
+                self.assertNotIn("internal-only-error-detail", diagnostic)
+                self.assertNotIn("Traceback", diagnostic)
+                self.assertEqual(reads, [self.source / "contract.md", unreadable])
+                self.assertFalse(output.parent.exists())
 
     def test_cli_reports_multiple_missing_required_paths_and_does_not_create_zip(self) -> None:
         self.write("index.html", "fictional source content")
