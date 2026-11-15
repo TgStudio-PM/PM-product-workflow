@@ -190,8 +190,12 @@ def _collect_files(root: Path, profile: dict) -> dict[str, bytes]:
             folded.add(case_key)
             try:
                 files[archive_name] = candidate.read_bytes()
-            except OSError:
-                raise PackageError("SOURCE-04 unable to read allowlisted file") from None
+            except OSError as exc:
+                raise PackageError(
+                    "SOURCE-04 unable to read allowlisted file "
+                    f"(archive_name={json.dumps(archive_name, ensure_ascii=True)}; "
+                    f"error_type={type(exc).__name__})"
+                ) from None
     missing = sorted({
         rel.as_posix()
         for raw in profile["required"] + [profile["entry"]] + profile.get("pages", [])
