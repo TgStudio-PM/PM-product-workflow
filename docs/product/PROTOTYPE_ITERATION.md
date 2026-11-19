@@ -63,6 +63,8 @@
 
 只读界面走查使用 `gov-ui-reviewer`；落实明确的界面调整使用 `gov-ui-refactor`。可按需使用 [gov-enterprise-cn Profile](../../profiles/gov-enterprise-cn/PROFILE.md) 及其[评审模板](../../profiles/gov-enterprise-cn/REVIEW_TEMPLATE.md)，补充界面评审记录。按任务选择，不要求先评审再实施，也不替代业务路径验收。
 
+样式修改先确认用户实际打开的导航入口及其源码/运行目录，再追到页面、组件和样式；完成后从同一入口复核。改了仍看不到时，按 [UI 定向改造的定位方法](../../.agents/skills/gov-ui-refactor/SKILL.md#改了仍未生效)区分未加载、被覆盖、状态不符和旧候选，不在多个副本反复补样式。沿用已有任务记录保留入口与生效证据，无需新增台账。
+
 将确定性改动交给开发者或执行型 Coding Agent 时，可按需引用[可选执行任务包模板](../../templates/optional/AGENT_TASK.md)，写明项目路径基准、实际基线、最小证据、文件边界和验证方式。需求判断、范围协调与最终产品验收仍由主线负责人负责；模板不是必填流程。
 
 ## 四项工作流验收口径
